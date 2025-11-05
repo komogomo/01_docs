@@ -1,0 +1,924 @@
+Folder PATH listing for volume ボリューム
+Volume serial number is 8AC9-85EB
+D:.
+│   01_HarmoNet_FileNaming_Standard_v1.0.md
+│   02_harmonet_project_reorg_v1.0.sh
+│   dirlist_20251102.txt
+│   dirlist_20251105_v01.txt
+│   dirlist_20251105_v02.txt
+│   gitignore
+│   README.md
+│   
+├───##_old
+│   │   .gitignore
+│   │   AIドリームチームによる開発手法.pdf
+│   │   AI利用の役割と料金プランについて.html
+│   │   Directory-List-20251102-0947.txt
+│   │   Directory-List-20251102-1006.txt
+│   │   Directory-List-20251102-1039.txt
+│   │   Directory-List-20251102-1117.txt
+│   │   dir_sync_log_20251102-1.txt
+│   │   dir_sync_log_20251102-130228.txt
+│   │   dir_sync_log_20251102-131108.txt
+│   │   HarmoNet Docs ディレクトリ最終方針 v3.2承認メモ.md
+│   │   HarmoNet 開発方針共有メモ（2025-11-01）.md
+│   │   harmonet-dir-diff-request-for-claude_v1.0.md
+│   │   harmonet_dir_sync_script-review_v1.0.md
+│   │   rename_suggestions.txt
+│   │   reorganize_log.txt
+│   │   secure-city-app-proposal.html
+│   │   securea-city-frontend.code-workspace
+│   │   securea-city.zip.202510220826
+│   │   sekurea-demo-20251020-075426.zip
+│   │   sekurea-demo-multilang-completed.zip
+│   │   sekurea-demo-multilang-updated.zip
+│   │   sekurea-demo-multilang-v2.zip
+│   │   sekurea-demo-multilang-v3.zip
+│   │   sekurea-demo-multilang-v4-complete.zip
+│   │   sekurea-demo-multilang-v5-fixed.zip
+│   │   sekurea-demo-v10-embedded-renamed .zip
+│   │   sekurea-demo-v6-complete.zip
+│   │   sekurea-demo-v7-100percent.zip
+│   │   v10-quick-test.md
+│   │   verification_report.md
+│   │   スマートコミュニティーアプリケーション開発WBS_202510121003.xlsx
+│   │   セキュレアシティAPI開発環境_技術スタック_最終版_20251019.html
+│   │   開発環境とアーキテクチャの最終決定.html
+│   │   
+│   ├───##_成果物
+│   │   │   01_プロダクト開発-20251102-0918.zip
+│   │   │   
+│   │   ├───##_old
+│   │   │       01_プロダクト開発.zip
+│   │   │       
+│   │   ├───00_モックアップ開発
+│   │   │   ├───00_開発アプローチ
+│   │   │   │   ├───Claude_SKILL.md
+│   │   │   │   │       securea-dev-standards-v2.0.zip
+│   │   │   │   │       securea-dev-standards-v2.1.zip
+│   │   │   │   │       securea-dev-standards-v2.2.zip
+│   │   │   │   │       securea-dev-standards-v3.0.zip
+│   │   │   │   │       securea-dev-standards-v3.2.1.zip
+│   │   │   │   │       securea-dev-standards-v3.2.zip
+│   │   │   │   │       securea-dev-standards-v3.3.zip
+│   │   │   │   │       
+│   │   │   │   └───Claude用プロジェクトファイル
+│   │   │   │           03_Multi-Tenant-Design_v2.0.md
+│   │   │   │           04_Development-Guidelines_v2.0.md
+│   │   │   │           05_Project-Structure-v3.3_EN.md
+│   │   │   │           05_Project-Structure_v3.0.md
+│   │   │   │           05_Project-Structure_v3_1.md
+│   │   │   │           Claude-Skill-Creation-Guide-v2.0_EN.md
+│   │   │   │           Claude-Skill-Creation-Guide_v2.0.md
+│   │   │   │           code-generation-rules-v2.1.md
+│   │   │   │           code-generation-rules-v2.1_EN.md
+│   │   │   │           code-generation-rules_v2.md
+│   │   │   │           Development-Environment-Setup_v2.0.md
+│   │   │   │           Directory-Structure_v1_2.md
+│   │   │   │           File-Modification-Checklist-v2.0.md
+│   │   │   │           naming-conventions-v2.1_EN.md
+│   │   │   │           naming-conventions.md
+│   │   │   │           
+│   │   │   ├───01_手順書関連
+│   │   │   │   │   GitHub操作マニュアル.docx
+│   │   │   │   │   WSL2 Ubuntu 24.04 LSTS 導入手順書.docx
+│   │   │   │   │   次C-1フェーズの選択肢 - Gemini相談用.pdf
+│   │   │   │   │   次C-2フェーズの選択肢 - Gemini相談用.pdf
+│   │   │   │   │   
+│   │   │   │   ├───##_old
+│   │   │   │   │       Git & GitHub 操作手順書.pdf
+│   │   │   │   │       git-github-guide.html
+│   │   │   │   │       
+│   │   │   │   └───C-3フェーズ作業予定_記録
+│   │   │   │           01_ファイル配置ガイド＆実装手順.pdf
+│   │   │   │           02_本日の作業スケジュール（2025_10_17）- マジックリンク認証実装.pdf
+│   │   │   │           20251017_セキュレアシティ - 開発引き継ぎ資料.pdf
+│   │   │   │           api_test_script.sh
+│   │   │   │           auth_controller.ts
+│   │   │   │           auth_module.ts
+│   │   │   │           Claude Pro vs Max 投資効果分析.pdf
+│   │   │   │           claude_max_analysis_html.html
+│   │   │   │           env_example.sh
+│   │   │   │           Geminiへの質問テンプレート集.pdf
+│   │   │   │           jwt_auth_guard.ts
+│   │   │   │           magic_link_dtos.ts
+│   │   │   │           magic_link_schema.txt
+│   │   │   │           magic_link_service.ts
+│   │   │   │           mail_service.ts
+│   │   │   │           setup_script.sh
+│   │   │   │           
+│   │   │   ├───02_設計関連ドキュメント
+│   │   │   │   ├───01_要件定義
+│   │   │   │   │   │   01_セキュレアシティ スマートコミュニケーションアプリ 機能要件定義書.pdf
+│   │   │   │   │   │   HarmoNet_マルチテナント設計仕様書_v1.1.txt
+│   │   │   │   │   │   securea-proposal-v2.html
+│   │   │   │   │   │   セキュレアシティ_アプリ利用ガイド_v2.1.docx
+│   │   │   │   │   │   セキュレアシティ_機能要件定義書_完全版_v2.1.docx
+│   │   │   │   │   │   
+│   │   │   │   │   └───##_old
+│   │   │   │   │           03_セキュレアシティ_マルチテナント設計仕様書.md
+│   │   │   │   │           
+│   │   │   │   ├───02_UIデザイン設計
+│   │   │   │   │       admin-screen-flow.mermaid
+│   │   │   │   │       parking-reservation-flow.mermaid
+│   │   │   │   │       secure-city-screen-flow.mermaid
+│   │   │   │   │       system-data-flow.mermaid
+│   │   │   │   │       セキュレアシティのスマートコミュニケーションアプリの画面イメージと画面遷移図.pdf
+│   │   │   │   │       
+│   │   │   │   ├───03_機能詳細設計
+│   │   │   │   │       03_セキュレアシティ_マルチテナント設計仕様書.md
+│   │   │   │   │       セキュレアシティ開発_本日の決定事項_20251019.html
+│   │   │   │   │       
+│   │   │   │   ├───04_開発環境構成
+│   │   │   │   │   │   スマートコミュニケーション_開発環境構成書.docx
+│   │   │   │   │   │   スマートコミュニケーション_開発環境構成書_20251024.html
+│   │   │   │   │   │   
+│   │   │   │   │   └───スマートコミュニケーション_開発環境構成書.files
+│   │   │   │   │           colorschememapping.xml
+│   │   │   │   │           filelist.xml
+│   │   │   │   │           themedata.thmx
+│   │   │   │   │           
+│   │   │   │   └───原本
+│   │   │   │           セキュレアシティ スマートコミュニケーションアプリ 技術仕様書.html
+│   │   │   │           セキュレアシティ スマートコミュニケーションアプリ 機能要件定義書.html
+│   │   │   │           セキュレアシティのスマートコミュニケーションアプリの画面イメージと画面遷移図.docx
+│   │   │   │           
+│   │   │   ├───03_検討資料
+│   │   │   │   │   04_開発ガイドライン_コーディング規約とデザイン原則_v02.md
+│   │   │   │   │   securea-city-static_dir_list_v02.txt
+│   │   │   │   │   開発アプローチ検討資料_PWA推奨.docx
+│   │   │   │   │   
+│   │   │   │   └───##_old
+│   │   │   │           04_開発ガイドライン_コーディング規約とデザイン原則.md
+│   │   │   │           
+│   │   │   └───99_中間生成物（未正書）
+│   │   │           01_NestJS & Prisma 開発環境セットアップガイド.docx
+│   │   │           02_環境構築・DBセットアップ手順書.docx
+│   │   │           03_NestJSアプリケーションAPI実装手順.docx
+│   │   │           05_プロジェクト構造_ディレクトリとファイル配置ルール.md
+│   │   │           05_プロジェクト構造_ディレクトリとファイル配置ルール_v2.md
+│   │   │           AIドリームチームによる開発手法_202510112252.docx
+│   │   │           AIドリームチーム編成とコスト戦略_202510112306.docx
+│   │   │           GPT5作成_AI_Collaboration_Model_Seminar.pptx
+│   │   │           手順書の単位について.txt
+│   │   │           自治会向けスマートコミュニケーションアプリ機能要件定義書_20251014.docx
+│   │   │           開発環境起動手順書.docx
+│   │   │           
+│   │   └───01_プロダクト開発
+│   │       │   Direcroty-List-20251102_v03.txt
+│   │       │   Documents_list.txt
+│   │       │   新規 テキスト ドキュメント.txt
+│   │       │   
+│   │       ├───##_old
+│   │       │   ├───00_要件定義書
+│   │       │   │   ├───##_old
+│   │       │   │   │       HarmoNet_機能要件定義書_v1.2.txt
+│   │       │   │   │       HarmoNet_機能要件定義書_v1_0.docx
+│   │       │   │   │       プロダクト開発用_機能要件定義書_v1.1.txt
+│   │       │   │   │       
+│   │       │   │   └───##_技術選定資料
+│   │       │   │       └───##_old
+│   │       │   │               プロダクト開発用_技術スタック仕様書_v1_0.md
+│   │       │   │               
+│   │       │   ├───01_基本設計
+│   │       │   │   ├───##_画面デザイン
+│   │       │   │   │   ├───00_デザインガイドライン
+│   │       │   │   │   │       01_DESIGN_PHILOSOPHY_Securea_City_Guideline_v2_0.md
+│   │       │   │   │   │       02_DESIGN_SYSTEM_Tailwind_Specification_v1_0.md
+│   │       │   │   │   │       
+│   │       │   │   │   ├───01_ログイン画面イメージ
+│   │       │   │   │   │       email-sent-v2.html
+│   │       │   │   │   │       login-final-design.html
+│   │       │   │   │   │       
+│   │       │   │   │   ├───02_ホーム画面イメージ
+│   │       │   │   │   │       home-complete-design.html
+│   │       │   │   │   │       
+│   │       │   │   │   └───03_掲示板画面イメージ
+│   │       │   │   │           board-complete-design.html
+│   │       │   │   │           
+│   │       │   │   ├───00_共通部品機能詳細
+│   │       │   │   │   └───01_ヘッダーフッターデザイン
+│   │       │   │   │       │   header-footer-improved-v1_1.md
+│   │       │   │   │       │   
+│   │       │   │   │       └───##_old
+│   │       │   │   │               header-footer-improved.html
+│   │       │   │   │               
+│   │       │   │   ├───01_画面機能詳細
+│   │       │   │   │   ├───01_画面共通仕様
+│   │       │   │   │   │   └───##_old
+│   │       │   │   │   │           common-design-system-v1_0.md
+│   │       │   │   │   │           common-footer-v1_0.md
+│   │       │   │   │   │           common-header-v1_0.md
+│   │       │   │   │   │           common-layout-v1_0.md
+│   │       │   │   │   │           
+│   │       │   │   │   ├───02_ログイン画面機能詳細
+│   │       │   │   │   │   │   email-sent-v1.1.html
+│   │       │   │   │   │   │   login-feature-design-v1_0-ch01.md
+│   │       │   │   │   │   │   login-feature-design-v1_0-ch02.md
+│   │       │   │   │   │   │   login-feature-design-v1_0-ch04.md
+│   │       │   │   │   │   │   login-feature-design-v1_0-ch05.md
+│   │       │   │   │   │   │   login-feature-design-v1_0-ch06.md
+│   │       │   │   │   │   │   login-feature-design-v1_0-index.md
+│   │       │   │   │   │   │   login-feature-design-v1_1-ch03.md
+│   │       │   │   │   │   │   login-final-design-v1.1.html
+│   │       │   │   │   │   │   
+│   │       │   │   │   │   └───##_old
+│   │       │   │   │   │           login-feature-design-v1_0-ch03.md
+│   │       │   │   │   │           
+│   │       │   │   │   ├───03_ホーム画面機能詳細
+│   │       │   │   │   │   │   home-complete-design-v1.1.html
+│   │       │   │   │   │   │   home-feature-design-v2_0-ch01.md
+│   │       │   │   │   │   │   home-feature-design-v2_0-ch02.md
+│   │       │   │   │   │   │   home-feature-design-v2_0-index.md
+│   │       │   │   │   │   │   home-feature-design-v2_1-ch03.md
+│   │       │   │   │   │   │   home-feature-design-v2_1-ch04.md
+│   │       │   │   │   │   │   home-feature-design-v2_1-ch05.md
+│   │       │   │   │   │   │   login-feature-design-v1_0-complete_with-gpt-comments.md
+│   │       │   │   │   │   │   
+│   │       │   │   │   │   └───##_old
+│   │       │   │   │   │           home-complete-design.html
+│   │       │   │   │   │           home-feature-design-v2_0-ch03.md
+│   │       │   │   │   │           home-feature-design-v2_0-ch04.md
+│   │       │   │   │   │           home-feature-design-v2_0-ch05.md
+│   │       │   │   │   │           home-screen-design-v1_0.html
+│   │       │   │   │   │           
+│   │       │   │   │   └───04_掲示板画面機能詳細
+│   │       │   │   │       │   board-complete-design.html
+│   │       │   │   │       │   board-feature-design-v2_0-ch01.md
+│   │       │   │   │       │   board-feature-design-v2_0-ch02.md
+│   │       │   │   │       │   board-feature-design-v2_0-ch03.md
+│   │       │   │   │       │   board-feature-design-v2_0-ch04.md
+│   │       │   │   │       │   board-feature-design-v2_0-ch05.md
+│   │       │   │   │       │   board-feature-design-v2_0-ch06.md
+│   │       │   │   │       │   board-feature-design-v2_0-ch07.md
+│   │       │   │   │       │   board-feature-design-v2_0-complete_with-gpt-comments.md
+│   │       │   │   │       │   board-feature-design-v2_0-index.md
+│   │       │   │   │       │   CharGPT-board-detail-simple_design.jpg
+│   │       │   │   │       │   CharGPT-board-simple_design.jpg
+│   │       │   │   │       │   
+│   │       │   │   │       └───##_old
+│   │       │   │   │               board-feature-design-v1_0.html
+│   │       │   │   │               board-feature-design-v1_1.md
+│   │       │   │   │               
+│   │       │   │   └───02_非機能要件
+│   │       │   │           common-accessibility-v1_0.md
+│   │       │   │           common-performance-v1_0.md
+│   │       │   │           common-security-v1_0.md
+│   │       │   │           
+│   │       │   └───02_機能詳細設計
+│   │       ├───03_HarmoNetDoc
+│   │       └───99_BACKUP_inactive_20251031
+│   │           │   .gitignore
+│   │           │   Doc-Directory-List-20251030_v1.1.txt
+│   │           │   
+│   │           ├───##_old
+│   │           │       Doc-Directory-List-20251030_v1.0.txt
+│   │           │       
+│   │           ├───assets
+│   │           │   └───html
+│   │           │       │   01-login-index_v1.0.html
+│   │           │       │   01-login-magiclink-email-send_v1.2.html
+│   │           │       │   02-home-design_v2.1.html
+│   │           │       │   02-home-design_v2.2.html
+│   │           │       │   03-board-design_v2.0.html
+│   │           │       │   03-board-detail_v1_0.html
+│   │           │       │   
+│   │           │       └───##_old
+│   │           │               01-login-email-sent-v1.1.html
+│   │           │               01-login-final_v1.1.html
+│   │           │               02-home-design_v1.1.html
+│   │           │               02-home-design_v2.0.html
+│   │           │               03-board-design_v1.0.html
+│   │           │               
+│   │           ├───docs
+│   │           │   │   HarmoNet_FileNaming_Standard_v1.0.md
+│   │           │   │   
+│   │           │   ├───00_requirements
+│   │           │   │   │   harmonet-functional-requirements-ch00-index_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch01-document-scope_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch02-system-overview_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch03-functional-req-part1_v1.4.md
+│   │           │   │   │   harmonet-functional-requirements-ch03-functional-req-part2_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch04-nonfunctional-req_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch05-config-env_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch06-limits-future_v1.3.md
+│   │           │   │   │   harmonet-functional-requirements-ch07-appendix_v1.3.md
+│   │           │   │   │   HarmoNET-Technical-Stack-Definition_v3.2.md
+│   │           │   │   │   
+│   │           │   │   └───##_old
+│   │           │   │           harmonet-functional-requirements-ch01-document-scope-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch02-system-overview-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch03-functional-req-part1-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch03-functional-req-part1_v1.3.md
+│   │           │   │           harmonet-functional-requirements-ch03-functional-req-part2-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch04-nonfunctional-req-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch05-config-env-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch06-limits-future-v1.2.md
+│   │           │   │           harmonet-functional-requirements-ch07-appendix_v1.2.txt
+│   │           │   │           harmonet-functional-requirements-index-v1.2.md
+│   │           │   │           HarmoNet_Functional_Requirements_v1.1.docx
+│   │           │   │           Technical_Stack_Definition_v3.1_EN.md
+│   │           │   │           
+│   │           │   ├───01_basic_design
+│   │           │   │   ├───00_common_components
+│   │           │   │   │       common-accessibility_v1.0.md
+│   │           │   │   │       common-contents-layout_v1.1.md
+│   │           │   │   │       common-design-system_v1.1.md
+│   │           │   │   │       common-error-handling-v1_0.md
+│   │           │   │   │       common-footer_v1.1.md
+│   │           │   │   │       common-header_v1.1.md
+│   │           │   │   │       common-i18n_v1.0.md
+│   │           │   │   │       common-layout_v1.1.md
+│   │           │   │   │       common-notification_v1_.0.md
+│   │           │   │   │       common-performance_v1.0.md
+│   │           │   │   │       common-security_v1.0.md
+│   │           │   │   │       harmonet-ui-common-spec_v1.0.txt
+│   │           │   │   │       
+│   │           │   │   ├───01_design_system
+│   │           │   │   │   │   Design_System_Loading_Template.md
+│   │           │   │   │   │   Design_Tokens_v1.0.json
+│   │           │   │   │   │   harmonet-design-system_v1.0.md
+│   │           │   │   │   │   Tailwind_Config_v1.0.js
+│   │           │   │   │   │   
+│   │           │   │   │   └───01_infrastructure
+│   │           │   │   │       └───multi-tenant
+│   │           │   │   │               HarmoNet_multi-tenant-architecture_v1_1_Part1.txt
+│   │           │   │   │               HarmoNet_multi-tenant-architecture_v1_1_Part2.txt
+│   │           │   │   │               HarmoNet_multi-tenant-architecture_v1_1_Part3.txt
+│   │           │   │   │               
+│   │           │   │   ├───02_screens
+│   │           │   │   │   ├───01_login
+│   │           │   │   │   │   └───login-feature-design
+│   │           │   │   │   │       │   login-feature-design-ch00-index_v1.2.md
+│   │           │   │   │   │       │   login-feature-design-ch01_v1.0.md
+│   │           │   │   │   │       │   login-feature-design-ch02_v1.0.md
+│   │           │   │   │   │       │   login-feature-design-ch03_v1.2.md
+│   │           │   │   │   │       │   login-feature-design-ch04_v1.0.md
+│   │           │   │   │   │       │   login-feature-design-ch05_v1.0.md
+│   │           │   │   │   │       │   login-feature-design-ch06_v1.0.md
+│   │           │   │   │   │       │   
+│   │           │   │   │   │       └───##_old
+│   │           │   │   │   │               login-feature-design-ch03_v1.1.md
+│   │           │   │   │   │               
+│   │           │   │   │   ├───02_home
+│   │           │   │   │   │   └───home-feature-design
+│   │           │   │   │   │       │   home-feature-design-ch00-index_v2.0.md
+│   │           │   │   │   │       │   home-feature-design-ch01_v1.1.txt
+│   │           │   │   │   │       │   home-feature-design-ch02_v2.1.md
+│   │           │   │   │   │       │   home-feature-design-ch03_v2.2.md
+│   │           │   │   │   │       │   home-feature-design-ch04_v2.2.md
+│   │           │   │   │   │       │   home-feature-design-ch05_v2.2.md
+│   │           │   │   │   │       │   login-feature-design-complete_with-gpt-comments_v1.0.md
+│   │           │   │   │   │       │   
+│   │           │   │   │   │       └───##_old
+│   │           │   │   │   │               home-feature-design-ch01_v1.0.md
+│   │           │   │   │   │               home-feature-design-ch02_v2.0.md
+│   │           │   │   │   │               home-feature-design-ch03_v2.1.md
+│   │           │   │   │   │               home-feature-design-ch04_v2.1.md
+│   │           │   │   │   │               home-feature-design-ch05_v2.1.md
+│   │           │   │   │   │               
+│   │           │   │   │   ├───03_board
+│   │           │   │   │   │   │   board-design-complete_with-gpt-comments.md
+│   │           │   │   │   │   │   CharGPT-board-simple_design.jpg
+│   │           │   │   │   │   │   CharGPT-detail-simple_design.jpg
+│   │           │   │   │   │   │   
+│   │           │   │   │   │   ├───##_old
+│   │           │   │   │   │   │       board-design-ch01_v2.0.md
+│   │           │   │   │   │   │       board-design-ch02_v2.0.md
+│   │           │   │   │   │   │       board-design-ch03_v2.1.md
+│   │           │   │   │   │   │       board-design-ch03_v2.2.md
+│   │           │   │   │   │   │       board-design-ch04_v2.1.md
+│   │           │   │   │   │   │       board-design-ch06_v2.0.md
+│   │           │   │   │   │   │       board-design-ch07_v2.0.md
+│   │           │   │   │   │   │       board-feature-design-ch03_v2.0.md
+│   │           │   │   │   │   │       board-feature-design-ch04_v2.0.md
+│   │           │   │   │   │   │       
+│   │           │   │   │   │   ├───ch00-index
+│   │           │   │   │   │   │   │   board-design-ch00-index_v2.1.md
+│   │           │   │   │   │   │   │   
+│   │           │   │   │   │   │   └───##_old
+│   │           │   │   │   │   │           board-design-ch00-index_v2.0.md
+│   │           │   │   │   │   │           
+│   │           │   │   │   │   ├───ch01-outline
+│   │           │   │   │   │   │       board-design-ch01_v2.1.md
+│   │           │   │   │   │   │       
+│   │           │   │   │   │   ├───ch02-header
+│   │           │   │   │   │   │       board-design-ch02_v2.1.md
+│   │           │   │   │   │   │       
+│   │           │   │   │   │   ├───ch03-post-body
+│   │           │   │   │   │   │       board-design-ch03_v2.3.md
+│   │           │   │   │   │   │       
+│   │           │   │   │   │   ├───ch04-read-status
+│   │           │   │   │   │   │   │   board-design-ch04_v2.4.md
+│   │           │   │   │   │   │   │   
+│   │           │   │   │   │   │   └───##_old
+│   │           │   │   │   │   │           board-design-ch04_v2.2.md
+│   │           │   │   │   │   │           board-design-ch04_v2.3.md
+│   │           │   │   │   │   │           
+│   │           │   │   │   │   ├───ch05-comments
+│   │           │   │   │   │   │   │   board-design-ch05_v2.0.md
+│   │           │   │   │   │   │   │   board-detail-rules-ch05-functional_v1.0.md
+│   │           │   │   │   │   │   │   
+│   │           │   │   │   │   │   └───##_old
+│   │           │   │   │   │   ├───ch06-comment-input
+│   │           │   │   │   │   │       board-design-ch06_v2.1.md
+│   │           │   │   │   │   │       board-detail-rules-ch06-functional_v1.0.md
+│   │           │   │   │   │   │       
+│   │           │   │   │   │   ├───ch07-modal-toast
+│   │           │   │   │   │   │       board-design-ch07_v2.1.md
+│   │           │   │   │   │   │       board-detail-rules-ch07-functional_v1.0.md
+│   │           │   │   │   │   │       
+│   │           │   │   │   │   └───ch08-error-handling
+│   │           │   │   │   ├───03_board-detail
+│   │           │   │   │   │   │   board-detail-design-ch00-index_v1.0.md
+│   │           │   │   │   │   │   board-detail-design-ch01_v2.0.md
+│   │           │   │   │   │   │   board-detail-design-ch02_v2.1.md
+│   │           │   │   │   │   │   board-detail-design-ch03_v2.1.md
+│   │           │   │   │   │   │   board-detail-design-ch04_v2.1.md
+│   │           │   │   │   │   │   board-detail-design-ch05_v2.1.md
+│   │           │   │   │   │   │   board-detail-design-ch06_v2.2.md
+│   │           │   │   │   │   │   board-detail-design-ch07_v2.2.md
+│   │           │   │   │   │   │   board-detail-design-ch08_v2.2.md
+│   │           │   │   │   │   │   
+│   │           │   │   │   │   └───##_old
+│   │           │   │   │   │           board-detail-design-ch02_v2.0.md
+│   │           │   │   │   │           board-detail-design-ch03_v2.0.md
+│   │           │   │   │   │           board-detail-design-ch04_v2.0.md
+│   │           │   │   │   │           board-detail-design-ch05_v2.0.md
+│   │           │   │   │   │           board-detail-design-ch06_v2.0.md
+│   │           │   │   │   │           board-detail-design-ch06_v2.1.md
+│   │           │   │   │   │           board-detail-design-ch07_v1.0.md
+│   │           │   │   │   │           board-detail-design-ch08_v1.1.md
+│   │           │   │   │   │           
+│   │           │   │   │   └───04_facility-booking
+│   │           │   │   │       │   facility-booking-feature-design-ch00-index_v1.2.md
+│   │           │   │   │       │   facility-booking-feature-design-ch01_v1.5.md
+│   │           │   │   │       │   facility-booking-feature-design-ch02_v1.0.md
+│   │           │   │   │       │   facility-booking-feature-design-ch03_v1.0.md
+│   │           │   │   │       │   facility-booking-feature-design-ch04_v1.0.md
+│   │           │   │   │       │   facility-booking-feature-design-ch05_v1.0.md
+│   │           │   │   │       │   facility-booking-feature-design-ch06_v1.0.md
+│   │           │   │   │       │   facility-booking-feature-design-ch07_v1.0.md
+│   │           │   │   │       │   施設予約追加機能要件検討資料.md
+│   │           │   │   │       │   
+│   │           │   │   │       └───##_old
+│   │           │   │   │               facility-booking-feature-design-ch00-index_v1.0.md
+│   │           │   │   │               facility-booking-feature-design-ch00-index_v1.1.md
+│   │           │   │   │               facility-booking-feature-design-ch01_v1.0.md
+│   │           │   │   │               facility-booking-feature-design-ch01_v1.1.txt
+│   │           │   │   │               facility-booking-feature-design-ch01_v1.2.md
+│   │           │   │   │               facility-booking-feature-design-ch01_v1.3.md
+│   │           │   │   │               facility-booking-feature-design-ch01_v1.4.md
+│   │           │   │   │               facility-booking-feature-design-ch04_v1.1_unified.md
+│   │           │   │   │               
+│   │           │   │   ├───03_nonfunctional
+│   │           │   │   └───04_architecture
+│   │           │   ├───02_integration
+│   │           │   ├───03_operation_preparation
+│   │           │   │   └───assets
+│   │           │   │       ├───html
+│   │           │   │       └───ui-images
+│   │           │   └───merge
+│   │           │       │   HarmoNet_Functional_Requirements_v1.3_merged_for_Claude.md
+│   │           │       │   
+│   │           │       └───##_old
+│   │           │               HarmoNet_Functional_Requirements_v1.2_merged_for_Claude.md
+│   │           │               
+│   │           └───Rules
+│   │               │   HarmoNet_Document_Management_Policy_v1.0.md
+│   │               │   
+│   │               ├───01-ALL-AI
+│   │               │       AI Collaborative Development Guideline v1.1.md
+│   │               │       File-Modification-Checklist-v2.1.md
+│   │               │       harmonet-doc-versioning-policy_v2.1.md
+│   │               │       README.md
+│   │               │       
+│   │               └───02-ForClaude
+│   │                       Claude_Execution_Rules_v1.1.md
+│   │                       
+│   ├───securea-city-static
+│   │   │   admin-home.html
+│   │   │   board-detail.html
+│   │   │   board-new.html
+│   │   │   board.html
+│   │   │   booking-confirm.html
+│   │   │   booking-detail.html
+│   │   │   booking-edit-confirm.html
+│   │   │   booking-edit.html
+│   │   │   booking-history.html
+│   │   │   booking.html
+│   │   │   check_status.py
+│   │   │   Directory-List.txt
+│   │   │   home.html
+│   │   │   index.html
+│   │   │   mypage.html
+│   │   │   notice-detail.html
+│   │   │   notice.html
+│   │   │   survey-answer.html
+│   │   │   survey-complete.html
+│   │   │   survey-create.html
+│   │   │   survey-manage.html
+│   │   │   survey-result.html
+│   │   │   user-admin.html
+│   │   │   user-register.html
+│   │   │   
+│   │   ├───css
+│   │   │       custom.css
+│   │   │       
+│   │   ├───data
+│   │   │       demo-data.js
+│   │   │       demo-mode.js
+│   │   │       file-utils.js
+│   │   │       
+│   │   └───js
+│   │           app.js
+│   │           i18n.js
+│   │           language.js
+│   │           
+│   └───work
+│       │   campfire_summary.html
+│       │   securea-app-mockup.tsx
+│       │   securea-app-proposal_exective_summary.html
+│       │   securea-app-proposal_v05.html
+│       │   securea-proposal-updated_202510112154.html
+│       │   securea-proposal-v2_202510111511.html
+│       │   securea-proposal-v2_202510111927.html
+│       │   server-cost-proposal_v06.html
+│       │   smallstart_infrastructure.html
+│       │   セキュレアシティ向けアプリケーション開発提案書.pdf
+│       │   大和ハウス自治会向けアプリ.txt
+│       │   自動車整備工場向けアプリ.html
+│       │   自治体向けアプリ.txt
+│       │   
+│       ├───20251016
+│       │       claude提案におけるGeminiレビュー結果.html
+│       │       postmanテストについての調査結果.pdf
+│       │       引き継ぎ資料.pdf
+│       │       環境再構築_20251016_v01.html
+│       │       環境構成に関する緊急協議資料_Claude for Gemini.html
+│       │       
+│       ├───20251019
+│       │   │   セキュレアシティAPI開発 - 作業完了報告書（最終版・2025_10_19）.pdf
+│       │   │   セキュレアシティAPI開発環境_技術スタック_最終版_20251019.html
+│       │   │   セキュレアシティ開発_本日の決定事項_20251019.html
+│       │   │   
+│       │   └───##_old
+│       │           セキュレアシティ開発_作業完了報告書_20251019-01.html
+│       │           セキュレアシティ開発_作業完了報告書_20251019-02.html
+│       │           
+│       ├───20251020
+│       │       現行施設予約システム.docx
+│       │       
+│       ├───20251025_作業記録
+│       │       Next-Chat-Instructions_v2.md
+│       │       Next-Chat-Instructions_v3.md
+│       │       
+│       └───セキュレアシティつくば研究学園_既存資料
+│               SECUREA Cityつくば研究学園集会所駐車場利用細則.pdf
+│               SECUREA Cityつくば研究学園駐車場配置図.pdf
+│               「住まいサポートネット・アプリ」サービス開始のお知らせ _ 株式会社ラージヒル.pdf
+│               住まいサポートネット既存アプリ画面.pdf
+│               大和ライフネクスト_住まいサポートネット.pdf
+│               
+├───00_project
+│   │   01_phase6-full-audit-order_v1.0.md
+│   │   02_harmonet-docs-directory-definition_v3.0.md
+│   │   03_harmonet-nonfunctional-design-phase7_v1.0.md
+│   │   04_harmonet-phase4-ai-collaboration-guideline_v1.0.md
+│   │   05_harmonet-phase8-test-strategy_v1.0.md
+│   │   06_harmonet-team-collaboration-guideline_v1.0.md
+│   │   07_phase6-start-log_v1.0.md
+│   │   harmonet-docs-directory-definition_v3.3-Final.md
+│   │   harmonet-document-policy_latest.md
+│   │   harmonet-phase9-impl-strategy-review_v1.0.md
+│   │   
+│   ├───##_old
+│   │       harmonet-docs-directory-definition_v3.0_for_download.md
+│   │       harmonet-docs-directory-definition_v3.2.md
+│   │       harmonet-docs-directory-structure-reference_v3.2r1.md
+│   │       
+│   ├───docs
+│   │       01_HarmoNet_Document_Management_Policy_v1.0.md
+│   │       
+│   ├───harmonet-git-utility
+│   │   │   harmonet-git-utility_v4.4.bat
+│   │   │   harmonet-git-utility_v4.4.ps1
+│   │   │   harmonet_git_log.txt
+│   │   │   tachikoma.ico
+│   │   │   
+│   │   └───##_old
+│   │           harmonet-git-utility_v2.bat
+│   │           harmonet-git-utility_v3.0.ps1
+│   │           harmonet-git-utility_v4.1.ps1
+│   │           harmonet-git-utility_v4.3.ps1
+│   │           harmonet-git-utility_v4.bat
+│   │           harmonet-git-utility_v4_2.ps1
+│   │           
+│   └───scripts
+│           harmonet_dir_sync_v3.2r1.ps1
+│           harmonet_file_reorganizer_v1.0.ps1
+│           harmonet_prefix_fullsort_v1.0.ps1
+│           
+├───00_requirements
+│   │   01_harmonet-functional-requirements-ch00-index_v1.3.md
+│   │   02_harmonet-functional-requirements-ch01-document-scope_v1.3.md
+│   │   03_harmonet-functional-requirements-ch02-system-overview_v1.3.md
+│   │   04_harmonet-functional-requirements-ch03-functional-req-part1_v1.4.md
+│   │   05_harmonet-functional-requirements-ch03-functional-req-part2_v1.3.md
+│   │   06_harmonet-functional-requirements-ch04-nonfunctional-req_v1.3.md
+│   │   07_harmonet-functional-requirements-ch05-config-env_v1.3.md
+│   │   08_harmonet-functional-requirements-ch06-limits-future_v1.3.md
+│   │   09_harmonet-functional-requirements-ch07-appendix_v1.3.md
+│   │   10_harmonet-technical-stack-definition_v3.3.md
+│   │   harmonet-technical-stack-definition_v3.5.md
+│   │   HarmoNet_Functional_Requirements_v1.3_merged_for_Claude.md
+│   │   
+│   └───##_old
+│           10_HarmoNET-Technical-Stack-Definition_v3.2.md
+│           harmonet-functional-requirements-ch01-document-scope-v1.2.md
+│           harmonet-functional-requirements-ch02-system-overview-v1.2.md
+│           harmonet-functional-requirements-ch03-functional-req-part1-v1.2.md
+│           harmonet-functional-requirements-ch03-functional-req-part1_v1.3.md
+│           harmonet-functional-requirements-ch03-functional-req-part2-v1.2.md
+│           harmonet-functional-requirements-ch04-nonfunctional-req-v1.2.md
+│           harmonet-functional-requirements-ch05-config-env-v1.2.md
+│           harmonet-functional-requirements-ch06-limits-future-v1.2.md
+│           harmonet-functional-requirements-ch07-appendix_v1.2.txt
+│           harmonet-functional-requirements-index-v1.2.md
+│           harmonet-technical-stack-definition_v3.4.md
+│           HarmoNet_Functional_Requirements_v1.1.docx
+│           Technical_Stack_Definition_v3.1_EN.md
+│           
+├───01_basic_design
+│   │   harmonet-design-system_latest.md
+│   │   harmonet-ui-common-spec_latest.md
+│   │   schema-definition-overview_v1.0.md
+│   │   
+│   ├───00_common_components
+│   │       common-accessibility_v1.0.md
+│   │       common-contents-layout_v1.1.md
+│   │       common-design-system_v1.1.md
+│   │       common-error-handling-v1_0.md
+│   │       common-footer_v1.1.md
+│   │       common-header_v1.1.md
+│   │       common-i18n_v1.0.md
+│   │       common-layout_v1.1.md
+│   │       common-notification_v1_.0.md
+│   │       common-performance_v1.0.md
+│   │       common-security_v1.0.md
+│   │       harmonet-ui-common-spec_v1.0.txt
+│   │       
+│   ├───01_design_system
+│   │   │   Design_System_Loading_Template.md
+│   │   │   Design_Tokens_v1.0.json
+│   │   │   harmonet-design-system_v1.0.md
+│   │   │   Tailwind_Config_v1.0.js
+│   │   │   
+│   │   └───01_infrastructure
+│   │       └───multi-tenant
+│   │               HarmoNet_multi-tenant-architecture_v1_1_Part1.txt
+│   │               HarmoNet_multi-tenant-architecture_v1_1_Part2.txt
+│   │               HarmoNet_multi-tenant-architecture_v1_1_Part3.txt
+│   │               
+│   ├───02_screens
+│   │   ├───01_login
+│   │   │   └───login-feature-design
+│   │   │       │   login-feature-design-ch00-index_v1.2.md
+│   │   │       │   login-feature-design-ch01_v1.0.md
+│   │   │       │   login-feature-design-ch02_v1.0.md
+│   │   │       │   login-feature-design-ch03_v1.2.md
+│   │   │       │   login-feature-design-ch04_v1.0.md
+│   │   │       │   login-feature-design-ch05_v1.0.md
+│   │   │       │   login-feature-design-ch06_v1.0.md
+│   │   │       │   
+│   │   │       └───##_old
+│   │   │               login-feature-design-ch03_v1.1.md
+│   │   │               
+│   │   ├───02_home
+│   │   │   └───home-feature-design
+│   │   │       │   home-feature-design-ch00-index_v2.0.md
+│   │   │       │   home-feature-design-ch01_v1.1.txt
+│   │   │       │   home-feature-design-ch02_v2.1.md
+│   │   │       │   home-feature-design-ch03_v2.2.md
+│   │   │       │   home-feature-design-ch04_v2.2.md
+│   │   │       │   home-feature-design-ch05_v2.2.md
+│   │   │       │   login-feature-design-complete_with-gpt-comments_v1.0.md
+│   │   │       │   
+│   │   │       └───##_old
+│   │   │               home-feature-design-ch01_v1.0.md
+│   │   │               home-feature-design-ch02_v2.0.md
+│   │   │               home-feature-design-ch03_v2.1.md
+│   │   │               home-feature-design-ch04_v2.1.md
+│   │   │               home-feature-design-ch05_v2.1.md
+│   │   │               
+│   │   ├───03_board
+│   │   │   │   board-design-complete_with-gpt-comments.md
+│   │   │   │   CharGPT-board-simple_design.jpg
+│   │   │   │   CharGPT-detail-simple_design.jpg
+│   │   │   │   
+│   │   │   ├───##_old
+│   │   │   │       board-design-ch01_v2.0.md
+│   │   │   │       board-design-ch02_v2.0.md
+│   │   │   │       board-design-ch03_v2.1.md
+│   │   │   │       board-design-ch03_v2.2.md
+│   │   │   │       board-design-ch04_v2.1.md
+│   │   │   │       board-design-ch06_v2.0.md
+│   │   │   │       board-design-ch07_v2.0.md
+│   │   │   │       board-feature-design-ch03_v2.0.md
+│   │   │   │       board-feature-design-ch04_v2.0.md
+│   │   │   │       
+│   │   │   ├───ch00-index
+│   │   │   │   │   board-design-ch00-index_v2.1.md
+│   │   │   │   │   
+│   │   │   │   └───##_old
+│   │   │   │           board-design-ch00-index_v2.0.md
+│   │   │   │           
+│   │   │   ├───ch01-outline
+│   │   │   │       board-design-ch01_v2.1.md
+│   │   │   │       
+│   │   │   ├───ch02-header
+│   │   │   │       board-design-ch02_v2.1.md
+│   │   │   │       
+│   │   │   ├───ch03-post-body
+│   │   │   │       board-design-ch03_v2.3.md
+│   │   │   │       
+│   │   │   ├───ch04-read-status
+│   │   │   │   │   board-design-ch04_v2.4.md
+│   │   │   │   │   
+│   │   │   │   └───##_old
+│   │   │   │           board-design-ch04_v2.2.md
+│   │   │   │           board-design-ch04_v2.3.md
+│   │   │   │           
+│   │   │   ├───ch05-comments
+│   │   │   │   │   board-design-ch05_v2.0.md
+│   │   │   │   │   board-detail-rules-ch05-functional_v1.0.md
+│   │   │   │   │   
+│   │   │   │   └───##_old
+│   │   │   ├───ch06-comment-input
+│   │   │   │       board-design-ch06_v2.1.md
+│   │   │   │       board-detail-rules-ch06-functional_v1.0.md
+│   │   │   │       
+│   │   │   ├───ch07-modal-toast
+│   │   │   │       board-design-ch07_v2.1.md
+│   │   │   │       board-detail-rules-ch07-functional_v1.0.md
+│   │   │   │       
+│   │   │   └───ch08-error-handling
+│   │   ├───03_board-detail
+│   │   │   │   board-detail-design-ch00-index_v1.0.md
+│   │   │   │   board-detail-design-ch01_v2.0.md
+│   │   │   │   board-detail-design-ch02_v2.1.md
+│   │   │   │   board-detail-design-ch03_v2.1.md
+│   │   │   │   board-detail-design-ch04_v2.1.md
+│   │   │   │   board-detail-design-ch05_v2.1.md
+│   │   │   │   board-detail-design-ch06_v2.2.md
+│   │   │   │   board-detail-design-ch07_v2.2.md
+│   │   │   │   board-detail-design-ch08_v2.2.md
+│   │   │   │   
+│   │   │   └───##_old
+│   │   │           board-detail-design-ch02_v2.0.md
+│   │   │           board-detail-design-ch03_v2.0.md
+│   │   │           board-detail-design-ch04_v2.0.md
+│   │   │           board-detail-design-ch05_v2.0.md
+│   │   │           board-detail-design-ch06_v2.0.md
+│   │   │           board-detail-design-ch06_v2.1.md
+│   │   │           board-detail-design-ch07_v1.0.md
+│   │   │           board-detail-design-ch08_v1.1.md
+│   │   │           
+│   │   └───04_facility-booking
+│   │       │   facility-booking-feature-design-ch00-index_v1.2.md
+│   │       │   facility-booking-feature-design-ch01_v1.5.md
+│   │       │   facility-booking-feature-design-ch02_v1.0.md
+│   │       │   facility-booking-feature-design-ch03_v1.0.md
+│   │       │   facility-booking-feature-design-ch04_v1.0.md
+│   │       │   facility-booking-feature-design-ch05_v1.0.md
+│   │       │   facility-booking-feature-design-ch06_v1.0.md
+│   │       │   facility-booking-feature-design-ch07_v1.0.md
+│   │       │   施設予約追加機能要件検討資料.md
+│   │       │   
+│   │       └───##_old
+│   │               facility-booking-feature-design-ch00-index_v1.0.md
+│   │               facility-booking-feature-design-ch00-index_v1.1.md
+│   │               facility-booking-feature-design-ch01_v1.0.md
+│   │               facility-booking-feature-design-ch01_v1.1.txt
+│   │               facility-booking-feature-design-ch01_v1.2.md
+│   │               facility-booking-feature-design-ch01_v1.3.md
+│   │               facility-booking-feature-design-ch01_v1.4.md
+│   │               facility-booking-feature-design-ch04_v1.1_unified.md
+│   │               
+│   ├───03_nonfunctional
+│   └───04_architecture
+├───02_assets
+│   └───html
+│       │   01-login-index_v1.0.html
+│       │   01-login-magiclink-email-send_v1.2.html
+│       │   02-home-design_v2.1.html
+│       │   02-home-design_v2.2.html
+│       │   03-board-design_v2.0.html
+│       │   03-board-detail_v1_0.html
+│       │   
+│       └───##_old
+├───02_integration
+├───03_detail_design
+│       board-richtext-integration_v1.0.md
+│       
+├───03_operation_preparation
+│   └───assets
+│       ├───html
+│       └───ui-images
+├───03_Rules
+│   ├───01-ALL-AI
+│   │       AI Collaborative Development Guideline v1.1.md
+│   │       File-Modification-Checklist-v2.1.md
+│   │       harmonet-doc-versioning-policy_v2.1.md
+│   │       
+│   ├───02-ForClaude
+│   │   └───##_old
+│   └───03-WorkFlow-Rules
+│           harmonet-doc-structure-redesign_draft_v0.1.md
+│           
+├───04_tenant
+│   │   01_harmonet-tenant-config-schema_v1.1.md
+│   │   02_tenant-config-part01_common-attributes_v1.1.md
+│   │   03_tenant-config-part02_roles-and-permissions_v1.1.md
+│   │   04_tenant-config-part03_login-settings_v1.1.md
+│   │   05_tenant-config-part04_home-screen_v1.2.md
+│   │   06_tenant-config-part05_board-settings_v1.0.md
+│   │   07_tenant-setting-list_v0.1.md
+│   │   
+│   └───##_old
+│           bag-pre-impl-report.yaml
+│           harmonet-tenant-config-schema_v1.0.md
+│           tenant-config-part01_common-attributes.md
+│           tenant-config-part02_roles-and-permissions.md
+│           tenant-config-part03_login-settings_v1.0.md
+│           tenant-config-part04_home-screen_v1.0.md
+│           
+├───05_implementation
+│   │   01_harmonet-supabase-setup-log_v1.0.md
+│   │   02_harmonet-next-task-phase5_v1.0.md
+│   │   03_harmonet-er-entity-definition_v1.2.yaml
+│   │   04_harmonet-prisma-schema_v1.0.prisma
+│   │   05_harmonet-db-er-definition_v1.0.md
+│   │   05_harmonet-er-diagram_v1.0.png
+│   │   06_harmonet-db-table-definition_v1.0.md
+│   │   08_harmonet-phase5-final-handover_v1_0.md
+│   │   20251104090633_create_initial_schema.sql
+│   │   20251104094921_enable_rls_policies.sql
+│   │   HarmoNet 作業依頼書.md
+│   │   HarmoNet_Phase5_RLS_Discussion_v1_0.md
+│   │   HarmoNet_Supabase_Setup_History_v1_0.md
+│   │   
+│   └───##_old
+│           03_harmonet-er-entity-definition_v1.0.yaml
+│           03_harmonet-er-entity-definition_v1.1.yaml
+│           07_harmonet-phase5-step5-5-handover_v1.0.md
+│           HarmoNet Phase5 Step5-4 DBテーブル定義書 生成指示書.md
+│           schema.prisma
+│           
+├───06_audit
+│       01_bag-pre-impl-report_fixed.yaml
+│       02_bag-lite-audit-review-report_v1.0.md
+│       03_bag-full-audit-summary_v1.0.md
+│       04_bag-full-audit-summary_v1.1.md
+│       05_bag-full-impl-report_v1.0.yaml
+│       06_harmonet-baglite-checklist_v1.0.md
+│       06_quality-approval-report_v1.0.md
+│       06_selfcheck_log_v1.0.md
+│       07_quality-approval-report_v2.0.md
+│       harmonet_schema_consistency_report_2025-11-05.md
+│       
+├───99_archive
+│   │   harmonet_dir_sync_v3.2r1.ps1
+│   │   
+│   ├───01_project_20251102-132115
+│   │       01_phase6-full-audit-order_v1.0.md
+│   │       02_harmonet-docs-directory-definition_v3.0.md
+│   │       03_harmonet-nonfunctional-design-phase7_v1.0.md
+│   │       04_harmonet-phase4-ai-collaboration-guideline_v1.0.md
+│   │       05_harmonet-phase8-test-strategy_v1.0.md
+│   │       06_harmonet-team-collaboration-guideline_v1.0.md
+│   │       07_phase6-start-log_v1.0.md
+│   │       
+│   └───_old
+│           01-login-email-sent-v1.1.html
+│           01-login-final_v1.1.html
+│           01_harmonet_prefix_rename_v1.0.ps1
+│           02-home-design_v1.1.html
+│           02-home-design_v2.0.html
+│           02_Direcroty-List-20251102_v02.txt
+│           03-board-design_v1.0.html
+│           03_Directory-List-20251102-0928.txt
+│           04_Doc-Directory-List-20251030_v1.0.txt
+│           05_harmonet_chapter_sort_v1.0.ps1
+│           06_Directory-List-20251102-0943.txt
+│           07_harmonet_chapter_sort_v1.1.ps1
+│           Claude_Execution_Rules_v1.1.md
+│           harmonet_chapter_sort_v1.3.ps1
+│           
+├───common
+│       01_ai-council-session01_review_v1.0.md
+│       
+└───merge
+    └───##_old
+            HarmoNet_Functional_Requirements_v1.2_merged_for_Claude.md
+            
