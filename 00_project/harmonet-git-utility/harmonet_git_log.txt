@@ -2,3 +2,5 @@
 2025-11-05 11:34:10 : [設計書リポジトリ (01_docs)] Commit/Push - Git Utility test
 2025-11-05 11:50:02 : [設計書リポジトリ (01_docs)] Commit/Push - tool test 2
 2025-11-05 14:49:52 : [自動検出: 01_docs] Commit/Push - harmonet-technical-stack-definition_v3.6.md に環境構成を変更。
+2025-11-05 16:01:17 : [自動検出: 01_docs] Commit/Push - github 利用ルールを記載
+2025-11-05 18:03:19 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - Prisma環境復旧完了 - スキーマとマイグレーション履歴を修正
