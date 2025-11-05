@@ -1,0 +1,43 @@
+# ==========================================================
+# HarmoNet Project .gitignore
+# ==========================================================
+
+# Google Drive temporary files
+.tmp.driveupload/
+~$*
+
+# OS dependent files
+.DS_Store
+Thumbs.db
+desktop.ini
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary backups and output files
+*.tmp
+*.bak
+*.log
+__snapshot_*/
+__backup_*/
+__old*/
+##_old/
+
+# Editor cache
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# PDF and export artifacts (exclude as needed)
+*.pdf
+*.docx
+*.pptx
+*.xlsx
+
+# AI tool working directories (Gemini/Claude etc)
+temp_*/
+cache_*/
+
+# Git Utility logs
+harmonet_git_log.txt
