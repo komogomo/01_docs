@@ -1,0 +1,109 @@
+﻿report_id: "BAG-FULL-IMPL-GEMINI-V1.0"
+report_name: "BAG-full 監査レポート (Gemini: 構造・参照・重複チェック)"
+timestamp: "2025-11-02T10:18:00Z" # JST
+auditor: "Gemini"
+target_phase: "Phase 6 (Full Audit Integration)"
+target_files:
+  - "tenant-config-part01_common-attributes_v1.1.md"
+  - "tenant-config-part02_roles-and-permissions_v1.1.md"
+  - "tenant-config-part03_login-settings_v1.1.md"
+  - "tenant-config-part04_home-screen_v1.2.md"
+  - "tenant-config-part05_board-settings_v1.0.md"
+  - "phase6-start-log_v1.0.md"
+
+summary:
+  status: "WARNING"
+  overall_assessment: "監査完了（要修正）。Part 01 と他Part間で、Single Source of Truth に違反する致命的な定義の競合・重複を4件検出しました。"
+  counts:
+    critical: 4
+    warning: 3
+    ok: 3
+
+issues:
+  - id: "C1"
+    severity: "CRITICAL"
+    title: "「翻訳キャッシュTTL」の定義が競合"
+    description: "Part 01 内で、翻訳キャッシュTTLが2つの異なる値（86400秒 vs 30日）で定義されています。"
+    locations:
+      - file: "tenant-config-part01_common-attributes_v1.1.md"
+        paths:
+          - "extension_interface.translation_api.cache_ttl"
+          - "constants.translation_cache_ttl_days"
+    impact: "実装時に参照すべき値が不明瞭であり、設定不整合の原因となります。"
+
+  - id: "C2"
+    severity: "CRITICAL"
+    title: "「TTSキャッシュTTL」の定義が重複"
+    description: "TTSキャッシュTTL（30日）が、実質的に同じ内容で2か所に重複して定義されています。"
+    locations:
+      - file: "tenant-config-part01_common-attributes_v1.1.md"
+        paths:
+          - "extension_interface.tts_api.cache_ttl"
+          - "constants.tts_cache_ttl_days"
+    impact: "管理者が変更可能なスコープ（configurable_by）が曖昧になっています。"
+
+  - id: "C3"
+    severity: "CRITICAL"
+    title: "「ログイン試行回数」の定義が競合"
+    description: "ログイン試行回数の上限設定が、Part 01 (default: 3, configurable) と Part 03 (max_attempts: 5) で競合しています。"
+    locations:
+      - file: "tenant-config-part01_common-attributes_v1.1.md"
+        path: "constants.login_attempt_limit"
+      - file: "tenant-config-part03_login-settings_v1.1.md"
+        path: "access_control.login_attempt_limits"
+    impact: "Part 01 の「テナント管理者による変更可能な設定」と Part 03 の「ハードコードされた設定」が深刻な競合を起こしています。"
+
+  - id: "C4"
+    severity: "CRITICAL"
+    title: "「言語設定」の定義が重複・分散"
+    description: "言語に関する設定が、Part 01 (システム全体) と Part 03 (ログイン画面UI) に分散・重複しています。"
+    locations:
+      - file: "tenant-config-part01_common-attributes_v1.1.md"
+        path: "system_common.language"
+      - file: "tenant-config-part03_login-settings_v1.1.md"
+        path: "language_settings"
+    impact: "W1, W2 の参照不正の原因となっており、他Partからの参照が混乱しています。"
+
+  - id: "W1"
+    severity: "WARNING"
+    title: "Part 04 → Part 01 の参照リンク不正"
+    description: "Part 04 が `linked_to: \"Part 01: language_settings\"` を参照していますが、Part 01 に該当定義が存在しません。"
+    locations:
+      - file: "tenant-config-part04_home-screen_v1.2.md"
+        path: "header.show_language_toggle"
+    recommendation: "C4 の修正後、`Part 01: system_common.language` または `Part 03: language_settings` のいずれかを指すよう修正が必要です。"
+
+  - id: "W2"
+    severity: "WARNING"
+    title: "Part 05 → Part 01 の参照リンク不正"
+    description: "Part 05 が `linked_to: \"Part 01: language_settings\"` を参照していますが、Part 01 に該当定義が存在しません。"
+    locations:
+      - file: "tenant-config-part05_board-settings_v1.0.md"
+        path: "general.default_language"
+    recommendation: "C4 の修正後、`Part 01: system_common.language` または `Part 03: language_settings` を参照するよう修正が必要です。"
+
+  - id: "W3"
+    severity: "WARNING"
+    title: "「テーマ設定」の定義が一部重複"
+    description: "背景テーマモードの定義が Part 01 ([light, dark, auto]) と Part 03 ([light, dark]) で重複しています。"
+    locations:
+      - file: "tenant-config-part01_common-attributes_v1.1.md"
+        path: "system_common.theme_mode"
+      - file: "tenant-config-part03_login-settings_v1.1.md"
+        path: "ui_theme.background_style"
+    impact: "Part 04 は Part 01 を参照しており、Part 03 の定義が実質的に未使用（冗長）となっています。"
+
+passed_checks:
+  - id: "OK1"
+    title: "UIテーマの継承 (Part 04, 05 → Part 03)"
+    description: "Part 04 および Part 05 から Part 03 (ui_theme) への inherit_from / 参照は正常です。"
+  - id: "OK2"
+    title: "ガイドラインの参照 (Part 04 → Part 05)"
+    description: "Part 04 から Part 05 (guideline_source_ref) への参照は正常です。"
+  - id: "OK3"
+    title: "権限構造の継承 (Part 03, 04, 05 → Part 02)"
+    description: "各Partの editable_by は Part 02 のロール定義に基づいており、一貫性が保たれています。"
+
+next_step:
+  recommendation: "検出された CRITICAL な不整合（C1〜C4）をインプットとして、Claude による設計整合レビューと修正案の作成を依頼してください。"
+  phase_log_reference: "`phase6-start-log_v1.0.md` に基づく次のステップは「Claude による設計整合レビュー（リンク／継承構造分析）」です。"

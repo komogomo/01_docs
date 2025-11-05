@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セキュレアシティアプリ開発 - 本日の決定事項(2025/10/19)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        .summary-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .phase-box {
+            background-color: #fff9e6;
+            border: 2px solid #f39c12;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .action-box {
+            background-color: #e8f8f5;
+            border: 2px solid #27ae60;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .status-completed {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .status-pending {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        ul {
+            line-height: 2;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .connection-info {
+            background-color: #fff3cd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .note {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .decision {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .emoji {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="emoji">📋</span> セキュレアシティアプリ開発 - 本日の決定事項</h1>
+        
+        <div class="summary-box">
+            <h3><span class="emoji">📅</span> 作成日時: 2025年10月19日(日)</h3>
+            <p><strong>プロジェクト:</strong> セキュレアシティ スマートコミュニケーションアプリ</p>
+            <p><strong>目的:</strong> マルチテナント対応の基盤設計と実装方針の確定</p>
+        </div>
+
+        <h2><span class="emoji">🎯</span> 1. マルチテナント方式の決定</h2>
+        
+        <div class="decision">
+            <h3>採用方式: テナントスキーマ方式</h3>
+            <p>各テナントごとに専用のPostgreSQLスキーマを作成し、データを完全に分離する方式を採用しました。</p>
+            
+            <h4>決定理由:</h4>
+            <ul>
+                <li><strong>データ分離:</strong> 各テナントのデータが物理的に分離され、セキュリティ向上</li>
+                <li><strong>運用保守性:</strong> テナント単位でのバックアップ・復元が容易</li>
+                <li><strong>バランス:</strong> 共有テーブル方式とDB完全分離方式の中間として最適</li>
+                <li><strong>スケーラビリティ:</strong> 将来的な拡張に対応しやすい</li>
+            </ul>
+
+            <h4>構成:</h4>
+            <ul>
+                <li><code>public</code>スキーマ: Tenantマスタテーブルを配置</li>
+                <li>各テナントスキーマ(例: <code>sc_0011_scr_000001</code>): User、Group、Circularなどの業務テーブルを配置</li>
+            </ul>
+        </div>
+
+        <h2><span class="emoji">👥</span> 2. グループ運用方針</h2>
+        
+        <div class="decision">
+            <h3>現段階の方針</h3>
+            <ul>
+                <li><span class="status-pending">必須項目ではない</span></li>
+                <li>書面申請時にグループ名を記載してもらう</li>
+                <li>グループがあれば掲示板・回覧板の参照が可能</li>
+            </ul>
+
+            <h3>将来の方針</h3>
+            <ul>
+                <li>パイロット運用後にアンケート収集</li>
+                <li>実際の利用者のフィードバックを元に仕様決定</li>
+                <li>汎用的な方法を実装</li>
+            </ul>
+
+            <div class="note">
+                <strong>💡 メリット:</strong> 実際の利用状況に基づいた柔軟な設計が可能
+            </div>
+        </div>
+
+        <h2><span class="emoji">📊</span> 3. CSVインポート方針</h2>
+        
+        <div class="decision">
+            <h3>現段階の方針</h3>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>詳細</th>
+                </tr>
+                <tr>
+                    <td>使用ツール</td>
+                    <td>A5:SQL Mk-2</td>
+                </tr>
+                <tr>
+                    <td>実施者</td>
+                    <td>運用保守担当者</td>
+                </tr>
+                <tr>
+                    <td>対応形式</td>
+                    <td>groupId(UUID)、groupName(文字列)の両方に対応</td>
+                </tr>
+                <tr>
+                    <td>対象テーブル</td>
+                    <td>User、Group、Tenant</td>
+                </tr>
+            </table>
+
+            <h3>将来の方針</h3>
+            <ul>
+                <li>本格運用時に管理画面を実装</li>
+                <li>CSVアップロード機能も検討</li>
+            </ul>
+        </div>
+
+        <h2><span class="emoji">🚀</span> 4. 実装方針(3フェーズ)</h2>
+
+        <div class="phase-box">
+            <h3>Phase 1: データベース基盤構築</h3>
+            <ol>
+                <li><strong>publicスキーマにTenantテーブル作成</strong>
+                    <ul>
+                        <li>テナント情報の一元管理</li>
+                        <li>displayId、name、schemaNameを保持</li>
+                    </ul>
+                </li>
+                <li><strong>テナントスキーマ作成</strong>
+                    <ul>
+                        <li>例: <code>sc_0011_scr_000001</code></li>
+                        <li>命名規則: <code>sc_[サイトコード]_scr_[施設コード]</code></li>
+                    </ul>
+                </li>
+                <li><strong>既存テーブルを各テナントスキーマに配置</strong>
+                    <ul>
+                        <li>User、Group、Circular、Notice、Booking等</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="phase-box">
+            <h3>Phase 2: テストデータ準備</h3>
+            
+            <h4>1. Tenantマスタ登録</h4>
+            <table>
+                <tr>
+                    <th>カラム</th>
+                    <th>値</th>
+                </tr>
+                <tr>
+                    <td>displayId</td>
+                    <td>A2601</td>
+                </tr>
+                <tr>
+                    <td>name</td>
+                    <td>セキュレアシティつくば研究学園の森</td>
+                </tr>
+                <tr>
+                    <td>schemaName</td>
+                    <td>sc_0011_scr_000001</td>
+                </tr>
+            </table>
+
+            <h4>2. Groupマスタ登録 (A5経由)</h4>
+            <pre><code>-- sc_0011_scr_000001 スキーマ内
+INSERT INTO groups (id, name, description) VALUES
+('uuid1', 'A-北', '1-10号室'),
+('uuid2', 'A-南', '11-20号室'),
+('uuid3', 'B-北', '21-30号室'),
+('uuid4', 'B-南', '31-40号室');</code></pre>
+
+            <h4>3. UserマスタCSV準備</h4>
+            <pre><code>email,name,language,role,groupId
+admin@example.com,管理者,ja,admin,
+user1@example.com,田中太郎,ja,user,uuid1
+user2@example.com,鈴木花子,ja,user,uuid2</code></pre>
+        </div>
+
+        <div class="phase-box">
+            <h3>Phase 3: 認証フロー修正</h3>
+            
+            <h4>1. <code>magic-link.service.ts</code> 修正内容</h4>
+            <ul>
+                <li>DB登録済みユーザーのみログイン可能にする制御追加</li>
+                <li>テナントスキーマの動的切り替え対応</li>
+                <li>グループ情報を含めてレスポンス返却</li>
+            </ul>
+
+            <h4>2. フロントエンド修正内容</h4>
+            <ul>
+                <li>displayId(施設ID)入力欄の追加</li>
+                <li>TOP画面にグループ名表示</li>
+            </ul>
+        </div>
+
+        <h2><span class="emoji">✅</span> 5. 準備状況の確認</h2>
+
+        <div class="action-box">
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>状態</th>
+                </tr>
+                <tr>
+                    <td>A5:SQL Mk-2 インストール</td>
+                    <td class="status-completed">✅ 完了</td>
+                </tr>
+                <tr>
+                    <td>PostgreSQL (Docker Desktop) 起動</td>
+                    <td class="status-completed">✅ 稼働中</td>
+                </tr>
+                <tr>
+                    <td>DB接続情報の把握</td>
+                    <td class="status-completed">✅ 確認済み</td>
+                </tr>
+                <tr>
+                    <td>実装方針の確定</td>
+                    <td class="status-completed">✅ 確定</td>
+                </tr>
+            </table>
+        </div>
+
+        <h2><span class="emoji">🔧</span> 6. データベース接続情報</h2>
+
+        <div class="connection-info">
+            <h3>A5:SQL Mk-2 接続設定</h3>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>値</th>
+                </tr>
+                <tr>
+                    <td>データベース種類</td>
+                    <td>PostgreSQL</td>
+                </tr>
+                <tr>
+                    <td>ホスト名</td>
+                    <td>localhost</td>
+                </tr>
+                <tr>
+                    <td>ポート番号</td>
+                    <td>5432</td>
+                </tr>
+                <tr>
+                    <td>データベース名</td>
+                    <td>securecity_db</td>
+                </tr>
+                <tr>
+                    <td>ユーザー名</td>
+                    <td>securecity_user</td>
+                </tr>
+                <tr>
+                    <td>パスワード</td>
+                    <td>SecurePass123</td>
+                </tr>
+            </table>
+
+            <p><strong>DATABASE_URL:</strong></p>
+            <code>postgresql://securecity_user:SecurePass123@localhost:5432/securecity_db?schema=public</code>
+        </div>
+
+        <h2><span class="emoji">📝</span> 7. 次のアクション</h2>
+
+        <div class="action-box">
+            <h3>Step 1: A5:SQL Mk-2でDB接続</h3>
+            <p>上記の接続情報を使用してデータベースに接続</p>
+
+            <h3>Step 2: Prismaスキーマ修正</h3>
+            <p>マルチテナント対応のスキーマを確定し、マイグレーション実行</p>
+
+            <h3>Step 3: テストデータ投入</h3>
+            <p>A5を使ってテナント・グループ・ユーザーを登録</p>
+        </div>
+
+        <h2><span class="emoji">📌</span> 8. 重要な設計判断のまとめ</h2>
+
+        <div class="decision">
+            <h3>柔軟性と段階的実装の重視</h3>
+            <ul>
+                <li><strong>マルチテナント:</strong> テナントスキーマ方式で確実なデータ分離</li>
+                <li><strong>グループ機能:</strong> 必須ではなく、実際の利用状況を見て判断</li>
+                <li><strong>データ投入:</strong> 現段階はA5で手動、将来的に管理画面実装</li>
+                <li><strong>認証:</strong> マジックリンク方式で、DB登録済みユーザーのみ許可</li>
+            </ul>
+
+            <div class="note">
+                <strong>💡 方針:</strong> パイロット運用で実際のニーズを把握し、汎用的な機能を段階的に実装する賢明なアプローチ
+            </div>
+        </div>
+
+        <hr style="margin: 40px 0;">
+
+        <footer style="text-align: center; color: #7f8c8d; font-size: 0.9em;">
+            <p>セキュレアシティ スマートコミュニケーションアプリ開発プロジェクト</p>
+            <p>作成日: 2025年10月19日</p>
+        </footer>
+    </div>
+</body>
+</html>

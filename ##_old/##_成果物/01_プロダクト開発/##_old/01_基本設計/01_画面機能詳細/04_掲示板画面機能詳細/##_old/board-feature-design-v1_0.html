@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セキュレアシティ - 掲示板機能 詳細設計書 v1.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-mvp {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .badge-future {
+            background: #e1bee7;
+            color: #7b1fa2;
+        }
+
+        .badge-recommended {
+            background: #bbdefb;
+            color: #1565c0;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffa726;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #66bb6a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "Courier New", monospace;
+            font-size: 0.9em;
+            color: #e91e63;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: #f8f8f2;
+        }
+
+        .toc {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .toc h2 {
+            color: #667eea;
+            margin-top: 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 10px;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .metadata-value {
+            color: #555;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            header {
+                background: #667eea;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .info-box, .warning-box, .success-box {
+                page-break-inside: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            h2, h3 {
+                page-break-after: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            header {
+                padding: 30px 20px;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>セキュレアシティ スマートコミュニケーションアプリ</h1>
+            <p>掲示板機能 詳細設計書 v1.0</p>
+        </header>
+
+        <div class="content">
+            <!-- メタデータ -->
+            <div class="metadata">
+                <div class="metadata-item">
+                    <div class="metadata-label">文書バージョン</div>
+                    <div class="metadata-value">1.0</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">作成日</div>
+                    <div class="metadata-value">2025年10月27日</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">対象フェーズ</div>
+                    <div class="metadata-value">MVP（初期リリース）</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">文書ID</div>
+                    <div class="metadata-value">SEC-APP-BOARD-DESIGN-001</div>
+                </div>
+            </div>
+
+            <!-- 目次 -->
+            <div class="toc">
+                <h2>目次</h2>
+                <ul>
+                    <li><a href="#section1">1. 概要</a></li>
+                    <li><a href="#section2">2. MVP機能セット</a></li>
+                    <li><a href="#section3">3. 掲示板の種類</a></li>
+                    <li><a href="#section4">4. 添付ファイル機能</a></li>
+                    <li><a href="#section5">5. 主要機能詳細</a></li>
+                    <li><a href="#section6">6. データベース設計</a></li>
+                    <li><a href="#section7">7. 技術的考慮事項</a></li>
+                    <li><a href="#section8">8. 開発スケジュール</a></li>
+                </ul>
+            </div>
+
+            <!-- 1. 概要 -->
+            <h2 id="section1">1. 概要</h2>
+
+            <h3>1.1 目的と背景</h3>
+            <p>本掲示板機能は、セキュレアシティ住民間の情報共有および管理組合からの周知事項配信を行うコミュニケーション基盤です。大規模分譲住宅地における多様な世帯（日本語話者・外国語話者・高齢者・子育て世帯など）を対象とし、以下を目的とします：</p>
+
+            <ul>
+                <li><strong>心理的な安心感の提供</strong> - 誰もが安心して投稿できる環境</li>
+                <li><strong>運用コストの低減</strong> - 管理者の負担を最小限に抑える</li>
+                <li><strong>差別化要素の実現</strong> - グループ掲示板による班・棟単位のコミュニケーション</li>
+                <li><strong>多言語対応</strong> - 日本語・英語・中国語での情報共有</li>
+            </ul>
+
+            <h3>1.2 基本方針</h3>
+            <div class="info-box">
+                <h4>設計の前提条件</h4>
+                <ul>
+                    <li>「荒れないこと」を最優先</li>
+                    <li>管理者が疲弊しない仕組み</li>
+                    <li>スマホファーストのUI/UX</li>
+                    <li>段階的な機能拡張が可能な設計</li>
+                </ul>
+            </div>
+
+            <!-- 2. MVP機能セット -->
+            <h2 id="section2">2. MVP機能セット</h2>
+
+            <h3>2.1 実装する機能一覧</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>機能</th>
+                        <th>実装範囲</th>
+                        <th>優先度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>掲示板種類</strong></td>
+                        <td>全体掲示板 + グループ掲示板 + 回覧板</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>投稿機能</strong></td>
+                        <td>タイトル・本文・カテゴリ・添付ファイル</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>添付ファイル</strong></td>
+                        <td>画像プレビュー / PDF・Office（ダウンロードのみ）</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>コメント</strong></td>
+                        <td>1階層返信のみ</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>表示制御</strong></td>
+                        <td>ニックネーム表示、返信可/不可制御</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>管理機能</strong></td>
+                        <td>自分の投稿削除、通報機能、既読管理（回覧板）</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>多言語</strong></td>
+                        <td>翻訳ボタン（Google Translation API）</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>モデレーション</strong></td>
+                        <td>シンプルなNGワードフィルタ</td>
+                        <td><span class="badge badge-mvp">MVP必須</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 将来実装機能（Phase 2以降）</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>機能</th>
+                        <th>判断タイミング</th>
+                        <th>備考</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AIモデレーション</td>
+                        <td>運用後、荒れた投稿の頻度を確認</td>
+                        <td>外部AIサービス連携、コスト要検討</td>
+                    </tr>
+                    <tr>
+                        <td>PDFプレビュー</td>
+                        <td>添付ファイル利用状況を確認</td>
+                        <td>ブラウザ内表示機能</td>
+                    </tr>
+                    <tr>
+                        <td>Office系プレビュー</td>
+                        <td>需要が高い場合のみ</td>
+                        <td>サードパーティライブラリ活用</td>
+                    </tr>
+                    <tr>
+                        <td>匿名投稿</td>
+                        <td>コミュニティの成熟度を見て判断</td>
+                        <td>トレーサビリティは維持</td>
+                    </tr>
+                    <tr>
+                        <td>投稿編集機能</td>
+                        <td>削除のみMVP、編集は将来検討</td>
+                        <td>編集履歴管理が必要</td>
+                    </tr>
+                    <tr>
+                        <td>高度な検索</td>
+                        <td>投稿数が増加してから</td>
+                        <td>全文検索エンジン導入</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 3. 掲示板の種類 -->
+            <h2 id="section3">3. 掲示板の種類</h2>
+
+            <h3>3.1 全体掲示板（一般掲示板）</h3>
+            <div class="info-box">
+                <h4>概要</h4>
+                <p>全住民が閲覧・投稿可能な掲示板。近隣の気づき、相談、共有事項など日常的な話題を扱います。</p>
+                
+                <h4>主な利用シーン</h4>
+                <ul>
+                    <li>近所で見かけた不審者情報の共有</li>
+                    <li>落とし物・迷子ペットの情報</li>
+                    <li>おすすめのお店・サービスの紹介</li>
+                    <li>子育て相談、習い事情報の交換</li>
+                    <li>イベント参加者の募集</li>
+                </ul>
+            </div>
+
+            <h3>3.2 グループ掲示板 ★差別化要素</h3>
+            <div class="success-box">
+                <h4>概要</h4>
+                <p>住民が所属するグループ（班・棟・エリアなど）ごとに専用に用意される掲示板。清掃当番・ごみ置き場管理・除草作業など、ローカルな運用連絡を扱います。</p>
+                
+                <h4>特徴</h4>
+                <ul>
+                    <li><strong>閲覧制限</strong> - 他グループからは閲覧・投稿不可</li>
+                    <li><strong>情報の局所化</strong> - グループ外への情報拡散を防止</li>
+                    <li><strong>運用の効率化</strong> - 関係者のみへの連絡が可能</li>
+                </ul>
+
+                <h4>主な利用シーン</h4>
+                <ul>
+                    <li>班ごとの清掃当番の調整</li>
+                    <li>棟内の共用部メンテナンス連絡</li>
+                    <li>ごみ置き場の清掃スケジュール</li>
+                    <li>エリア内イベントの企画・実施</li>
+                </ul>
+            </div>
+
+            <h3>3.3 回覧板・重要お知らせ</h3>
+            <div class="warning-box">
+                <h4>概要</h4>
+                <p>管理組合・理事会・管理会社など、公式な立場からのお知らせを掲載する専用枠。掲示は一方向（閲覧のみ）とし、住民からの返信は不可とします。</p>
+                
+                <h4>特徴</h4>
+                <ul>
+                    <li><strong>返信不可</strong> - 公式情報の一方向配信</li>
+                    <li><strong>上部固定表示</strong> - 重要度の視覚化</li>
+                    <li><strong>「重要」ラベル付与</strong> - 見落とし防止</li>
+                    <li><strong>既読管理</strong> - 閲覧状況の可視化</li>
+                </ul>
+
+                <h4>主な利用シーン</h4>
+                <ul>
+                    <li>総会開催のお知らせ</li>
+                    <li>大規模修繕工事の予定</li>
+                    <li>管理費改定の通知</li>
+                    <li>緊急時の安全情報</li>
+                </ul>
+            </div>
+
+            <!-- 4. 添付ファイル機能 -->
+            <h2 id="section4">4. 添付ファイル機能</h2>
+
+            <h3>4.1 設計方針</h3>
+            <p>スマホからの運用をメインとしつつ、管理組合の資料配布ニーズに対応するため、<strong>権限レベル別の添付制御</strong>を採用します。</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>利用者</th>
+                        <th>主な投稿環境</th>
+                        <th>添付ファイルニーズ</th>
+                        <th>対応方針</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>一般利用者</strong></td>
+                        <td>スマホ</td>
+                        <td>画像（近所の様子、イベント写真など）</td>
+                        <td>画像のみ許可（デフォルト）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>管理組合・理事会</strong></td>
+                        <td>PC</td>
+                        <td>総会資料、収支報告、規約、お知らせ文書</td>
+                        <td>PDF・Office系を許可</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.2 権限別の添付制御</h3>
+
+            <h4>一般住民（デフォルト設定）</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>設定値</th>
+                        <th>備考</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>許可ファイル形式</td>
+                        <td>.jpg, .jpeg, .png, .gif</td>
+                        <td>管理画面で変更可能</td>
+                    </tr>
+                    <tr>
+                        <td>最大ファイルサイズ</td>
+                        <td>5MB</td>
+                        <td>管理画面で変更可能</td>
+                    </tr>
+                    <tr>
+                        <td>1投稿あたりの最大数</td>
+                        <td>3個</td>
+                        <td>管理画面で変更可能</td>
+                    </tr>
+                    <tr>
+                        <td>機能の有効/無効</td>
+                        <td>有効</td>
+                        <td>管理画面で変更可能</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>管理組合・理事会（固定設定）</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>設定値</th>
+                        <th>備考</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>許可ファイル形式</td>
+                        <td>.jpg, .jpeg, .png, .gif, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx</td>
+                        <td>変更不可</td>
+                    </tr>
+                    <tr>
+                        <td>最大ファイルサイズ</td>
+                        <td>20MB</td>
+                        <td>大きな資料に対応</td>
+                    </tr>
+                    <tr>
+                        <td>1投稿あたりの最大数</td>
+                        <td>10個</td>
+                        <td>複数資料の同時配布</td>
+                    </tr>
+                    <tr>
+                        <td>機能の有効/無効</td>
+                        <td>常時有効</td>
+                        <td>変更不可</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.3 管理画面での設定</h3>
+            <div class="info-box">
+                <h4>管理者が設定可能な項目</h4>
+                <ul>
+                    <li><strong>一般利用者の添付機能ON/OFF</strong> - 運用状況に応じて柔軟に制御</li>
+                    <li><strong>許可するファイル形式</strong> - 画像のみ、またはPDF・Officeも許可</li>
+                    <li><strong>ファイルサイズ上限</strong> - ストレージ容量に応じて調整</li>
+                    <li><strong>添付数の上限</strong> - スパム投稿防止のため調整可能</li>
+                </ul>
+            </div>
+
+            <h3>4.4 プレビュー機能</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ファイル種類</th>
+                        <th>MVP対応</th>
+                        <th>表示方法</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>画像（jpg/png/gif）</td>
+                        <td><span class="badge badge-mvp">必須</span></td>
+                        <td>インライン表示（プレビュー）</td>
+                    </tr>
+                    <tr>
+                        <td>PDF</td>
+                        <td><span class="badge badge-mvp">推奨</span></td>
+                        <td>ダウンロードリンクのみ</td>
+                    </tr>
+                    <tr>
+                        <td>Office（Word/Excel/PowerPoint）</td>
+                        <td><span class="badge badge-mvp">推奨</span></td>
+                        <td>ダウンロードリンクのみ</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <h4>将来実装予定</h4>
+                <ul>
+                    <li>PDFのブラウザ内プレビュー表示</li>
+                    <li>Office系ファイルのプレビュー表示（サードパーティライブラリ活用）</li>
+                </ul>
+            </div>
+
+            <!-- 5. 主要機能詳細 -->
+            <h2 id="section5">5. 主要機能詳細</h2>
+
+            <h3>5.1 投稿機能</h3>
+
+            <h4>新規スレッド投稿</h4>
+            <ul>
+                <li><strong>タイトル</strong> - 最大200文字</li>
+                <li><strong>本文</strong> - 最大5000文字（管理画面で変更可能）</li>
+                <li><strong>カテゴリ選択</strong> - 質問・相談・情報共有・イベントなど</li>
+                <li><strong>画像添付</strong> - 最大3枚（一般利用者）、10枚（管理組合）</li>
+                <li><strong>掲示板選択</strong> - 全体掲示板 / グループ掲示板</li>
+            </ul>
+
+            <h4>投稿者表示</h4>
+            <ul>
+                <li><strong>ニックネーム表示</strong> - ユーザープロフィールで設定したニックネーム</li>
+                <li><strong>投稿日時</strong> - 「○分前」「○時間前」「○日前」形式</li>
+                <li><strong>投稿者権限バッジ</strong> - 「管理組合」「理事会」などのラベル表示</li>
+            </ul>
+
+            <h3>5.2 コメント機能</h3>
+            <ul>
+                <li><strong>1階層のみ</strong> - 複雑な入れ子構造は採用しない</li>
+                <li><strong>コメント投稿</strong> - 最大1000文字</li>
+                <li><strong>返信可/不可制御</strong> - 回覧板タグの投稿は返信不可</li>
+                <li><strong>時系列表示</strong> - 投稿順に表示（新しいコメントが下）</li>
+            </ul>
+
+            <h3>5.3 既読管理機能（回覧板向け）</h3>
+            <div class="success-box">
+                <h4>管理者機能</h4>
+                <ul>
+                    <li><strong>既読状況の確認</strong> - 各ユーザーごとの閲覧日時を記録</li>
+                    <li><strong>既読率の集計</strong> - 全体の何%が閲覧したか把握</li>
+                    <li><strong>未読者への再通知</strong> - メール・プッシュ通知で再送信</li>
+                    <li><strong>CSV出力</strong> - 総会報告や運用記録として利用可能</li>
+                </ul>
+
+                <h4>技術的実装</h4>
+                <p>投稿を開いた瞬間に既読フラグを自動記録。ユーザーが「確認済み」ボタンを押す必要なし（UX向上）。</p>
+            </div>
+
+            <h3>5.4 通報機能</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>通報理由</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>スパム</td>
+                        <td>広告、宣伝、無関係な投稿</td>
+                    </tr>
+                    <tr>
+                        <td>不適切な内容</td>
+                        <td>誹謗中傷、攻撃的な表現</td>
+                    </tr>
+                    <tr>
+                        <td>ハラスメント</td>
+                        <td>特定個人への嫌がらせ</td>
+                    </tr>
+                    <tr>
+                        <td>個人情報の晒し</td>
+                        <td>他人の個人情報を無断公開</td>
+                    </tr>
+                    <tr>
+                        <td>その他</td>
+                        <td>その他の問題（自由記述）</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>5.5 翻訳機能</h3>
+            <ul>
+                <li><strong>Google Translation API連携</strong> - 高精度な自動翻訳</li>
+                <li><strong>対応言語</strong> - 日本語 ⇔ 英語 ⇔ 中国語（簡体字）</li>
+                <li><strong>翻訳ボタン</strong> - 投稿・コメントごとに配置</li>
+                <li><strong>原文との切り替え</strong> - ワンタップで原文表示に戻れる</li>
+            </ul>
+
+            <h3>5.6 モデレーション機能（MVP）</h3>
+            <div class="info-box">
+                <h4>シンプルなNGワードフィルタ</h4>
+                <ul>
+                    <li>管理画面でNGワード登録</li>
+                    <li>投稿時に警告表示（投稿は許可）</li>
+                    <li>心理的な抑止効果を期待</li>
+                </ul>
+
+                <h4>投稿ガイドライン表示</h4>
+                <ul>
+                    <li>投稿画面に「言葉づかいに気をつけましょう」などの注意書き</li>
+                    <li>コミュニティルールへのリンク</li>
+                </ul>
+            </div>
+
+            <!-- 6. データベース設計 -->
+            <h2 id="section6">6. データベース設計</h2>
+
+            <h3>6.1 テーブル構造</h3>
+
+            <h4>user_groups（グループマスタ）</h4>
+            <pre><code>CREATE TABLE user_groups (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,           -- 「A棟」「1班」など
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+
+            <h4>user_group_members（グループメンバーシップ）</h4>
+            <pre><code>CREATE TABLE user_group_members (
+    user_id INT REFERENCES users(id),
+    group_id INT REFERENCES user_groups(id),
+    role VARCHAR(20) DEFAULT 'member',    -- 'admin', 'member'
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, group_id)
+);</code></pre>
+
+            <h4>bbs_posts（投稿テーブル）</h4>
+            <pre><code>CREATE TABLE bbs_posts (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    title VARCHAR(200) NOT NULL,
+    content TEXT NOT NULL,
+    category VARCHAR(50),                 -- '質問', '相談', '情報共有', 'イベント'
+    is_announcement BOOLEAN DEFAULT FALSE, -- 回覧板フラグ
+    allow_reply BOOLEAN DEFAULT TRUE,     -- 返信可否
+    group_id INT REFERENCES user_groups(id), -- NULL: 全体掲示板
+    visibility VARCHAR(20) DEFAULT 'public', -- 'public', 'group'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP                  -- 論理削除
+);</code></pre>
+
+            <h4>bbs_comments（コメントテーブル）</h4>
+            <pre><code>CREATE TABLE bbs_comments (
+    id SERIAL PRIMARY KEY,
+    post_id INT REFERENCES bbs_posts(id),
+    user_id INT REFERENCES users(id),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP                  -- 論理削除
+);</code></pre>
+
+            <h4>post_attachments（添付ファイルテーブル）</h4>
+            <pre><code>CREATE TABLE post_attachments (
+    id SERIAL PRIMARY KEY,
+    post_id INT REFERENCES bbs_posts(id),
+    filename VARCHAR(255) NOT NULL,       -- 保存ファイル名（UUID等）
+    original_name VARCHAR(255) NOT NULL,  -- 元のファイル名
+    file_type VARCHAR(50),                -- 'image', 'pdf', 'office'
+    file_size BIGINT,
+    mime_type VARCHAR(100),
+    uploaded_by INT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+
+            <h4>post_read_status（既読管理テーブル）</h4>
+            <pre><code>CREATE TABLE post_read_status (
+    id SERIAL PRIMARY KEY,
+    post_id INT REFERENCES bbs_posts(id),
+    user_id INT REFERENCES users(id),
+    read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(post_id, user_id)
+);</code></pre>
+
+            <h4>post_reports（通報テーブル）</h4>
+            <pre><code>CREATE TABLE post_reports (
+    id SERIAL PRIMARY KEY,
+    post_id INT REFERENCES bbs_posts(id),
+    comment_id INT REFERENCES bbs_comments(id), -- NULLの場合は投稿への通報
+    reporter_user_id INT REFERENCES users(id),
+    reason VARCHAR(50),                   -- 'spam', 'inappropriate', 'harassment', etc.
+    detail TEXT,
+    status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'resolved', 'dismissed'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP,
+    resolved_by INT REFERENCES users(id)
+);</code></pre>
+
+            <h4>system_settings（システム設定テーブル）</h4>
+            <pre><code>CREATE TABLE system_settings (
+    key VARCHAR(100) PRIMARY KEY,
+    value TEXT,
+    description TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by INT REFERENCES users(id)
+);
+
+-- 設定例
+INSERT INTO system_settings VALUES 
+('resident_attachment_enabled', 'true', '一般利用者の添付ファイル機能', NOW(), 1),
+('resident_allowed_types', '["image/jpeg","image/png","image/gif"]', '許可ファイル形式', NOW(), 1),
+('resident_max_file_size', '5242880', '最大ファイルサイズ（bytes）', NOW(), 1),
+('resident_max_files', '3', '1投稿あたりの最大ファイル数', NOW(), 1);</code></pre>
+
+            <h3>6.2 インデックス設計</h3>
+            <pre><code>-- 投稿一覧の高速化
+CREATE INDEX idx_posts_visibility ON bbs_posts(visibility, group_id, created_at);
+CREATE INDEX idx_posts_deleted ON bbs_posts(deleted_at);
+
+-- コメント取得の高速化
+CREATE INDEX idx_comments_post_id ON bbs_comments(post_id, created_at);
+
+-- 既読状況の高速化
+CREATE INDEX idx_read_status_post ON post_read_status(post_id);
+CREATE INDEX idx_read_status_user ON post_read_status(user_id);
+
+-- 通報管理の高速化
+CREATE INDEX idx_reports_status ON post_reports(status, created_at);</code></pre>
+
+            <!-- 7. 技術的考慮事項 -->
+            <h2 id="section7">7. 技術的考慮事項</h2>
+
+            <h3>7.1 セキュリティ対策</h3>
+
+            <h4>ファイルアップロード</h4>
+            <ul>
+                <li><strong>拡張子検証</strong> - ホワイトリスト方式で許可形式のみ受付</li>
+                <li><strong>MIMEタイプ検証</strong> - 拡張子とMIMEタイプの一致確認</li>
+                <li><strong>ファイルサイズ制限</strong> - 権限レベル別に上限設定</li>
+                <li><strong>マルウェアスキャン</strong> - ClamAV等の軽量ソリューション導入</li>
+                <li><strong>ファイル名のサニタイズ</strong> - UUID等でリネーム、元ファイル名は別保存</li>
+            </ul>
+
+            <h4>アクセス制御</h4>
+            <ul>
+                <li><strong>グループ投稿の可視性制御</strong> - メンバーシップ確認</li>
+                <li><strong>添付ファイルダウンロード</strong> - 署名付きURL（有効期限付き）</li>
+                <li><strong>CSRFトークン</strong> - すべての投稿・編集操作で検証</li>
+                <li><strong>SQLインジェクション対策</strong> - プリペアドステートメント使用</li>
+            </ul>
+
+            <h3>7.2 ストレージ管理</h3>
+
+            <h4>推奨アーキテクチャ</h4>
+            <ul>
+                <li><strong>画像</strong> - CDN + オブジェクトストレージ（S3等）</li>
+                <li><strong>PDF・Office</strong> - オブジェクトストレージ（署名付きURL）</li>
+                <li><strong>画像の自動圧縮</strong> - アップロード時にリサイズ・最適化</li>
+            </ul>
+
+            <h4>容量見積もり（300世帯想定）</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>計算</th>
+                        <th>月間容量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>一般利用者の画像</td>
+                        <td>30投稿 × 2MB × 2枚</td>
+                        <td>120MB</td>
+                    </tr>
+                    <tr>
+                        <td>管理組合の資料</td>
+                        <td>10投稿 × 5MB × 3ファイル</td>
+                        <td>150MB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>合計</strong></td>
+                        <td></td>
+                        <td><strong>270MB/月 ≈ 3.2GB/年</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>ストレージコスト試算：</strong> AWS S3 Standardで年間約$0.07（約10円）</p>
+
+            <h3>7.3 パフォーマンス最適化</h3>
+
+            <h4>画像の遅延読み込み</h4>
+            <pre><code>// Intersection Observer APIを使用
+const imageObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.src;
+      imageObserver.unobserve(img);
+    }
+  });
+});</code></pre>
+
+            <h4>ページネーション</h4>
+            <ul>
+                <li>1ページあたり20投稿</li>
+                <li>無限スクロール or ページャー（管理画面で選択）</li>
+                <li>カーソルベースのページネーション（オフセット方式より高速）</li>
+            </ul>
+
+            <h3>7.4 APIエンドポイント設計</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>エンドポイント</th>
+                        <th>メソッド</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>/api/posts</td>
+                        <td>GET</td>
+                        <td>投稿一覧取得（可視性フィルタ付き）</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts</td>
+                        <td>POST</td>
+                        <td>新規投稿作成</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts/:id</td>
+                        <td>GET</td>
+                        <td>投稿詳細取得</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts/:id</td>
+                        <td>DELETE</td>
+                        <td>投稿削除（論理削除）</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts/:id/comments</td>
+                        <td>GET</td>
+                        <td>コメント一覧取得</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts/:id/comments</td>
+                        <td>POST</td>
+                        <td>コメント投稿</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts/:id/read</td>
+                        <td>POST</td>
+                        <td>既読記録（自動実行）</td>
+                    </tr>
+                    <tr>
+                        <td>/api/posts/:id/report</td>
+                        <td>POST</td>
+                        <td>投稿通報</td>
+                    </tr>
+                    <tr>
+                        <td>/api/attachments/upload</td>
+                        <td>POST</td>
+                        <td>ファイルアップロード</td>
+                    </tr>
+                    <tr>
+                        <td>/api/attachments/:id/download</td>
+                        <td>GET</td>
+                        <td>ファイルダウンロード</td>
+                    </tr>
+                    <tr>
+                        <td>/api/groups</td>
+                        <td>GET</td>
+                        <td>所属グループ一覧取得</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 8. 開発スケジュール -->
+            <h2 id="section8">8. 開発スケジュール</h2>
+
+            <h3>8.1 工数見積もり</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>工数</th>
+                        <th>備考</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>基本的な投稿・コメント機能</td>
+                        <td>5日</td>
+                        <td>CRUD操作、UI/UX実装</td>
+                    </tr>
+                    <tr>
+                        <td>グループ掲示板機能</td>
+                        <td>8日</td>
+                        <td>権限管理、可視性制御</td>
+                    </tr>
+                    <tr>
+                        <td>添付ファイル機能</td>
+                        <td>8日</td>
+                        <td>アップロード、権限別制御、管理画面設定</td>
+                    </tr>
+                    <tr>
+                        <td>既読管理機能</td>
+                        <td>3日</td>
+                        <td>自動記録、管理画面表示、CSV出力</td>
+                    </tr>
+                    <tr>
+                        <td>通報機能</td>
+                        <td>2日</td>
+                        <td>通報UI、管理画面</td>
+                    </tr>
+                    <tr>
+                        <td>翻訳機能</td>
+                        <td>3日</td>
+                        <td>Google Translation API連携</td>
+                    </tr>
+                    <tr>
+                        <td>NGワードフィルタ</td>
+                        <td>2日</td>
+                        <td>シンプルな実装</td>
+                    </tr>
+                    <tr>
+                        <td>管理画面</td>
+                        <td>5日</td>
+                        <td>投稿管理、設定画面</td>
+                    </tr>
+                    <tr>
+                        <td>テスト・バグ修正</td>
+                        <td>5日</td>
+                        <td>総合テスト</td>
+                    </tr>
+                    <tr>
+                        <td><strong>合計</strong></td>
+                        <td><strong>41日（約8週間）</strong></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8.2 開発フェーズ</h3>
+            <div class="info-box">
+                <h4>Phase 1: MVP開発（2026年Q1-Q2）</h4>
+                <ul>
+                    <li>Week 1-2: 基本的な投稿・コメント機能</li>
+                    <li>Week 3-4: グループ掲示板機能</li>
+                    <li>Week 5-6: 添付ファイル機能</li>
+                    <li>Week 7: 既読管理・通報・翻訳機能</li>
+                    <li>Week 8: 管理画面・テスト</li>
+                </ul>
+
+                <h4>Phase 2: 機能拡張（2026年Q3-Q4）</h4>
+                <ul>
+                    <li>運用状況のフィードバック収集</li>
+                    <li>AIモデレーション機能の検討・導入判断</li>
+                    <li>PDFプレビュー機能の実装検討</li>
+                    <li>その他、利用者要望に基づく機能追加</li>
+                </ul>
+            </div>
+
+            <h3>8.3 リリース判定基準</h3>
+            <div class="success-box">
+                <h4>MVP リリース条件</h4>
+                <ul>
+                    <li>✅ 全体掲示板とグループ掲示板が正常動作</li>
+                    <li>✅ 画像添付・プレビューが正常動作</li>
+                    <li>✅ PDF・Office系ファイルのダウンロードが正常動作</li>
+                    <li>✅ 翻訳機能が3言語で正常動作</li>
+                    <li>✅ 既読管理が正常に記録・表示される</li>
+                    <li>✅ 管理画面から設定変更が可能</li>
+                    <li>✅ セキュリティテストでクリティカルな問題なし</li>
+                    <li>✅ スマホ・PC両方で正常動作</li>
+                </ul>
+            </div>
+
+            <!-- フッター -->
+            <div style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #eee; text-align: center; color: #999;">
+                <p>セキュレアシティ スマートコミュニケーションアプリ</p>
+                <p>掲示板機能 詳細設計書 v1.0</p>
+                <p>文書ID: SEC-APP-BOARD-DESIGN-001</p>
+                <p>作成日: 2025年10月27日</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

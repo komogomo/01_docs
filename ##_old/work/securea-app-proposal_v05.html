@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セキュレアシティ向けアプリケーション開発提案書</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            .page-break { page-break-before: always; }
+        }
+        
+        body {
+            font-family: 'BIZ UDPGothic', 'Yu Gothic', 'Meiryo', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+        }
+        
+        .cover {
+            text-align: center;
+            padding: 100px 0;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .cover h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #003366;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 20px;
+        }
+        
+        .cover .subtitle {
+            font-size: 24px;
+            margin: 30px 0;
+            color: #555;
+        }
+        
+        .cover .date {
+            font-size: 16px;
+            margin-top: 60px;
+            color: #666;
+        }
+        
+        h2 {
+            color: #003366;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #003366;
+        }
+        
+        h3 {
+            color: #0066cc;
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #333;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .highlight-box {
+            background: #f0f8ff;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .problem-box {
+            background: #fff5f5;
+            border-left: 4px solid #cc0000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .solution-box {
+            background: #f0fff0;
+            border-left: 4px solid #00cc66;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #003366;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .function-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .number-highlight {
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        /* Hero Image Styles */
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: visible;
+            margin: 40px 0;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.03) 10px,
+                rgba(255,255,255,0.03) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+        
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50%, -50%); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 50px 20px 60px 20px;
+        }
+        
+        .hero-content h2 {
+            font-size: 36px;
+            margin-bottom: 25px;
+            color: white;
+            border: none;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero-content p {
+            font-size: 18px;
+            max-width: 600px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            margin-bottom: 35px;
+        }
+        
+        .house-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+        }
+        
+        .house-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        /* Chart Styles */
+        .chart-container {
+            margin: 30px 0;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #003366;
+        }
+        
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 400px;
+            margin: 20px 0;
+            border-bottom: 3px solid #333;
+            border-left: 3px solid #333;
+            padding: 30px 20px 10px 10px;
+            position: relative;
+            background: #fafafa;
+        }
+        
+        .bar {
+            flex: 1;
+            margin: 0 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            max-width: 180px;
+        }
+        
+        .bar-fill {
+            width: 90%;
+            display: block !important;
+            background: linear-gradient(to top, #0066cc, #4da6ff) !important;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            box-shadow: 0 -2px 10px rgba(0, 102, 204, 0.3);
+        }
+        
+        .bar-label {
+            margin-top: 15px;
+            padding-top: 10px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #003366;
+            white-space: nowrap;
+            text-align: center;
+            line-height: 1.3;
+            background: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .line-chart {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .line-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- 表紙 -->
+    <div class="cover">
+        <h1>セキュレアシティ向け<br>自治会アプリケーション開発提案書</h1>
+        <div class="subtitle">住民サービスのDX化による<br>顧客満足度向上プロジェクト</div>
+        <div class="date">提案日:2025年10月</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- セキュレアビジュアル -->
+    <div class="hero-image">
+        <div class="hero-content">
+            <h2>SECUREA CITY</h2>
+            <p>ふれあう。ほっとする。安心して暮らせる、つながりのあるまち。</p>
+            <div class="house-icons">
+                <div class="house-icon">🏘️</div>
+                <div class="house-icon">👨‍👩‍👧‍👦</div>
+                <div class="house-icon">🌳</div>
+                <div class="house-icon">🔐</div>
+                <div class="house-icon">📱</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- エグゼクティブサマリー -->
+    <h2>1. エグゼクティブサマリー</h2>
+    
+    <div class="highlight-box">
+        <h4>提案の概要</h4>
+        <p>本提案は、大和ハウス工業株式会社が展開するセキュレアシティの居住者向けに、生活利便性を飛躍的に向上させるスマートフォンアプリケーションの開発をご提案するものです。</p>
+    </div>
+
+    <h3>提案の背景</h3>
+    <p>現在、セキュレアシティの居住者は、住宅メンテナンスや消耗品の発注、自治会業務など、多くの手続きを電話ベースで行っています。この仕組みは、コールセンターを介した伝言や後日の電話連絡によるスケジュール調整など、居住者・事業者双方にとって非効率な状態となっています。</p>
+
+    <h3>提案のポイント</h3>
+    <ul>
+        <li><strong>居住者の利便性向上:</strong> アプリ一つで住宅関連の全ての手続きを完結</li>
+        <li><strong>大和ハウスの差別化:</strong> 住宅販売後のサービスで他社との明確な差別化を実現</li>
+        <li><strong>持続可能なビジネスモデル:</strong> 居住者月額400円+ハウスメーカー年額12,000円/戸のデュアルレベニューモデル</li>
+        <li><strong>段階的な成長:</strong> 初期300戸→中期1,500戸→最終目標10,000戸への段階的展開</li>
+        <li><strong>高い収益性:</strong> 10,000戸規模で年間収益1億6,800万円、営業利益率52.4%を実現</li>
+        <li><strong>現実的な目標:</strong> セキュレア累計2万戸以上のうち、10,000戸(約50%)をカバーする実現可能な計画</li>
+        <li><strong>横展開の可能性:</strong> 他ハウスメーカーや中小工務店への展開も視野</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- 現状分析と課題 -->
+    <h2>2. 現状分析と課題</h2>
+
+    <h3>セキュレアシティの概要</h3>
+    <div class="highlight-box">
+        <h4>2025年10月時点の展開状況</h4>
+        <p>大和ハウス工業は年間約4,000棟の分譲住宅を販売しており、セキュレアは同社の主力分譲地ブランドとして全国展開されています。</p>
+        <ul>
+            <li><strong>展開規模:</strong> 数十戸~200戸規模の大規模分譲住宅地</li>
+            <li><strong>展開エリア:</strong> 全国各地(北海道から九州まで)</li>
+            <li><strong>現在販売中:</strong> 東京都59件、愛知県113件など、全国で多数の物件を展開</li>
+            <li><strong>推定累計戸数:</strong> 過去10年以上の展開実績から、累計で<strong>2万戸以上</strong>と推定</li>
+            <li><strong>対象想定戸数:</strong> 居住中世帯を対象とした場合、<strong>約10,000~15,000戸</strong>が実現可能な目標</li>
+        </ul>
+        <p class="number-highlight">※本提案では、段階的に10,000戸への展開を目標とし、保守的な収益試算を行います。</p>
+    </div>
+    
+    <ul>
+        <li>対象規模:数十戸~200戸の大規模分譲住宅</li>
+        <li>展開エリア:全国各地</li>
+        <li>居住者層:小さい子どもがいる世帯が中心、高齢世帯も増加傾向</li>
+    </ul>
+
+    <div class="problem-box">
+        <h3>現状の問題点</h3>
+        
+        <h4>① メンテナンス依頼の非効率性</h4>
+        <ul>
+            <li>支店またはコールセンターへの電話連絡が必須</li>
+            <li>担当者不在時は伝言対応となり、後日の折り返し待ち</li>
+            <li>電話でのスケジュール調整に時間がかかる</li>
+            <li>営業時間内の対応が必要で、働く世代には不便</li>
+        </ul>
+
+        <h4>② 消耗品発注の煩雑さ</h4>
+        <ul>
+            <li>換気扇フィルター、引き戸の戸車など定期交換部品の発注も電話対応</li>
+            <li>自宅に適合する部品の特定が困難</li>
+            <li>交換作業の手配も別途調整が必要</li>
+        </ul>
+
+        <h4>③ 自治会業務のアナログ運用</h4>
+        <ul>
+            <li>駐車場予約が専用Webで分散管理</li>
+            <li>回覧板が物理的に回覧され、タイムラグが発生</li>
+            <li>住民間のコミュニケーション手段が限定的</li>
+        </ul>
+
+        <h4>④ 安全・安心機能の不足</h4>
+        <ul>
+            <li>監視カメラ映像の確認に手間がかかる</li>
+            <li>高齢者の見守り機能がない</li>
+            <li>災害時の情報伝達手段が限定的</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ソリューション概要 -->
+    <h2>3. ソリューション概要</h2>
+
+    <div class="solution-box">
+        <h3>提案するアプリケーションの特徴</h3>
+        <p>セキュレアシティ専用のスマートフォンアプリケーションを開発し、住宅メンテナンス、自治会業務、コミュニティ形成、安全・安心機能を一元化します。</p>
+    </div>
+
+    <h3>アプリケーションの基本設計</h3>
+    <ul>
+        <li><strong>プラットフォーム:</strong> iOS/Android対応のネイティブアプリ</li>
+        <li><strong>認証方式:</strong> セキュアな居住者認証システム</li>
+        <li><strong>データ連携:</strong> 大和ハウスの既存システムとAPI連携</li>
+        <li><strong>セキュリティ:</strong> 個人情報保護に準拠した設計</li>
+    </ul>
+
+    <h3>大和ハウスとの連携による価値創出</h3>
+    <p>本アプリケーションは、大和ハウスが保有する以下の情報と連携することで、他社には真似できない付加価値を提供します:</p>
+    <ul>
+        <li>各戸建ての詳細な仕様・部品情報</li>
+        <li>メンテナンス履歴データ</li>
+        <li>定期点検スケジュール</li>
+        <li>DHEMS(住宅用エネルギー管理システム)データ</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- 機能詳細 -->
+    <h2>4. 機能詳細</h2>
+
+    <div class="function-card">
+        <h3>① 駐車場予約機能</h3>
+        <h4>概要</h4>
+        <p>来客用駐車場の空き状況確認と予約をアプリ上で完結し、PayPay決済にも対応します。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>駐車場MAP表示:リアルタイムの空き状況を視覚的に表示</li>
+            <li>予約機能:日時指定での予約が可能</li>
+            <li>PayPay決済:キャッシュレスで利用料金を支払い</li>
+            <li>予約履歴管理:過去の利用履歴を確認可能</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>現在、駐車場予約は単体Webシステムで運用されていますが、アプリに統合することで利便性が向上し、利用率の向上が期待できます。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>② 電子回覧板機能</h3>
+        <h4>概要</h4>
+        <p>従来の紙ベースの回覧板をデジタル化し、即座に全世帯へ情報を届けます。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>回覧板の閲覧:自治会からのお知らせをアプリで確認</li>
+            <li>既読管理:誰が閲覧したか管理者が確認可能</li>
+            <li>プッシュ通知:新しい回覧板が届いたら通知</li>
+            <li>コメント機能:回覧内容への質問や返信が可能</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>物理的な回覧板の紛失や遅延がなくなり、情報伝達のスピードと確実性が向上します。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>③ 監視カメラ再生機能</h3>
+        <h4>概要</h4>
+        <p>セキュリティカメラの録画データをアプリから確認できる機能です。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>録画映像の再生:日時指定での映像確認</li>
+            <li>カメラ選択:複数のカメラから選択可能</li>
+            <li>権限管理:適切なアクセス権限設定</li>
+            <li>ダウンロード機能:証拠保全のための映像ダウンロード</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>車両盗難やいたずらなどの被害発生時に、住民自身で迅速に証拠を確認でき、警察への通報や被害届提出がスムーズになります。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>④ 掲示板機能</h3>
+        <h4>概要</h4>
+        <p>居住者同士が情報交換できるコミュニティ掲示板を提供します。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>カテゴリー別掲示板:子育て、地域情報、趣味など</li>
+            <li>投稿・返信機能:テキスト・画像の投稿が可能</li>
+            <li>検索機能:過去の投稿を検索</li>
+            <li>モデレーション機能:不適切な投稿の管理</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>小さい子どもがいる世帯が多いセキュレアシティにおいて、学校イベント情報の共有や地域コミュニティの形成を促進します。また、高齢者の孤立防止にも貢献します。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>⑤ 安心見守り機能</h3>
+        <h4>概要</h4>
+        <p>高齢者や一人暮らしの方の安否確認を支援する機能です。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>定期確認通知:設定した時間に安否確認の通知を送信</li>
+            <li>アクション記録:アプリの利用状況を記録</li>
+            <li>緊急連絡機能:異常時に指定した連絡先へ通知</li>
+            <li>位置情報共有:家族間での位置情報共有(オプション)</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>孤独死や病気による対応遅れのリスクを低減し、安心して暮らせる環境を提供します。</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="function-card">
+        <h3>⑥ 消耗品発注機能</h3>
+        <h4>概要</h4>
+        <p>換気扇フィルターや引き戸の戸車など、住宅の消耗品をアプリから簡単に発注できます。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>対応部品一覧:自宅に適合する部品のみ表示</li>
+            <li>ワンクリック発注:部品番号を調べる必要なし</li>
+            <li>交換作業手配:部品交換が必要な場合、作業も同時手配</li>
+            <li>定期配送設定:定期交換品の自動配送設定</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>大和ハウスが各戸建ての部品情報を管理しているため、間違った部品を発注するリスクがゼロになります。電話でのやり取りが不要になり、24時間いつでも発注可能です。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>⑦ メンテナンス記録機能</h3>
+        <h4>概要</h4>
+        <p>住宅のメンテナンス履歴を一元管理し、今後の点検予定も確認できます。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>メンテナンス履歴:過去の点検・修理記録を表示</li>
+            <li>次回点検予定:定期点検のスケジュール確認</li>
+            <li>リマインダー通知:作業日前日に通知を送信</li>
+            <li>点検レポート:点検結果の詳細レポート表示</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>メンテナンス予約を忘れて不在になることを防ぎ、住宅の適切な維持管理をサポートします。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>⑧ DHEMS連携機能</h3>
+        <h4>概要</h4>
+        <p>各戸に設置されているDHEMS(住宅用エネルギー管理システム)のデータをアプリから確認できます。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>エネルギー使用状況:電気・ガスの使用量を表示</li>
+            <li>太陽光発電モニタリング:発電量・売電量を確認</li>
+            <li>蓄電池状態確認:EllyPower等の蓄電池の状態表示</li>
+            <li>省エネアドバイス:使用状況に応じた省エネ提案</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>専用タブレットが不要になり、普段使っているスマートフォンで確認できることで利便性が向上します。また、EXEOのEllyPowerサポート業務との連携も可能です。</p>
+    </div>
+
+    <div class="function-card">
+        <h3>⑨ 通知機能</h3>
+        <h4>概要</h4>
+        <p>災害情報や大和ハウスからのお知らせをプッシュ通知で配信します。</p>
+        
+        <h4>主な機能</h4>
+        <ul>
+            <li>災害情報通知:台風・地震などの災害情報と対策アドバイス</li>
+            <li>住宅メンテナンス情報:季節ごとの住宅ケア情報</li>
+            <li>大和ハウスからのお知らせ:新サービスやキャンペーン情報</li>
+            <li>地域イベント情報:セキュレアシティでのイベント案内</li>
+        </ul>
+        
+        <h4>期待される効果</h4>
+        <p>住宅の構造や設備に疎い方でも、適切なタイミングで必要な情報を受け取れます。大和ハウスの継続的なサポート体制をアピールできます。</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ビジネスモデル -->
+    <h2>5. ビジネスモデル</h2>
+
+    <h3>収益構造の基本コンセプト</h3>
+    <p>居住者とハウスメーカーの双方から収益を得る<strong>デュアルレベニューモデル</strong>を採用します。これにより、居住者の負担を抑えつつ、持続可能な運営を実現します。</p>
+
+    <div class="highlight-box">
+        <h4>価格設定の市場調査結果</h4>
+        <p>類似サービスの価格帯調査:</p>
+        <ul>
+            <li>マンション管理アプリ:月額300~600円</li>
+            <li>コミュニティアプリ:月額400~800円</li>
+            <li>住宅メンテナンスサービス:月額500~1,000円</li>
+        </ul>
+    </div>
+
+    <h3>料金体系</h3>
+    
+    <div class="chart-container">
+        <div class="chart-title">💰 デュアルレベニューモデル(10,000戸規模)</div>
+        <div class="bar-chart" style="height: 350px;">
+            <div class="bar">
+                <div class="bar-fill" style="height: 120px; display: block; background: linear-gradient(to top, #43e97b, #38f9d7);">
+                    <div class="bar-value">4,800万円<br>(28.6%)</div>
+                </div>
+                <div class="bar-label">居住者からの収入<br>月額400円×12ヶ月</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 280px; display: block; background: linear-gradient(to top, #667eea, #764ba2);">
+                    <div class="bar-value">1.2億円<br>(71.4%)</div>
+                </div>
+                <div class="bar-label">ハウスメーカーからの収入<br>年額12,000円</div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 20px; font-weight: bold; color: #003366;">
+            年間総収益: 1億6,800万円 = 居住者4,800万円 + ハウスメーカー1.2億円
+        </p>
+    </div>
+    
+    <table>
+        <tr>
+            <th>負担者</th>
+            <th>料金</th>
+            <th>内容</th>
+        </tr>
+        <tr>
+            <td><strong>居住者</strong></td>
+            <td><span class="number-highlight">月額400円/世帯</span><br>(年間4,800円)</td>
+            <td>
+                • アプリ利用料<br>
+                • 基本機能の利用<br>
+                • カスタマーサポート<br>
+                • データ通信費の一部
+            </td>
+        </tr>
+        <tr>
+            <td><strong>ハウスメーカー<br>(大和ハウス)</strong></td>
+            <td><span class="number-highlight">年額12,000円/戸</span><br>(月額換算1,000円)</td>
+            <td>
+                • システム保守費用<br>
+                • サーバー運用費<br>
+                • セキュリティ対策費<br>
+                • 機能アップデート費<br>
+                • API連携維持費
+            </td>
+        </tr>
+    </table>
+
+    <h3>ハウスメーカー側の費用負担の妥当性</h3>
+    <div class="solution-box">
+        <p>年額12,000円/戸の費用は、ハウスメーカーにとって以下の予算から捻出可能です:</p>
+        <ul>
+            <li><strong>販促費・広告宣伝費:</strong> 本アプリ自体が強力な販促ツールとなる</li>
+            <li><strong>顧客満足度向上投資:</strong> 既存顧客の満足度向上は新規顧客獲得コストより低い</li>
+            <li><strong>コールセンター費用削減:</strong> 電話対応業務の削減により相殺可能</li>
+            <li><strong>ブランド価値向上投資:</strong> 競合他社との差別化による長期的ROI</li>
+        </ul>
+    </div>
+
+    <h3>収益試算</h3>
+    
+    <h4>ケース1:パイロット展開(初年度・3拠点)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>内容</th>
+        </tr>
+        <tr>
+            <td>対象戸数</td>
+            <td>300戸(100戸×3拠点)</td>
+        </tr>
+        <tr>
+            <td>居住者からの年間収入</td>
+            <td>400円 × 300戸 × 12ヶ月 = <span class="number-highlight">144万円</span></td>
+        </tr>
+        <tr>
+            <td>ハウスメーカーからの年間収入</td>
+            <td>12,000円 × 300戸 = <span class="number-highlight">360万円</span></td>
+        </tr>
+        <tr>
+            <td><strong>年間総収益</strong></td>
+            <td><span class="number-highlight">504万円</span></td>
+        </tr>
+        <tr>
+            <td>想定運営費(初期は割高)</td>
+            <td>約600万円(開発費償却含む)</td>
+        </tr>
+        <tr>
+            <td>収支</td>
+            <td>初年度は投資フェーズ</td>
+        </tr>
+    </table>
+
+    <h4>ケース2:中期展開(2-3年目・15拠点)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>内容</th>
+        </tr>
+        <tr>
+            <td>対象戸数</td>
+            <td>1,500戸(平均100戸×15拠点)</td>
+        </tr>
+        <tr>
+            <td>居住者からの年間収入</td>
+            <td>400円 × 1,500戸 × 12ヶ月 = <span class="number-highlight">720万円</span></td>
+        </tr>
+        <tr>
+            <td>ハウスメーカーからの年間収入</td>
+            <td>12,000円 × 1,500戸 = <span class="number-highlight">1,800万円</span></td>
+        </tr>
+        <tr>
+            <td><strong>年間総収益</strong></td>
+            <td><span class="number-highlight">2,520万円</span></td>
+        </tr>
+        <tr>
+            <td>年間運営費</td>
+            <td>約2,200万円</td>
+        </tr>
+        <tr>
+            <td><strong>営業利益</strong></td>
+            <td><span class="number-highlight">約320万円</span></td>
+        </tr>
+    </table>
+
+    <h4>ケース3:本格展開(5年目・50拠点)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>内容</th>
+        </tr>
+        <tr>
+            <td>対象戸数</td>
+            <td>5,000戸(平均100戸×50拠点)</td>
+        </tr>
+        <tr>
+            <td>居住者からの年間収入</td>
+            <td>400円 × 5,000戸 × 12ヶ月 = <span class="number-highlight">2,400万円</span></td>
+        </tr>
+        <tr>
+            <td>ハウスメーカーからの年間収入</td>
+            <td>12,000円 × 5,000戸 = <span class="number-highlight">6,000万円</span></td>
+        </tr>
+        <tr>
+            <td><strong>年間総収益</strong></td>
+            <td><span class="number-highlight">8,400万円</span></td>
+        </tr>
+        <tr>
+            <td>年間運営費</td>
+            <td>約4,500万円</td>
+        </tr>
+        <tr>
+            <td><strong>営業利益</strong></td>
+            <td><span class="number-highlight">約3,900万円</span></td>
+        </tr>
+    </table>
+
+    <h4>ケース4:最終目標(7-10年目・全国展開)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>内容</th>
+        </tr>
+        <tr>
+            <td>対象戸数</td>
+            <td><strong>10,000戸</strong>(全国のセキュレアシティの主要拠点をカバー)</td>
+        </tr>
+        <tr>
+            <td>居住者からの年間収入</td>
+            <td>400円 × 10,000戸 × 12ヶ月 = <span class="number-highlight">4,800万円</span></td>
+        </tr>
+        <tr>
+            <td>ハウスメーカーからの年間収入</td>
+            <td>12,000円 × 10,000戸 = <span class="number-highlight">1億2,000万円</span></td>
+        </tr>
+        <tr>
+            <td><strong>年間総収益</strong></td>
+            <td><span class="number-highlight">1億6,800万円</span></td>
+        </tr>
+        <tr>
+            <td>年間運営費</td>
+            <td>約8,000万円</td>
+        </tr>
+        <tr>
+            <td><strong>営業利益</strong></td>
+            <td><span class="number-highlight">約8,800万円</span></td>
+        </tr>
+        <tr>
+            <td>営業利益率</td>
+            <td><strong>52.4%</strong></td>
+        </tr>
+    </table>
+
+    <h3>費用構造</h3>
+    
+    <h4>初期開発費用(一時費用)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>金額</th>
+        </tr>
+        <tr>
+            <td>要件定義・基本設計</td>
+            <td>500万円</td>
+        </tr>
+        <tr>
+            <td>アプリ開発(iOS/Android)</td>
+            <td>2,000万円</td>
+        </tr>
+        <tr>
+            <td>バックエンド開発・API構築</td>
+            <td>1,500万円</td>
+        </tr>
+        <tr>
+            <td>大和ハウスシステム連携</td>
+            <td>800万円</td>
+        </tr>
+        <tr>
+            <td>テスト・品質保証</td>
+            <td>500万円</td>
+        </tr>
+        <tr>
+            <td><strong>合計初期開発費</strong></td>
+            <td><strong>5,300万円</strong></td>
+        </tr>
+    </table>
+    <p>※初期開発費は、1,500戸規模で年間320万円の利益が出た場合、約17年で償却。<br>
+    ただし、5,000戸規模(年間利益3,900万円)に達すれば、約1.4年で償却可能。</p>
+
+    <h4>年間運営費(1,500戸規模での想定)</h4>
+    <table>
+        <tr>
+            <th>費用項目</th>
+            <th>年間費用</th>
+        </tr>
+        <tr>
+            <td>サーバー・インフラ費用(AWS/Azure)</td>
+            <td>300万円</td>
+        </tr>
+        <tr>
+            <td>保守・運用費用</td>
+            <td>600万円</td>
+        </tr>
+        <tr>
+            <td>カスタマーサポート費用(3名体制)</td>
+            <td>400万円</td>
+        </tr>
+        <tr>
+            <td>機能改善・アップデート費用</td>
+            <td>500万円</td>
+        </tr>
+        <tr>
+            <td>人件費・管理費</td>
+            <td>400万円</td>
+        </tr>
+        <tr>
+            <td><strong>合計運営費</strong></td>
+            <td><strong>2,200万円</strong></td>
+        </tr>
+    </table>
+
+    <h4>年間運営費(10,000戸規模での想定)</h4>
+    <table>
+        <tr>
+            <th>費用項目</th>
+            <th>年間費用</th>
+        </tr>
+        <tr>
+            <td>サーバー・インフラ費用</td>
+            <td>1,200万円</td>
+        </tr>
+        <tr>
+            <td>保守・運用費用</td>
+            <td>2,000万円</td>
+        </tr>
+        <tr>
+            <td>カスタマーサポート費用(10名体制)</td>
+            <td>1,500万円</td>
+        </tr>
+        <tr>
+            <td>機能改善・アップデート費用</td>
+            <td>1,800万円</td>
+        </tr>
+        <tr>
+            <td>人件費・管理費</td>
+            <td>1,500万円</td>
+        </tr>
+        <tr>
+            <td><strong>合計運営費</strong></td>
+            <td><strong>8,000万円</strong></td>
+        </tr>
+    </table>
+
+    <p><strong>営業利益(1,500戸規模):</strong> 2,520万円 - 2,200万円 = <span class="number-highlight">約320万円/年</span>(利益率12.7%)</p>
+    <p><strong>営業利益(10,000戸規模):</strong> 1億6,800万円 - 8,000万円 = <span class="number-highlight">約8,800万円/年</span>(利益率52.4%)</p>
+
+    <div class="chart-container">
+        <div class="chart-title">📊 段階的収益推移(年間総収益)</div>
+        <div class="bar-chart">
+            <div class="bar">
+                <div class="bar-fill" style="height: 70px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">504万円</div>
+                </div>
+                <div class="bar-label">初年度<br>300戸</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 140px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">2,520万円</div>
+                </div>
+                <div class="bar-label">2-3年目<br>1,500戸</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 250px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">8,400万円</div>
+                </div>
+                <div class="bar-label">5年目<br>5,000戸</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 340px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">1.68億円</div>
+                </div>
+                <div class="bar-label">7-10年目<br>10,000戸</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">📈 営業利益の推移</div>
+        <div class="bar-chart">
+            <div class="bar">
+                <div class="bar-fill" style="height: 70px; display: block; background: linear-gradient(to top, #ef5350, #e57373);">
+                    <div class="bar-value" style="color: #c62828;">投資期</div>
+                </div>
+                <div class="bar-label">初年度<br>300戸</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 100px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">320万円</div>
+                </div>
+                <div class="bar-label">2-3年目<br>1,500戸</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 240px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">3,900万円</div>
+                </div>
+                <div class="bar-label">5年目<br>5,000戸</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 340px; display: block; background: linear-gradient(to top, #0066cc, #4da6ff);">
+                    <div class="bar-value">8,800万円</div>
+                </div>
+                <div class="bar-label">7-10年目<br>10,000戸</div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 20px; font-weight: bold; color: #0066cc;">
+            営業利益率: 12.7% → 46.4% → 52.4%へと段階的に向上
+        </p>
+    </div>
+
+    <h3>段階的展開戦略</h3>
+    <table>
+        <tr>
+            <th>フェーズ</th>
+            <th>期間</th>
+            <th>目標戸数</th>
+            <th>主な施策</th>
+        </tr>
+        <tr>
+            <td><strong>フェーズ1<br>(初年度)</strong></td>
+            <td>1年目</td>
+            <td><span class="number-highlight">300戸</span><br>(3拠点)</td>
+            <td>パイロット版開発・実証実験<br>フィードバック収集・機能改善</td>
+        </tr>
+        <tr>
+            <td><strong>フェーズ2<br>(拡大期)</strong></td>
+            <td>2-3年目</td>
+            <td><span class="number-highlight">1,500戸</span><br>(15拠点)</td>
+            <td>改善版の全国主要エリア展開<br>マーケティング強化</td>
+        </tr>
+        <tr>
+            <td><strong>フェーズ3<br>(成長期)</strong></td>
+            <td>4-5年目</td>
+            <td><span class="number-highlight">5,000戸</span><br>(50拠点)</td>
+            <td>全国本格展開<br>機能拡充・付加価値向上</td>
+        </tr>
+        <tr>
+            <td><strong>フェーズ4<br>(成熟期)</strong></td>
+            <td>6-7年目</td>
+            <td><span class="number-highlight">10,000戸</span><br>(100拠点)</td>
+            <td>セキュレアシティ主要拠点を網羅<br>収益安定化</td>
+        </tr>
+        <tr>
+            <td><strong>フェーズ5<br>(展開期)</strong></td>
+            <td>8年目以降</td>
+            <td><span class="number-highlight">15,000戸+</span></td>
+            <td>他ハウスメーカーへの横展開<br>中小工務店向けSaaS化</td>
+        </tr>
+    </table>
+
+    <div class="highlight-box">
+        <h4>展開の実現可能性</h4>
+        <p>大和ハウスは年間約4,000棟の分譲住宅を販売しており、セキュレアブランドは累計で2万戸以上と推定されます。本計画では、既存の居住者を対象に段階的に10,000戸への展開を目指します。これは全セキュレア居住者の約50%をカバーする現実的な目標です。</p>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">📊 対象戸数の段階的拡大</div>
+        <div class="bar-chart">
+            <div class="bar">
+                <div class="bar-fill" style="height: 80px; display: block; background: linear-gradient(to top, #ffa726, #fb8c00);">
+                    <div class="bar-value">300戸</div>
+                </div>
+                <div class="bar-label">初年度<br>3拠点</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 140px; display: block; background: linear-gradient(to top, #66bb6a, #43a047);">
+                    <div class="bar-value">1,500戸</div>
+                </div>
+                <div class="bar-label">2-3年目<br>15拠点</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 250px; display: block; background: linear-gradient(to top, #42a5f5, #1e88e5);">
+                    <div class="bar-value">5,000戸</div>
+                </div>
+                <div class="bar-label">4-5年目<br>50拠点</div>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" style="height: 340px; display: block; background: linear-gradient(to top, #ab47bc, #8e24aa);">
+                    <div class="bar-value">10,000戸</div>
+                </div>
+                <div class="bar-label">6-7年目<br>100拠点</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>居住者にとっての価格の妥当性</h3>
+    <div class="highlight-box">
+        <p><strong>月額400円で得られる価値:</strong></p>
+        <ul>
+            <li>コールセンターへの電話代削減(1回の電話で数百円相当)</li>
+            <li>時間の節約(月1回の手続きで30分節約 = 数千円の価値)</li>
+            <li>安心・安全の確保(見守り機能、監視カメラ)</li>
+            <li>コミュニティ形成(近隣との情報交換)</li>
+            <li>エネルギー管理による光熱費削減の可能性</li>
+        </ul>
+        <p>月額400円は、<strong>1日あたり約13円</strong>の負担で、ペットボトル飲料1本以下のコストです。</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 期待効果 -->
+    <h2>6. 期待される効果</h2>
+
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">最終目標戸数</div>
+            <div class="metric-value">10,000戸</div>
+            <div class="metric-label">全国のセキュレアシティをカバー</div>
+        </div>
+        <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="metric-label">最終年間収益</div>
+            <div class="metric-value">1.68億円</div>
+            <div class="metric-label">持続可能な収益基盤</div>
+        </div>
+        <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="metric-label">営業利益率</div>
+            <div class="metric-value">52.4%</div>
+            <div class="metric-label">高収益事業へ成長</div>
+        </div>
+        <div class="metric-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="metric-label">居住者月額負担</div>
+            <div class="metric-value">400円</div>
+            <div class="metric-label">1日あたり約13円</div>
+        </div>
+    </div>
+
+    <h3>居住者へのメリット</h3>
+    <div class="solution-box">
+        <ul>
+            <li><strong>時間の節約:</strong> 電話連絡や折り返し待ちが不要、24時間いつでも手続き可能</li>
+            <li><strong>利便性の向上:</strong> 一つのアプリで住宅関連の全ての手続きを完結</li>
+            <li><strong>安心・安全:</strong> 見守り機能、監視カメラ、災害情報で安心な生活を実現</li>
+            <li><strong>コミュニティ形成:</strong> 掲示板機能で近隣住民との交流促進</li>
+            <li><strong>情報の透明性:</strong> メンテナンス履歴やエネルギー使用状況の可視化</li>
+        </ul>
+    </div>
+
+    <h3>大和ハウスへのメリット</h3>
+    <div class="solution-box">
+        <ul>
+            <li><strong>差別化戦略:</strong> 他ハウスメーカーとの明確な差別化要素</li>
+            <li><strong>顧客満足度向上:</strong> 購入後のサービス充実によるブランド価値向上</li>
+            <li><strong>業務効率化とコスト削減:</strong> コールセンター業務の負荷軽減により、年額12,000円/戸の投資を相殺</li>
+            <li><strong>販促効果:</strong> 本アプリ自体が強力な販促ツールとなり、新規顧客獲得に貢献</li>
+            <li><strong>データ活用:</strong> 居住者の利用データから新サービスの企画が可能</li>
+            <li><strong>長期的な顧客関係:</strong> アプリを通じた継続的な接点確保</li>
+            <li><strong>リフォーム提案機会:</strong> メンテナンスデータから適切なタイミングでリフォーム提案</li>
+            <li><strong>投資対効果:</strong> 年額12,000円/戸は既存の販促費・顧客サービス費から捻出可能</li>
+        </ul>
+    </div>
+
+    <h3>EXEOの強み</h3>
+    <div class="highlight-box">
+        <ul>
+            <li><strong>既存の関係性:</strong> EllyPower蓄電池の設置・サポート業務を通じた大和ハウスとの信頼関係</li>
+            <li><strong>業界理解:</strong> 住宅設備やエネルギー管理システムへの深い理解</li>
+            <li><strong>サポート体制:</strong> 既存のサポートデスク業務のノウハウを活用可能</li>
+            <li><strong>技術力:</strong> DHEMS連携など、複雑なシステム統合の実現能力</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 開発スケジュール -->
+    <h2>7. 開発スケジュール概要</h2>
+
+    <div class="chart-container">
+        <div class="chart-title">📅 展開ロードマップ</div>
+        <div class="metric-grid" style="margin-top: 20px;">
+            <div class="metric-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="metric-label">フェーズ1</div>
+                <div class="metric-value">1年目</div>
+                <div class="metric-label">300戸 | パイロット</div>
+            </div>
+            <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="metric-label">フェーズ2</div>
+                <div class="metric-value">2-3年目</div>
+                <div class="metric-label">1,500戸 | 黒字化</div>
+            </div>
+            <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="metric-label">フェーズ3</div>
+                <div class="metric-value">4-5年目</div>
+                <div class="metric-label">5,000戸 | 本格展開</div>
+            </div>
+            <div class="metric-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="metric-label">フェーズ4</div>
+                <div class="metric-value">6-7年目</div>
+                <div class="metric-label">10,000戸 | 成熟期</div>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <tr>
+            <th>フェーズ</th>
+            <th>期間</th>
+            <th>主な内容</th>
+        </tr>
+        <tr>
+            <td>要件定義</td>
+            <td>1-2ヶ月</td>
+            <td>大和ハウスとの詳細要件調整、API仕様策定</td>
+        </tr>
+        <tr>
+            <td>基本設計</td>
+            <td>1ヶ月</td>
+            <td>システム設計、UI/UX設計</td>
+        </tr>
+        <tr>
+            <td>開発</td>
+            <td>4-6ヶ月</td>
+            <td>アプリ開発、バックエンド開発、システム連携</td>
+        </tr>
+        <tr>
+            <td>テスト</td>
+            <td>1-2ヶ月</td>
+            <td>機能テスト、セキュリティテスト、負荷テスト</td>
+        </tr>
+        <tr>
+            <td>パイロット運用</td>
+            <td>3ヶ月</td>
+            <td>特定のセキュレアシティでの実証実験</td>
+        </tr>
+        <tr>
+            <td>改善・本格展開</td>
+            <td>2ヶ月</td>
+            <td>フィードバック反映、全国展開準備</td>
+        </tr>
+    </table>
+
+    <p><strong>合計開発期間:</strong> 約12-16ヶ月(要件定義から本格展開まで)</p>
+
+    <div class="page-break"></div>
+
+    <!-- 技術仕様概要 -->
+    <h2>8. 技術仕様概要</h2>
+
+    <h3>システム構成</h3>
+    <ul>
+        <li><strong>フロントエンド:</strong> iOS/Android ネイティブアプリ(Swift/Kotlin)</li>
+        <li><strong>バックエンド:</strong> クラウドベース(AWS/Azure)、REST API</li>
+        <li><strong>データベース:</strong> スケーラブルなRDBMS</li>
+        <li><strong>セキュリティ:</strong> SSL/TLS暗号化、OAuth 2.0認証、個人情報保護対策</li>
+        <li><strong>決済連携:</strong> PayPay API連携</li>
+        <li><strong>外部連携:</strong> 大和ハウス既存システムとのAPI連携、DHEMS連携</li>
+    </ul>
+
+    <h3>セキュリティ対策</h3>
+    <ul>
+        <li>居住者認証の厳格化(多要素認証の検討)</li>
+        <li>個人情報の暗号化保存</li>
+        <li>監視カメラ映像のアクセス権限管理</li>
+        <li>定期的なセキュリティ監査の実施</li>
+        <li>GDPR、個人情報保護法への準拠</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- リスクと対策 -->
+    <h2>9. リスクと対策</h2>
+
+    <table>
+        <tr>
+            <th>リスク</th>
+            <th>対策</th>
+        </tr>
+        <tr>
+            <td>大和ハウスとの連携が得られない</td>
+            <td>EXEO既存の関係性を活用し、早期段階でトップ層への提案を実施。Win-Winの関係を明確に提示。コールセンター業務削減による投資回収効果を数値で示す</td>
+        </tr>
+        <tr>
+            <td>居住者の利用率が低い</td>
+            <td>パイロット版での検証を徹底。UI/UXを高齢者にも使いやすい設計に。導入時の丁寧な説明会を実施。最初の3ヶ月無料キャンペーンなどの導入施策</td>
+        </tr>
+        <tr>
+            <td>月額400円の負担感</td>
+            <td>得られる価値(時間削減、安心・安全、コミュニティ)を明確に提示。1日13円という低負担をアピール。初期ユーザーへの割引プランを用意</td>
+        </tr>
+        <tr>
+            <td>ハウスメーカーの年額費用負担への抵抗</td>
+            <td>コールセンター業務削減効果を具体的に試算。販促効果とブランド価値向上を数値化。段階的な価格設定(初年度割引など)を提案</td>
+        </tr>
+        <tr>
+            <td>開発コストの超過</td>
+            <td>段階的開発により初期投資を抑制。MVPから始めて段階的に機能追加。外部開発パートナーとの固定価格契約</td>
+        </tr>
+        <tr>
+            <td>セキュリティインシデント</td>
+            <td>開発段階からセキュリティを重視した設計。第三者機関によるセキュリティ監査を実施。保険への加入</td>
+        </tr>
+        <tr>
+            <td>他社類似サービスの先行</td>
+            <td>大和ハウスとの独占的連携により差別化。DHEMS連携など他社には真似できない機能を提供。スピード重視の開発</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- まとめ -->
+    <h2>10. まとめ</h2>
+
+    <div class="highlight-box">
+        <h3>本提案の核心的価値</h3>
+        <p>本アプリケーションは、単なる利便性向上ツールではなく、<strong>「住宅購入後の暮らし全体をサポートする包括的なプラットフォーム」</strong>です。</p>
+    </div>
+
+    <h3>大和ハウスにとっての戦略的意義</h3>
+    <p>住宅業界では「建てて終わり」ではなく、「建てた後のサービス」が差別化要素となる時代です。本アプリケーションは、大和ハウスの住宅価値を底上げし、他ハウスメーカーとの明確な差別化を実現します。</p>
+
+    <h3>持続可能なビジネスモデル</h3>
+    <p>居住者からの月額400円とハウスメーカーからの年額12,000円/戸というデュアルレベニューモデルにより、持続可能な収益構造を確立できます。</p>
+    
+    <div class="highlight-box">
+        <h4>収益性の段階的向上</h4>
+        <ul>
+            <li><strong>初期(300戸):</strong> 年間収益504万円 - 投資フェーズ</li>
+            <li><strong>中期(1,500戸):</strong> 年間収益2,520万円、営業利益320万円</li>
+            <li><strong>成長期(5,000戸):</strong> 年間収益8,400万円、営業利益3,900万円</li>
+            <li><strong>成熟期(10,000戸):</strong> 年間収益1億6,800万円、営業利益8,800万円</li>
+        </ul>
+        <p>10,000戸規模に達すれば、<strong>営業利益率52.4%</strong>の高収益事業となります。さらに、他ハウスメーカーや中小工務店への横展開により、収益の大幅な拡大も見込めます。</p>
+    </div>
+
+    <h3>社会的価値</h3>
+    <ul>
+        <li>高齢者の見守りによる孤独死防止</li>
+        <li>コミュニティ形成による地域の絆強化</li>
+        <li>エネルギー使用の可視化による省エネ推進</li>
+        <li>災害時の迅速な情報伝達</li>
+    </ul>
+
+    <h3>次のステップ</h3>
+    <ol>
+        <li>大和ハウス工業との初回協議の設定</li>
+        <li>パイロットプロジェクトの対象セキュレアシティの選定</li>
+        <li>詳細な要件定義とスケジュール策定</li>
+        <li>開発パートナーの選定</li>
+    </ol>
+
+    <div class="solution-box" style="margin-top: 40px;">
+        <h3>結び</h3>
+        <p>本提案は、居住者の生活の質を向上させ、大和ハウスのブランド価値を高め、持続可能なビジネスモデルを構築する、三方良しのプロジェクトです。</p>
+        <p>セキュレアシティを「ただの分譲住宅地」から「デジタル技術で支えられた先進的なコミュニティ」へと進化させる、この取り組みにご賛同いただければ幸いです。</p>
+    </div>
+
+    <div class="footer">
+        <p>本提案書に関するお問い合わせは、担当者までご連絡ください。</p>
+        <p>© 2025 セキュレアシティ向けアプリケーション開発提案</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スモールスタート構成 インフラ設計</title>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'BIZ UDPGothic', 'Yu Gothic', 'Meiryo', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+        }
+        
+        h1 {
+            color: #003366;
+            font-size: 28px;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #003366;
+            font-size: 22px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0066cc;
+        }
+        
+        h3 {
+            color: #0066cc;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #333;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 13px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #003366;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .highlight-box h3 {
+            color: white;
+            border: none;
+        }
+        
+        .info-box {
+            background: #f0f8ff;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .cost-box {
+            background: #f0fff0;
+            border-left: 4px solid #00cc66;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box {
+            background: #fff5f5;
+            border-left: 4px solid #ff9900;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .oss-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .architecture-diagram {
+            background: white;
+            border: 2px solid #0066cc;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .phase-card {
+            background: white;
+            border: 2px solid #0066cc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .cost-summary {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .cost-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .total-row {
+            background-color: #e3f2fd !important;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 スモールスタート構成<br>インフラ設計・コスト試算書</h1>
+
+    <div class="highlight-box">
+        <h3>💡 基本方針</h3>
+        <ul style="font-size: 16px;">
+            <li><strong>最小構成からスタート:</strong> 必要最小限のリソースで開始</li>
+            <li><strong>OSS最大活用:</strong> 商用サービスをOSSで代替してコスト削減</li>
+            <li><strong>段階的拡張:</strong> TPS増加に応じて柔軟にスケール</li>
+            <li><strong>ログ最適化:</strong> 日次アーカイブ、月次削除で容量削減</li>
+            <li><strong>パイロット前提:</strong> 本格展開時に再設計・再試算</li>
+        </ul>
+    </div>
+
+    <h2>1. TPS別 前提条件</h2>
+
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>50 TPS</th>
+            <th>100 TPS</th>
+            <th>250 TPS</th>
+            <th>500 TPS</th>
+        </tr>
+        <tr>
+            <td><strong>想定世帯数</strong></td>
+            <td>300世帯</td>
+            <td>600世帯</td>
+            <td>1,500世帯</td>
+            <td>3,000世帯</td>
+        </tr>
+        <tr>
+            <td><strong>DAU (60%)</strong></td>
+            <td>180人</td>
+            <td>360人</td>
+            <td>900人</td>
+            <td>1,800人</td>
+        </tr>
+        <tr>
+            <td><strong>ピーク同時接続</strong></td>
+            <td>50人</td>
+            <td>100人</td>
+            <td>250人</td>
+            <td>500人</td>
+        </tr>
+        <tr>
+            <td><strong>1日のAPIコール数</strong></td>
+            <td>432万回</td>
+            <td>864万回</td>
+            <td>2,160万回</td>
+            <td>4,320万回</td>
+        </tr>
+        <tr>
+            <td><strong>月間APIコール数</strong></td>
+            <td>1.3億回</td>
+            <td>2.6億回</td>
+            <td>6.5億回</td>
+            <td>13億回</td>
+        </tr>
+        <tr>
+            <td><strong>DBストレージ</strong></td>
+            <td>50GB</td>
+            <td>100GB</td>
+            <td>250GB</td>
+            <td>500GB</td>
+        </tr>
+        <tr>
+            <td><strong>S3ストレージ</strong></td>
+            <td>100GB</td>
+            <td>200GB</td>
+            <td>500GB</td>
+            <td>1TB</td>
+        </tr>
+    </table>
+
+    <div class="info-box">
+        <h4>📊 TPS計算根拠</h4>
+        <p><strong>TPS = ピーク同時接続数 × 1ユーザーあたり平均API数(20) / 20秒</strong></p>
+        <p>例) 50 TPS = 50人 × 20 API / 20秒 = 50 TPS</p>
+    </div>
+
+    <h2>2. OSS活用によるコスト削減策</h2>
+
+    <div class="oss-box">
+        <h3>🔧 商用サービス → OSSへの置き換え</h3>
+        
+        <table>
+            <tr>
+                <th>用途</th>
+                <th>商用サービス</th>
+                <th>月額コスト</th>
+                <th>OSS代替案</th>
+                <th>削減後コスト</th>
+                <th>削減額</th>
+            </tr>
+            <tr>
+                <td><strong>監視・APM</strong></td>
+                <td>Datadog</td>
+                <td>¥8-50万</td>
+                <td>Prometheus + Grafana</td>
+                <td>¥0.5-2万<br>(EC2費用のみ)</td>
+                <td><span style="color: #00cc66;">¥7.5-48万</span></td>
+            </tr>
+            <tr>
+                <td><strong>エラー監視</strong></td>
+                <td>Sentry</td>
+                <td>¥2-12万</td>
+                <td>Sentry OSS<br>(セルフホスト)</td>
+                <td>¥0.3-1万</td>
+                <td><span style="color: #00cc66;">¥1.7-11万</span></td>
+            </tr>
+            <tr>
+                <td><strong>ログ管理</strong></td>
+                <td>CloudWatch Logs<br>(大量保存)</td>
+                <td>¥3-15万</td>
+                <td>Grafana Loki<br>(日次削除)</td>
+                <td>¥0.5-2万</td>
+                <td><span style="color: #00cc66;">¥2.5-13万</span></td>
+            </tr>
+            <tr>
+                <td><strong>プッシュ通知</strong></td>
+                <td>Firebase Pro</td>
+                <td>¥5-35万</td>
+                <td>自前サーバー<br>(FCM API直接)</td>
+                <td>¥0(含まれる)</td>
+                <td><span style="color: #00cc66;">¥5-35万</span></td>
+            </tr>
+            <tr>
+                <td><strong>メール送信</strong></td>
+                <td>SendGrid</td>
+                <td>¥1-15万</td>
+                <td>AWS SES直接</td>
+                <td>¥0.1-1万</td>
+                <td><span style="color: #00cc66;">¥0.9-14万</span></td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="2"><strong>合計削減額</strong></td>
+                <td><strong>¥19-127万</strong></td>
+                <td></td>
+                <td><strong>¥1.4-6万</strong></td>
+                <td><strong style="color: #00cc66;">¥17.6-121万</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>3. フェーズ別 インフラ構成</h2>
+
+    <h3>Phase 1: パイロット版 (50 TPS / 300世帯)</h3>
+
+    <div class="phase-card">
+        <h4>🏗️ 構成</h4>
+        
+        <div class="architecture-diagram">
+            <div style="text-align: center; line-height: 2;">
+                <strong>【モバイルアプリ】</strong><br>
+                ↓ HTTPS<br>
+                <strong>【CloudFront + S3】</strong> (静的ファイル配信)<br>
+                ↓<br>
+                <strong>【Application Load Balancer】</strong><br>
+                ↓<br>
+                <strong>【EC2 t3.small × 1台】</strong> (Node.js + NestJS)<br>
+                ↓↓<br>
+                <strong>【RDS t3.micro】</strong> (PostgreSQL 15) ← <strong>【ElastiCache t3.micro】</strong> (Redis)
+            </div>
+        </div>
+
+        <h4>💻 サーバー仕様</h4>
+        <table>
+            <tr>
+                <th>サービス</th>
+                <th>スペック</th>
+                <th>台数</th>
+                <th>用途</th>
+            </tr>
+            <tr>
+                <td><strong>EC2 (App)</strong></td>
+                <td>t3.small (2vCPU/2GB)</td>
+                <td>1台</td>
+                <td>アプリケーションサーバー</td>
+            </tr>
+            <tr>
+                <td><strong>RDS</strong></td>
+                <td>db.t3.micro (2vCPU/1GB)<br>Single-AZ</td>
+                <td>1台</td>
+                <td>PostgreSQL 15</td>
+            </tr>
+            <tr>
+                <td><strong>ElastiCache</strong></td>
+                <td>cache.t3.micro (2vCPU/0.5GB)</td>
+                <td>1台</td>
+                <td>Redis (セッション・キャッシュ)</td>
+            </tr>
+            <tr>
+                <td><strong>監視用EC2</strong></td>
+                <td>t3.micro (2vCPU/1GB)</td>
+                <td>1台</td>
+                <td>Prometheus + Grafana + Loki</td>
+            </tr>
+        </table>
+
+        <h4>📦 ストレージ</h4>
+        <ul>
+            <li><strong>RDS ストレージ:</strong> 50GB (gp3)</li>
+            <li><strong>S3:</strong> 100GB (画像・動画・ログ)</li>
+            <li><strong>EBS:</strong> EC2用 30GB × 2台</li>
+        </ul>
+
+        <h4>🔧 OSSスタック</h4>
+        <ul>
+            <li><strong>アプリケーション:</strong> Node.js 20 + NestJS 10 + Prisma 5</li>
+            <li><strong>監視:</strong> Prometheus + Grafana + Node Exporter</li>
+            <li><strong>ログ:</strong> Grafana Loki (日次ローテーション)</li>
+            <li><strong>エラー監視:</strong> Sentry OSS (セルフホスト)</li>
+            <li><strong>プッシュ通知:</strong> 自前実装 (FCM API)</li>
+        </ul>
+    </div>
+
+    <h4>💰 Phase 1 月額コスト (50 TPS)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>スペック</th>
+            <th>月額費用</th>
+        </tr>
+        <tr>
+            <td><strong>EC2 (App)</strong></td>
+            <td>t3.small × 1台 (730h)</td>
+            <td>¥2.5万</td>
+        </tr>
+        <tr>
+            <td><strong>EC2 (監視)</strong></td>
+            <td>t3.micro × 1台</td>
+            <td>¥1.2万</td>
+        </tr>
+        <tr>
+            <td><strong>ALB</strong></td>
+            <td>Application Load Balancer</td>
+            <td>¥2.8万</td>
+        </tr>
+        <tr>
+            <td><strong>RDS</strong></td>
+            <td>db.t3.micro Single-AZ + 50GB</td>
+            <td>¥2.0万</td>
+        </tr>
+        <tr>
+            <td><strong>ElastiCache</strong></td>
+            <td>cache.t3.micro × 1</td>
+            <td>¥1.5万</td>
+        </tr>
+        <tr>
+            <td><strong>S3</strong></td>
+            <td>100GB (Standard + ライフサイクル)</td>
+            <td>¥0.3万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudFront</strong></td>
+            <td>データ転送 200GB</td>
+            <td>¥1.5万</td>
+        </tr>
+        <tr>
+            <td><strong>Route 53</strong></td>
+            <td>ホストゾーン + クエリ</td>
+            <td>¥0.5万</td>
+        </tr>
+        <tr>
+            <td><strong>AWS SES</strong></td>
+            <td>メール送信 10,000通</td>
+            <td>¥0.1万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudWatch</strong></td>
+            <td>基本メトリクス (最小限)</td>
+            <td>¥0.5万</td>
+        </tr>
+        <tr>
+            <td><strong>EBS</strong></td>
+            <td>gp3 30GB × 2台</td>
+            <td>¥0.6万</td>
+        </tr>
+        <tr>
+            <td><strong>データ転送</strong></td>
+            <td>アウトバウンド ~50GB</td>
+            <td>¥0.5万</td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="2"><strong>月額合計</strong></td>
+            <td><strong>¥14.0万</strong></td>
+        </tr>
+        <tr style="background-color: #c8e6c9;">
+            <td colspan="2"><strong>年額合計</strong></td>
+            <td><strong>¥168万</strong></td>
+        </tr>
+    </table>
+
+    <h3>Phase 2: 初期拡大 (100 TPS / 600世帯)</h3>
+
+    <div class="phase-card">
+        <h4>🏗️ 構成変更点</h4>
+        <ul>
+            <li><strong>EC2:</strong> t3.small → <strong>t3.medium × 2台</strong> (Auto Scaling)</li>
+            <li><strong>RDS:</strong> db.t3.micro → <strong>db.t3.small</strong> + ストレージ100GB</li>
+            <li><strong>ElastiCache:</strong> t3.micro → <strong>t3.small</strong></li>
+            <li><strong>S3:</strong> 100GB → <strong>200GB</strong></li>
+        </ul>
+    </div>
+
+    <h4>💰 Phase 2 月額コスト (100 TPS)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>スペック</th>
+            <th>月額費用</th>
+        </tr>
+        <tr>
+            <td><strong>EC2 (App)</strong></td>
+            <td>t3.medium × 2台</td>
+            <td>¥10.0万</td>
+        </tr>
+        <tr>
+            <td><strong>EC2 (監視)</strong></td>
+            <td>t3.micro × 1台</td>
+            <td>¥1.2万</td>
+        </tr>
+        <tr>
+            <td><strong>ALB</strong></td>
+            <td>Application Load Balancer</td>
+            <td>¥3.5万</td>
+        </tr>
+        <tr>
+            <td><strong>RDS</strong></td>
+            <td>db.t3.small Single-AZ + 100GB</td>
+            <td>¥4.5万</td>
+        </tr>
+        <tr>
+            <td><strong>ElastiCache</strong></td>
+            <td>cache.t3.small × 1</td>
+            <td>¥3.0万</td>
+        </tr>
+        <tr>
+            <td><strong>S3</strong></td>
+            <td>200GB</td>
+            <td>¥0.6万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudFront</strong></td>
+            <td>データ転送 400GB</td>
+            <td>¥3.0万</td>
+        </tr>
+        <tr>
+            <td><strong>Route 53</strong></td>
+            <td>ホストゾーン + クエリ</td>
+            <td>¥0.5万</td>
+        </tr>
+        <tr>
+            <td><strong>AWS SES</strong></td>
+            <td>メール送信 20,000通</td>
+            <td>¥0.2万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudWatch</strong></td>
+            <td>基本メトリクス</td>
+            <td>¥0.8万</td>
+        </tr>
+        <tr>
+            <td><strong>EBS</strong></td>
+            <td>gp3 30GB × 3台</td>
+            <td>¥0.9万</td>
+        </tr>
+        <tr>
+            <td><strong>データ転送</strong></td>
+            <td>アウトバウンド ~100GB</td>
+            <td>¥1.0万</td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="2"><strong>月額合計</strong></td>
+            <td><strong>¥29.2万</strong></td>
+        </tr>
+        <tr style="background-color: #c8e6c9;">
+            <td colspan="2"><strong>年額合計</strong></td>
+            <td><strong>¥350万</strong></td>
+        </tr>
+    </table>
+
+    <h3>Phase 3: 成長期 (250 TPS / 1,500世帯)</h3>
+
+    <div class="phase-card">
+        <h4>🏗️ 構成変更点</h4>
+        <ul>
+            <li><strong>EC2:</strong> t3.medium × 2 → <strong>t3.large × 3台</strong> (Auto Scaling)</li>
+            <li><strong>RDS:</strong> db.t3.small → <strong>db.t3.medium Multi-AZ</strong> + ストレージ250GB</li>
+            <li><strong>ElastiCache:</strong> t3.small → <strong>t3.medium × 2台</strong> (レプリケーション)</li>
+            <li><strong>S3:</strong> 200GB → <strong>500GB</strong></li>
+            <li><strong>監視サーバー:</strong> t3.micro → <strong>t3.small</strong></li>
+        </ul>
+    </div>
+
+    <h4>💰 Phase 3 月額コスト (250 TPS)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>スペック</th>
+            <th>月額費用</th>
+        </tr>
+        <tr>
+            <td><strong>EC2 (App)</strong></td>
+            <td>t3.large × 3台</td>
+            <td>¥30.0万</td>
+        </tr>
+        <tr>
+            <td><strong>EC2 (監視)</strong></td>
+            <td>t3.small × 1台</td>
+            <td>¥2.5万</td>
+        </tr>
+        <tr>
+            <td><strong>ALB</strong></td>
+            <td>Application Load Balancer</td>
+            <td>¥5.0万</td>
+        </tr>
+        <tr>
+            <td><strong>RDS</strong></td>
+            <td>db.t3.medium Multi-AZ + 250GB</td>
+            <td>¥18.0万</td>
+        </tr>
+        <tr>
+            <td><strong>ElastiCache</strong></td>
+            <td>cache.t3.medium × 2台</td>
+            <td>¥12.0万</td>
+        </tr>
+        <tr>
+            <td><strong>S3</strong></td>
+            <td>500GB (ライフサイクル適用)</td>
+            <td>¥1.2万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudFront</strong></td>
+            <td>データ転送 1TB</td>
+            <td>¥6.0万</td>
+        </tr>
+        <tr>
+            <td><strong>Route 53</strong></td>
+            <td>ホストゾーン + クエリ</td>
+            <td>¥0.8万</td>
+        </tr>
+        <tr>
+            <td><strong>AWS SES</strong></td>
+            <td>メール送信 50,000通</td>
+            <td>¥0.5万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudWatch</strong></td>
+            <td>基本メトリクス</td>
+            <td>¥1.5万</td>
+        </tr>
+        <tr>
+            <td><strong>EBS</strong></td>
+            <td>gp3 50GB × 4台</td>
+            <td>¥2.0万</td>
+        </tr>
+        <tr>
+            <td><strong>データ転送</strong></td>
+            <td>アウトバウンド ~250GB</td>
+            <td>¥2.5万</td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="2"><strong>月額合計</strong></td>
+            <td><strong>¥82.0万</strong></td>
+        </tr>
+        <tr style="background-color: #c8e6c9;">
+            <td colspan="2"><strong>年額合計</strong></td>
+            <td><strong>¥984万</strong></td>
+        </tr>
+    </table>
+
+    <h3>Phase 4: 本格展開 (500 TPS / 3,000世帯)</h3>
+
+    <div class="phase-card">
+        <h4>🏗️ 構成変更点</h4>
+        <ul>
+            <li><strong>EC2:</strong> t3.large × 3 → <strong>c6i.xlarge × 4台</strong> (CPU最適化)</li>
+            <li><strong>RDS:</strong> db.t3.medium → <strong>db.r6i.large Multi-AZ</strong> + ストレージ500GB</li>
+            <li><strong>ElastiCache:</strong> t3.medium × 2 → <strong>r6g.large × 2台</strong> (クラスター構成)</li>
+            <li><strong>S3:</strong> 500GB → <strong>1TB</strong></li>
+            <li><strong>監視サーバー:</strong> t3.small → <strong>t3.medium</strong></li>
+        </ul>
+
+        <div class="warning-box">
+            <h4>⚠️ 本格展開時の追加検討事項</h4>
+            <ul>
+                <li><strong>別途再設計:</strong> この段階で全体アーキテクチャの見直し</li>
+                <li><strong>マイクロサービス化:</strong> 機能分割の検討</li>
+                <li><strong>CDN強化:</strong> より高度なキャッシュ戦略</li>
+                <li><strong>DDoS対策:</strong> AWS Shield Standard/Advanced</li>
+                <li><strong>監視強化:</strong> 商用APMの導入検討</li>
+            </ul>
+        </div>
+    </div>
+
+    <h4>💰 Phase 4 月額コスト (500 TPS)</h4>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>スペック</th>
+            <th>月額費用</th>
+        </tr>
+        <tr>
+            <td><strong>EC2 (App)</strong></td>
+            <td>c6i.xlarge × 4台</td>
+            <td>¥65.0万</td>
+        </tr>
+        <tr>
+            <td><strong>EC2 (監視)</strong></td>
+            <td>t3.medium × 1台</td>
+            <td>¥5.0万</td>
+        </tr>
+        <tr>
+            <td><strong>ALB</strong></td>
+            <td>Application Load Balancer</td>
+            <td>¥8.0万</td>
+        </tr>
+        <tr>
+            <td><strong>RDS</strong></td>
+            <td>db.r6i.large Multi-AZ + 500GB</td>
+            <td>¥45.0万</td>
+        </tr>
+        <tr>
+            <td><strong>ElastiCache</strong></td>
+            <td>r6g.large × 2台 (クラスター)</td>
+            <td>¥25.0万</td>
+        </tr>
+        <tr>
+            <td><strong>S3</strong></td>
+            <td>1TB (最適化済み)</td>
+            <td>¥2.0万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudFront</strong></td>
+            <td>データ転送 2TB</td>
+            <td>¥10.0万</td>
+        </tr>
+        <tr>
+            <td><strong>Route 53</strong></td>
+            <td>ホストゾーン + クエリ</td>
+            <td>¥1.2万</td>
+        </tr>
+        <tr>
+            <td><strong>AWS SES</strong></td>
+            <td>メール送信 100,000通</td>
+            <td>¥1.0万</td>
+        </tr>
+        <tr>
+            <td><strong>CloudWatch</strong></td>
+            <td>標準メトリクス</td>
+            <td>¥2.5万</td>
+        </tr>
+        <tr>
+            <td><strong>EBS</strong></td>
+            <td>gp3 100GB × 5台</td>
+            <td>¥5.0万</td>
+        </tr>
+        <tr>
+            <td><strong>データ転送</strong></td>
+            <td>アウトバウンド ~500GB</td>
+            <td>¥5.0万</td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="2"><strong>月額合計</strong></td>
+            <td><strong>¥174.7万</strong></td>
+        </tr>
+        <tr style="background-color: #c8e6c9;">
+            <td colspan="2"><strong>年額合計</strong></td>
+            <td><strong>¥2,096万</strong></td>
+        </tr>
+    </table>
+
+    <h2>4. 初期費用 (セットアップコスト)</h2>
+
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>内容</th>
+            <th>費用</th>
+        </tr>
+        <tr>
+            <td><strong>AWS初期設定</strong></td>
+            <td>アカウント作成、IAM設定、VPC構築</td>
+            <td>¥0 (無料)</td>
+        </tr>
+        <tr>
+            <td><strong>ドメイン取得</strong></td>
+            <td>.jp ドメイン (1年分)</td>
+            <td>¥0.3万</td>
+        </tr>
+        <tr>
+            <td><strong>SSL証明書</strong></td>
+            <td>AWS Certificate Manager (無料)</td>
+            <td>¥0</td>
+        </tr>
+        <tr>
+            <td><strong>初回構築作業</strong></td>
+            <td>インフラコード作成、CI/CD構築</td>
+            <td>¥50万<br>(2週間・2名)</td>
+        </tr>
+        <tr>
+            <td><strong>OSSセットアップ</strong></td>
+            <td>Prometheus/Grafana/Loki/Sentry構築</td>
+            <td>¥30万<br>(1週間・2名)</td>
+        </tr>
+        <tr>
+            <td><strong>監視設定</strong></td>
+            <td>アラート設定、ダッシュボード構築</td>
+            <td>¥20万<br>(1週間・1名)</td>
+        </tr>
+        <tr>
+            <td><strong>セキュリティ設定</strong></td>
+            <td>WAF、セキュリティグループ、暗号化</td>
+            <td>¥30万<br>(1週間・2名)</td>
+        </tr>
+        <tr>
+            <td><strong>負荷テスト</strong></td>
+            <td>Apache JMeter / Locustによる負荷試験</td>
+            <td>¥20万<br>(1週間・1名)</td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="2"><strong>初期費用合計</strong></td>
+            <td><strong>¥150.3万</strong></td>
+        </tr>
+    </table>
+
+    <h2>5. ログ管理戦略 (コスト削減)</h2>
+
+    <div class="oss-box">
+        <h3>📝 Grafana Loki によるログ管理</h3>
+
+        <h4>実装方針</h4>
+        <ul>
+            <li><strong>収集:</strong> Promtail (各EC2にインストール)</li>
+            <li><strong>保存:</strong> Grafana Loki (監視用EC2上)</li>
+            <li><strong>可視化:</strong> Grafana</li>
+            <li><strong>ローテーション:</strong> 日次で圧縮・アーカイブ</li>
+            <li><strong>削除:</strong> 30日経過後に自動削除</li>
+        </ul>
+
+        <h4>ログ容量試算</h4>
+        <table>
+            <tr>
+                <th>TPS</th>
+                <th>1日のログ量</th>
+                <th>圧縮後 (30日保存)</th>
+                <th>ストレージ費用/月</th>
+            </tr>
+            <tr>
+                <td><strong>50 TPS</strong></td>
+                <td>5GB</td>
+                <td>50GB (圧縮率90%)</td>
+                <td>¥0.1万 (EBS)</td>
+            </tr>
+            <tr>
+                <td><strong>100 TPS</strong></td>
+                <td>10GB</td>
+                <td>100GB</td>
+                <td>¥0.2万</td>
+            </tr>
+            <tr>
+                <td><strong>250 TPS</strong></td>
+                <td>25GB</td>
+                <td>250GB</td>
+                <td>¥0.5万</td>
+            </tr>
+            <tr>
+                <td><strong>500 TPS</strong></td>
+                <td>50GB</td>
+                <td>500GB</td>
+                <td>¥1.0万</td>
+            </tr>
+        </table>
+
+        <div class="code-block">
+# Loki 設定例 (loki-config.yaml)
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+  chunk_idle_period: 1h
+  max_chunk_age: 1h
+  chunk_retain_period: 30s
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/boltdb-shipper-active
+    cache_location: /loki/boltdb-shipper-cache
+    shared_store: filesystem
+  filesystem:
+    directory: /loki/chunks
+
+limits_config:
+  retention_period: 720h  # 30日保存
+
+# 日次削除スクリプト (cron設定)
+0 2 * * * find /loki/chunks -mtime +30 -delete
+        </div>
+
+        <div class="cost-box">
+            <h4>💰 CloudWatch Logs との比較</h4>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>CloudWatch Logs</th>
+                    <th>Grafana Loki (OSS)</th>
+                    <th>削減額</th>
+                </tr>
+                <tr>
+                    <td><strong>50 TPS</strong></td>
+                    <td>¥3万/月</td>
+                    <td>¥0.1万/月</td>
+                    <td><span style="color: #00cc66;">¥2.9万</span></td>
+                </tr>
+                <tr>
+                    <td><strong>100 TPS</strong></td>
+                    <td>¥6万/月</td>
+                    <td>¥0.2万/月</td>
+                    <td><span style="color: #00cc66;">¥5.8万</span></td>
+                </tr>
+                <tr>
+                    <td><strong>250 TPS</strong></td>
+                    <td>¥15万/月</td>
+                    <td>¥0.5万/月</td>
+                    <td><span style="color: #00cc66;">¥14.5万</span></td>
+                </tr>
+                <tr>
+                    <td><strong>500 TPS</strong></td>
+                    <td>¥30万/月</td>
+                    <td>¥1.0万/月</td>
+                    <td><span style="color: #00cc66;">¥29万</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <h2>6. コスト削減施策まとめ</h2>
+
+    <div class="cost-box">
+        <h3>💰 削減効果一覧</h3>
+
+        <table>
+            <tr>
+                <th>施策</th>
+                <th>50 TPS</th>
+                <th>100 TPS</th>
+                <th>250 TPS</th>
+                <th>500 TPS</th>
+            </tr>
+            <tr>
+                <td><strong>OSS監視ツール</strong><br>(Prometheus/Grafana)</td>
+                <td>¥7.5万/月</td>
+                <td>¥10万/月</td>
+                <td>¥20万/月</td>
+                <td>¥40万/月</td>
+            </tr>
+            <tr>
+                <td><strong>Loki ログ管理</strong><br>(CloudWatch代替)</td>
+                <td>¥2.9万/月</td>
+                <td>¥5.8万/月</td>
+                <td>¥14.5万/月</td>
+                <td>¥29万/月</td>
+            </tr>
+            <tr>
+                <td><strong>Sentry OSS</strong><br>(セルフホスト)</td>
+                <td>¥1.7万/月</td>
+                <td>¥3万/月</td>
+                <td>¥6万/月</td>
+                <td>¥10万/月</td>
+            </tr>
+            <tr>
+                <td><strong>自前プッシュ通知</strong><br>(Firebase代替)</td>
+                <td>¥5万/月</td>
+                <td>¥8万/月</td>
+                <td>¥15万/月</td>
+                <td>¥30万/月</td>
+            </tr>
+            <tr>
+                <td><strong>AWS SES直接利用</strong><br>(SendGrid代替)</td>
+                <td>¥0.9万/月</td>
+                <td>¥1.8万/月</td>
+                <td>¥4万/月</td>
+                <td>¥8万/月</td>
+            </tr>
+            <tr>
+                <td><strong>S3ライフサイクル</strong><br>(古いデータ削除)</td>
+                <td>¥0.2万/月</td>
+                <td>¥0.4万/月</td>
+                <td>¥1万/月</td>
+                <td>¥2万/月</td>
+            </tr>
+            <tr class="total-row">
+                <td><strong>月額削減合計</strong></td>
+                <td><strong>¥18.2万</strong></td>
+                <td><strong>¥29万</strong></td>
+                <td><strong>¥60.5万</strong></td>
+                <td><strong>¥119万</strong></td>
+            </tr>
+            <tr style="background-color: #c8e6c9;">
+                <td><strong>年間削減合計</strong></td>
+                <td><strong>¥218万</strong></td>
+                <td><strong>¥348万</strong></td>
+                <td><strong>¥726万</strong></td>
+                <td><strong>¥1,428万</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>7. 総コストまとめ</h2>
+
+    <div class="cost-summary">
+        <h3 style="color: white; border: none;">💰 フェーズ別 総コスト (OSS活用後)</h3>
+        
+        <table style="color: white; border-color: rgba(255,255,255,0.3); margin-top: 20px;">
+            <tr style="background: rgba(255,255,255,0.2);">
+                <th style="border-color: rgba(255,255,255,0.3);">項目</th>
+                <th style="border-color: rgba(255,255,255,0.3);">50 TPS</th>
+                <th style="border-color: rgba(255,255,255,0.3);">100 TPS</th>
+                <th style="border-color: rgba(255,255,255,0.3);">250 TPS</th>
+                <th style="border-color: rgba(255,255,255,0.3);">500 TPS</th>
+            </tr>
+            <tr style="background: rgba(255,255,255,0.1);">
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>初期費用</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);">¥150万</td>
+                <td style="border-color: rgba(255,255,255,0.3);">+¥30万</td>
+                <td style="border-color: rgba(255,255,255,0.3);">+¥50万</td>
+                <td style="border-color: rgba(255,255,255,0.3);">+¥100万</td>
+            </tr>
+            <tr style="background: rgba(255,255,255,0.05);">
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>月額費用</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥14万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥29万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥82万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥175万</strong></td>
+            </tr>
+            <tr style="background: rgba(255,255,255,0.1);">
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>年額費用</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥168万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥350万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥984万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥2,096万</strong></td>
+            </tr>
+            <tr style="background: rgba(255,255,255,0.2);">
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>初年度総額</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥318万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥530万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥1,214万</strong></td>
+                <td style="border-color: rgba(255,255,255,0.3);"><strong>¥2,526万</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <h3>従来構成との比較</h3>
+
+    <table>
+        <tr>
+            <th>TPS</th>
+            <th>従来構成 (年額)</th>
+            <th>OSS活用構成 (年額)</th>
+            <th>削減額</th>
+            <th>削減率</th>
+        </tr>
+        <tr>
+            <td><strong>50 TPS</strong></td>
+            <td>¥696万</td>
+            <td>¥168万</td>
+            <td><span style="color: #00cc66;">¥528万</span></td>
+            <td><span style="color: #00cc66;">75.9%</span></td>
+        </tr>
+        <tr>
+            <td><strong>100 TPS</strong></td>
+            <td>¥1,020万</td>
+            <td>¥350万</td>
+            <td><span style="color: #00cc66;">¥670万</span></td>
+            <td><span style="color: #00cc66;">65.7%</span></td>
+        </tr>
+        <tr>
+            <td><strong>250 TPS</strong></td>
+            <td>¥2,196万</td>
+            <td>¥984万</td>
+            <td><span style="color: #00cc66;">¥1,212万</span></td>
+            <td><span style="color: #00cc66;">55.2%</span></td>
+        </tr>
+        <tr>
+            <td><strong>500 TPS</strong></td>
+            <td>¥3,792万</td>
+            <td>¥2,096万</td>
+            <td><span style="color: #00cc66;">¥1,696万</span></td>
+            <td><span style="color: #00cc66;">44.7%</span></td>
+        </tr>
+    </table>
+
+    <h2>8. リスクと対策</h2>
+
+    <div class="warning-box">
+        <h3>⚠️ スモールスタート構成のリスク</h3>
+
+        <h4>1. 単一障害点 (Phase 1)</h4>
+        <ul>
+            <li><strong>リスク:</strong> EC2/RDS/Redisが1台のため、障害時にサービス停止</li>
+            <li><strong>対策:</strong> 
+                <ul>
+                    <li>定期的なスナップショット取得 (RDS: 毎日自動)</li>
+                    <li>CloudWatch Alarms で異常検知</li>
+                    <li>Phase 2移行時にMulti-AZ化</li>
+                    <li>メンテナンスウィンドウの設定 (深夜帯)</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>2. スケール限界</h4>
+        <ul>
+            <li><strong>リスク:</strong> 想定以上のトラフィック増加時に対応できない</li>
+            <li><strong>対策:</strong>
+                <ul>
+                    <li>Auto Scaling設定 (CPU 70%でスケールアウト)</li>
+                    <li>事前の負荷テスト実施</li>
+                    <li>CloudFrontによるキャッシュ最大活用</li>
+                    <li>レート制限の実装</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>3. OSSのメンテナンス負荷</h4>
+        <ul>
+            <li><strong>リスク:</strong> 商用サービスより運用負荷が高い</li>
+            <li><strong>対策:</strong>
+                <ul>
+                    <li>Docker化による環境統一</li>
+                    <li>Infrastructure as Code (Terraform)</li>
+                    <li>自動アップデートスクリプト</li>
+                    <li>Phase 3以降で商用サービス移行も検討</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>4. データバックアップ</h4>
+        <ul>
+            <li><strong>対策:</strong>
+                <ul>
+                    <li>RDS: 自動バックアップ 7日間保持</li>
+                    <li>S3: バージョニング有効化</li>
+                    <li>週次で手動スナップショット (30日保持)</li>
+                    <li>災害対策: クロスリージョンレプリケーション (Phase 3以降)</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <h2>9. まとめ</h2>
+
+    <div class="highlight-box">
+        <h3>✅ スモールスタート構成の利点</h3>
+        
+        <ul style="font-size: 16px;">
+            <li><strong>低い初期投資:</strong> 初期費用150万円、月額14万円からスタート</li>
+            <li><strong>大幅なコスト削減:</strong> OSS活用により従来比75.9%削減 (50 TPS時)</li>
+            <li><strong>柔軟な拡張性:</strong> TPS増加に応じて段階的にスケール可能</li>
+            <li><strong>パイロット適合:</strong> リスクを最小化した検証環境</li>
+            <li><strong>本格展開への移行:</strong> Phase 4で全面再設計を前提</li>
+        </ul>
+
+        <h3 style="color: white;">💰 推奨プラン</h3>
+        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <p style="font-size: 18px; margin: 0;"><strong>Phase 1 (50 TPS / 300世帯)</strong></p>
+            <div class="cost-value">初期費用: ¥150万<br>年間運用: ¥168万</div>
+            <p style="font-size: 16px;">合計初年度: <strong>¥318万</strong></p>
+            <p style="margin-top: 15px;">この構成で6-12ヶ月運用し、効果を検証後に拡張を判断</p>
+        </div>
+    </div>
+
+</body>
+</html>

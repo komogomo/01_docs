@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホーム - HarmoNET (共通定義 v1.1 適用)</title>
+    <style>
+        /* ===================================
+           HarmoNET Design System v1.0 (home-designベース)
+           + common-contents v1.1 準拠
+        =================================== */
+        
+        :root {
+            /* Background Colors */
+            --color-bg-base: #F9FAFB;
+            --color-bg-card: #FFFFFF;
+            --color-bg-border: #E5E7EB;
+            
+            /* Text Colors */
+            --color-text-primary: #1F2937;
+            --color-text-secondary: #6B7280;
+            --color-text-tertiary: #9CA3AF;
+            
+            /* Action Colors */
+            --color-action-blue: #2563EB;
+            --color-action-blue-hover: #1d4ed8;
+            --color-action-blue-light: rgba(37, 99, 235, 0.1); /* common-footer の #DBEAFE とほぼ同等 */
+            
+            /* State Colors */
+            --color-success: #16A34A;
+            --color-warning: #F59E0B;
+            --color-warning-light: #FFFBEB;
+            --color-error: #DC2626;
+            --color-info: #3B82F6;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Border Radius */
+            --radius-sm: 0.5rem; /* 8px */
+            --radius-md: 1rem; /* 16px */
+            /* ★ common-contents (rounded-2xl) 準拠のため追加 */
+            --radius-xl: 1.5rem; /* 24px */
+            
+            /* Typography */
+            --font-size-xs: 11px;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-md: 15px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+        }
+
+        /* Reset and Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'BIZ UDGothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: var(--color-bg-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        .demo-container {
+            background: var(--color-bg-card);
+            /* ★ common-contents (rounded-2xl) 準拠 */
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--color-bg-border);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* ===================================
+           Header Styles (common-header_v1.1.md 準拠)
+        =================================== */
+        .page-header {
+            background: var(--color-bg-card);
+            border-bottom: 1px solid var(--color-bg-border);
+            /* ★ common-header 準拠 */
+            padding: 0 20px;
+            height: 60px;
+        }
+
+        .page-header__container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%; /* 親の高さ(60px)に合わせる */
+        }
+
+        .app-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* 通知ボタン (common-header準拠) */
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px; /* common-header 準拠 */
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: background-color 0.15s ease;
+        }
+
+        .notification-btn:hover {
+            background-color: var(--color-bg-base); /* common-header 準拠 */
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            stroke: var(--color-text-secondary); /* common-header 準拠 */
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--color-error); /* common-header 準拠 */
+            color: white;
+            font-size: 10px; /* common-header 準拠 */
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--color-bg-card);
+        }
+
+        /* 言語切り替え (common-header準拠) */
+        .language-switcher {
+            display: flex;
+            gap: var(--spacing-xs);
+            background: var(--color-bg-base); /* common-header 準拠 */
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-sm); /* common-header 準拠 */
+        }
+
+        .lang-btn {
+            padding: 4px 10px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--color-action-blue);
+            background: var(--color-action-blue-light);
+        }
+
+        .lang-btn--active {
+            background: var(--color-bg-card);
+            color: var(--color-action-blue);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===================================
+           Content Area (common-contents-layout準拠)
+        =================================== */
+        .page-content {
+            background: var(--color-bg-base);
+            height: 500px;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+        }
+
+        /* Welcome Card */
+        .welcome-card {
+            background: var(--color-action-blue);
+            /* ★ common-contents (rounded-2xl) 準拠 */
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            color: white;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .welcome-card__greeting {
+            font-size: var(--font-size-base);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .welcome-card__name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .welcome-card__room {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            stroke: var(--color-action-blue);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .section-link {
+            font-size: 13px;
+            color: var(--color-action-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .section-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Notice Card */
+        .notice-card {
+            background: var(--color-bg-card);
+            /* ★ common-contents (rounded-2xl) 準拠 */
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--color-bg-border);
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .notice-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .notice-card--unread {
+            border-left: 3px solid var(--color-action-blue);
+            background: #f0f7ff;
+        }
+
+        .notice-card__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .notice-card__badge {
+            font-size: var(--font-size-xs);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+            background: var(--color-bg-border);
+            color: var(--color-text-secondary);
+        }
+
+        .notice-card__badge--unread {
+            background: var(--color-action-blue);
+            color: white;
+        }
+
+        .notice-card__date {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+        }
+
+        .notice-card__title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .notice-card__category {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        /* Function Tiles */
+        .function-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: var(--spacing-md);
+        }
+
+        .function-tile {
+            background: var(--color-bg-card);
+            /* ★ common-contents (rounded-2xl) 準拠 */
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--color-bg-border);
+            padding: var(--spacing-md) 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .function-tile:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+            border-color: var(--color-action-blue);
+        }
+
+        .function-tile__icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto var(--spacing-sm);
+            stroke: var(--color-action-blue);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .function-tile__label {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        /* ダミータイル（準備中） */
+        .function-tile--disabled {
+            background: var(--color-bg-base);
+            border-color: var(--color-bg-border);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .function-tile--disabled:hover {
+            box-shadow: var(--shadow-sm);
+            transform: none;
+            border-color: var(--color-bg-border);
+        }
+
+        .function-tile--disabled .function-tile__icon {
+            stroke: var(--color-text-tertiary);
+        }
+
+        .function-tile--disabled .function-tile__label {
+            color: var(--color-text-secondary);
+        }
+
+        /* ===================================
+           Footer Navigation (common-footer_v1.1.md 準拠)
+        =================================== */
+        .page-footer {
+          position: relative; /* .demo-container 内のため relative */
+          height: 60px; /* common-footer 準拠 */
+          background-color: var(--color-bg-card); /* 準拠 (CSS変数) */
+          border-top: 1px solid var(--color-bg-border); /* 準拠 (CSS変数) */
+          z-index: 10; 
+          padding: 0; 
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%; /* page-footer の高さ 60px を使う */
+        }
+        
+        .footer-nav-btn {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 44px; /* common-footer 準拠 */
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          transition: background-color 0.15s ease-in-out;
+          padding: 4px;
+          color: var(--color-text-secondary); /* 準拠 (CSS変数) */
+          position: relative; /* バッジの基点 */
+          min-width: 0; 
+        }
+        
+        .footer-nav-btn:hover {
+          background-color: var(--color-bg-base); /* 準拠 (CSS変数) */
+          border-radius: var(--radius-sm); /* 準拠 (0.5rem) */
+        }
+        
+        .footer-nav-btn--active {
+          /* common-footer アクティブスタイル */
+          background-color: var(--color-action-blue-light); 
+          border-radius: var(--radius-sm); /* 準拠 (0.5rem) */
+          color: var(--color-action-blue); /* 準拠 (CSS変数) */
+        }
+        
+        .footer-nav-icon {
+          width: 24px; 
+          height: 24px; 
+          stroke: currentColor;
+          stroke-width: 1.5; 
+          fill: none;
+          margin-bottom: 2px; /* common-footer 準拠 */
+        }
+        
+        .footer-nav-label {
+          font-size: var(--font-size-sm); /* 準拠 (12px) */
+          line-height: 1.6; /* 準拠 */
+          font-weight: 400; /* 準拠 */
+          white-space: nowrap;
+        }
+
+        .footer-nav-btn--active .footer-nav-label {
+          color: var(--color-action-blue); /* 準拠 (CSS変数) */
+          font-weight: 600; /* 準拠 */
+        }
+
+        .footer-nav-badge {
+            position: absolute;
+            top: 6px;
+            right: 8px; /* common-footer 準拠 */
+            min-width: 18px; 
+            height: 18px; 
+            background: var(--color-error); 
+            color: white;
+            font-size: var(--font-size-xs); /* 11px */
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--color-bg-card); 
+        }
+
+        .footer-nav-btn--logout {
+            color: var(--color-error); /* 準拠 */
+        }
+
+        .footer-nav-btn--logout:hover {
+          background-color: #FEE2E2; /* common-footer 準拠 (Error Light) */
+          color: var(--color-error); 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 374px) {
+            .app-title {
+                font-size: var(--font-size-lg);
+            }
+            
+            .function-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            /* common-footer 準拠のレスポンシブ */
+            .footer-nav-icon {
+                width: 20px;
+                height: 20px;
+            }
+            .footer-nav-label {
+                font-size: var(--font-size-xs); /* 11px */
+            }
+        }
+    </style>
+</head>
+<body data-page="home">
+    <div class="demo-container">
+        <header class="page-header">
+            <div class="page-header__container">
+                <h1 class="app-title">HarmoNET</h1>
+                <div class="header-actions">
+                    <button class="notification-btn" aria-label="通知 (未読3件)">
+                        <svg class="notification-icon" viewBox="0 0 24 24">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    
+                    <div class="language-switcher">
+                        <button class="lang-btn lang-btn--active" data-lang="ja">JA</button>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                        <button class="lang-btn" data-lang="cn">CN</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="welcome-card">
+                <div class="welcome-card__greeting">こんにちは、</div>
+                <div class="welcome-card__name">田中さん</div>
+                <div class="welcome-card__room">A棟 105号室</div>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">
+                    <svg class="section-icon" viewBox="0 0 24 24">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    最新のお知らせ
+                </div>
+                <a href="#" class="section-link">一覧を見る</a>
+            </div>
+
+            <div class="notice-card notice-card--unread">
+                <div class="notice-card__header">
+                    <span class="notice-card__badge notice-card__badge--unread">未読</span>
+                    <span class="notice-card__date">2025/10/28</span>
+                </div>
+                <div class="notice-card__title">新しい回覧板が届いています</div>
+                <div class="notice-card__category">秋祭りのお知らせ</div>
+            </div>
+
+            <div class="notice-card">
+                <div class="notice-card__header">
+                    <span class="notice-card__badge">既読</span>
+                    <span class="notice-card__date">2025/10/26</span>
+                </div>
+                <div class="notice-card__title">メンテナンス予定のリマインダー</div>
+                <div class="notice-card__category">明日 10:00 - 換気扇清掃</div>
+            </div>
+
+            <div class="notice-card">
+                <div class="notice-card__header">
+                    <span class="notice-card__badge">既読</span>
+                    <span class="notice-card__date">2025/10/25</span>
+                </div>
+                <div class="notice-card__title">管理費のお知らせ</div>
+                <div class="notice-card__category">回覧</div>
+            </div>
+
+            <div class="section-header" style="margin-top: 24px;">
+                <div class="section-title">
+                    <svg class="section-icon" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    機能メニュー
+                </div>
+            </div>
+
+            <div class="function-grid">
+                <!-- 実装済み機能 -->
+                <div class="function-tile">
+                    <svg class="function-tile__icon" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <div class="function-tile__label">施設予約</div>
+                </div>
+
+                <div class="function-tile">
+                    <svg class="function-tile__icon" viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <div class="function-tile__label">掲示板</div>
+                </div>
+
+                <div class="function-tile">
+                    <svg class="function-tile__icon" viewBox="0 0 24 24">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        <path d="M9 12h6m-6 4h6"></path>
+                    </svg>
+                    <div class="function-tile__label">アンケート</div>
+                </div>
+
+                <!-- ダミータイル（準備中） -->
+                <div class="function-tile function-tile--disabled">
+                    <svg class="function-tile__icon" viewBox="0 0 24 24">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="function-tile__label">準備中</div>
+                </div>
+
+                <div class="function-tile function-tile--disabled">
+                    <svg class="function-tile__icon" viewBox="0 0 24 24">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="function-tile__label">準備中</div>
+                </div>
+
+                <div class="function-tile function-tile--disabled">
+                    <svg class="function-tile__icon" viewBox="0 0 24 24">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="function-tile__label">準備中</div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            <nav class="footer-nav">
+                <button class="footer-nav-btn footer-nav-btn--active" data-page="home">
+                    <svg class="footer-nav-icon" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span class="footer-nav-label">ホーム</span>
+                </button>
+
+                <button class="footer-nav-btn" data-page="notice">
+                    <span class="footer-nav-badge">3</span>
+                    <svg class="footer-nav-icon" viewBox="0 0 24 24">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="footer-nav-label">お知らせ</span>
+                </button>
+
+                <button class="footer-nav-btn" data-page="board">
+                    <svg class="footer-nav-icon" viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="footer-nav-label">掲示板</span>
+                </button>
+
+                <button class="footer-nav-btn" data-page="facility">
+                    <svg class="footer-nav-icon" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="footer-nav-label">施設予約</span>
+                </button>
+
+                <button class="footer-nav-btn" data-page="mypage">
+                    <svg class="footer-nav-icon" viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="footer-nav-label">マイページ</span>
+                </button>
+
+                <button class="footer-nav-btn footer-nav-btn--logout" data-page="logout">
+                    <svg class="footer-nav-icon" viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span class="footer-nav-label">ログアウト</span>
+                </button>
+            </nav>
+        </footer>
+    </div>
+
+    <script>
+        // Footer active state (ログアウト確認含む)
+        document.querySelectorAll('.footer-nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.dataset.page !== 'logout') {
+                    document.querySelectorAll('.footer-nav-btn').forEach(b => {
+                        b.classList.remove('footer-nav-btn--active');
+                    });
+                    this.classList.add('footer-nav-btn--active');
+                }
+                
+                const page = this.dataset.page;
+                console.log('Navigate to:', page);
+                
+                if (page === 'logout') {
+                    if (confirm('ログアウトしますか?')) { /* common-footer 準拠 */
+                        alert('ログアウトしました');
+                    }
+                }
+            });
+        });
+
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.lang-btn').forEach(b => {
+                    b.classList.remove('lang-btn--active');
+                });
+                this.classList.add('lang-btn--active');
+                const lang = this.getAttribute('data-lang');
+                console.log('Language switched to:', lang);
+            });
+        });
+        
+        // 通知ボタン
+        document.querySelector('.notification-btn').addEventListener('click', function() {
+            console.log('Navigate to: notifications');
+            alert('通知一覧画面へ遷移します'); /* common-header 準拠 */
+        });
+
+        // 機能タイル（実装済み機能のみ）
+        document.querySelectorAll('.function-tile:not(.function-tile--disabled)').forEach(tile => {
+            tile.addEventListener('click', function() {
+                const label = this.querySelector('.function-tile__label').textContent;
+                alert(`${label}画面へ遷移します`);
+            });
+        });
+
+        // ダミータイル（準備中）
+        document.querySelectorAll('.function-tile--disabled').forEach(tile => {
+            tile.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('この機能は準備中です');
+            });
+        });
+    </script>
+</body>
+</html>

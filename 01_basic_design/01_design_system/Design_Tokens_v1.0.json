@@ -1,0 +1,287 @@
+{
+  "$schema": "https://schemas.design-tokens.org/v0.1/design-tokens.schema.json",
+  "document": {
+    "id": "SEC-APP-DESIGN-TOKENS-001",
+    "version": "1.0",
+    "created": "2025-10-27",
+    "description": "Design Tokens for SECUREA City Smart Communication App"
+  },
+  "color": {
+    "primary": {
+      "start": {
+        "value": "#667eea",
+        "type": "color",
+        "description": "プライマリグラデーション開始色（パープルブルー）"
+      },
+      "end": {
+        "value": "#764ba2",
+        "type": "color",
+        "description": "プライマリグラデーション終了色（ディープパープル）"
+      }
+    },
+    "accent": {
+      "main": {
+        "value": "#3b82f6",
+        "type": "color",
+        "description": "アクセントカラー（ブルー）"
+      },
+      "light": {
+        "value": "#60a5fa",
+        "type": "color",
+        "description": "ライトアクセントカラー"
+      }
+    },
+    "background": {
+      "primary": {
+        "value": "#f9fafb",
+        "type": "color",
+        "description": "メイン背景色（ホワイトグレー）"
+      },
+      "secondary": {
+        "value": "#f3f4f6",
+        "type": "color",
+        "description": "カード背景色（ライトグレー）"
+      },
+      "border": {
+        "value": "#e5e7eb",
+        "type": "color",
+        "description": "ボーダー色"
+      }
+    },
+    "text": {
+      "primary": {
+        "value": "#1f2937",
+        "type": "color",
+        "description": "見出し・重要テキスト（チャコールグレー）"
+      },
+      "secondary": {
+        "value": "#6b7280",
+        "type": "color",
+        "description": "本文テキスト（ミディアムグレー）"
+      },
+      "tertiary": {
+        "value": "#9ca3af",
+        "type": "color",
+        "description": "補足情報（ライトグレー）"
+      }
+    },
+    "state": {
+      "success": {
+        "value": "#10b981",
+        "type": "color",
+        "description": "成功状態（グリーン）"
+      },
+      "warning": {
+        "value": "#f59e0b",
+        "type": "color",
+        "description": "警告状態（オレンジ）"
+      },
+      "error": {
+        "value": "#ef4444",
+        "type": "color",
+        "description": "エラー状態（レッド）"
+      },
+      "info": {
+        "value": "#3b82f6",
+        "type": "color",
+        "description": "情報状態（ブルー）"
+      }
+    }
+  },
+  "spacing": {
+    "xs": {
+      "value": "4px",
+      "type": "dimension",
+      "description": "最小間隔"
+    },
+    "sm": {
+      "value": "8px",
+      "type": "dimension",
+      "description": "小さな余白"
+    },
+    "md": {
+      "value": "16px",
+      "type": "dimension",
+      "description": "標準的な余白"
+    },
+    "lg": {
+      "value": "24px",
+      "type": "dimension",
+      "description": "大きな余白"
+    },
+    "xl": {
+      "value": "32px",
+      "type": "dimension",
+      "description": "セクション間の余白"
+    },
+    "2xl": {
+      "value": "48px",
+      "type": "dimension",
+      "description": "大セクション間の余白"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": {
+        "value": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans JP', sans-serif",
+        "type": "fontFamily",
+        "description": "システムフォント + 日本語対応"
+      }
+    },
+    "fontSize": {
+      "xs": {
+        "value": "14px",
+        "type": "dimension",
+        "description": "補足情報サイズ"
+      },
+      "sm": {
+        "value": "14px",
+        "type": "dimension",
+        "description": "小サイズ"
+      },
+      "base": {
+        "value": "16px",
+        "type": "dimension",
+        "description": "本文サイズ"
+      },
+      "md": {
+        "value": "16px",
+        "type": "dimension",
+        "description": "h4サイズ"
+      },
+      "lg": {
+        "value": "18px",
+        "type": "dimension",
+        "description": "h3サイズ"
+      },
+      "xl": {
+        "value": "20px",
+        "type": "dimension",
+        "description": "h2サイズ"
+      },
+      "2xl": {
+        "value": "24px",
+        "type": "dimension",
+        "description": "h1サイズ"
+      }
+    },
+    "fontWeight": {
+      "normal": {
+        "value": "400",
+        "type": "fontWeight",
+        "description": "通常テキスト"
+      },
+      "medium": {
+        "value": "500",
+        "type": "fontWeight",
+        "description": "強調テキスト"
+      },
+      "semibold": {
+        "value": "600",
+        "type": "fontWeight",
+        "description": "見出し"
+      },
+      "bold": {
+        "value": "700",
+        "type": "fontWeight",
+        "description": "重要な見出し"
+      }
+    },
+    "lineHeight": {
+      "tight": {
+        "value": "1.25",
+        "type": "number",
+        "description": "見出し用"
+      },
+      "normal": {
+        "value": "1.5",
+        "type": "number",
+        "description": "通常"
+      },
+      "relaxed": {
+        "value": "1.75",
+        "type": "number",
+        "description": "読みやすさ重視"
+      },
+      "loose": {
+        "value": "2",
+        "type": "number",
+        "description": "余白重視"
+      }
+    }
+  },
+  "borderRadius": {
+    "card": {
+      "value": "12px",
+      "type": "dimension",
+      "description": "カードの角丸"
+    },
+    "button": {
+      "value": "8px",
+      "type": "dimension",
+      "description": "ボタンの角丸"
+    }
+  },
+  "shadow": {
+    "card": {
+      "value": "0 2px 8px rgba(0, 0, 0, 0.1)",
+      "type": "shadow",
+      "description": "カードの影"
+    },
+    "cardHover": {
+      "value": "0 4px 16px rgba(0, 0, 0, 0.15)",
+      "type": "shadow",
+      "description": "カードホバー時の影"
+    }
+  },
+  "transition": {
+    "duration": {
+      "default": {
+        "value": "200ms",
+        "type": "duration",
+        "description": "標準的なトランジション時間"
+      }
+    },
+    "timingFunction": {
+      "default": {
+        "value": "ease",
+        "type": "cubicBezier",
+        "description": "標準的なイージング"
+      }
+    }
+  },
+  "breakpoint": {
+    "mobile": {
+      "value": "0px",
+      "type": "dimension",
+      "description": "モバイル（0-599px）"
+    },
+    "tablet": {
+      "value": "600px",
+      "type": "dimension",
+      "description": "タブレット（600-1023px）"
+    },
+    "desktop": {
+      "value": "1024px",
+      "type": "dimension",
+      "description": "デスクトップ（1024px以上）"
+    }
+  },
+  "maxWidth": {
+    "mobile": {
+      "value": "420px",
+      "type": "dimension",
+      "description": "モバイル最大幅"
+    },
+    "tablet": {
+      "value": "768px",
+      "type": "dimension",
+      "description": "タブレット最大幅"
+    },
+    "desktop": {
+      "value": "1024px",
+      "type": "dimension",
+      "description": "デスクトップ最大幅"
+    }
+  }
+}

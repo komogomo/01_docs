@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>開発環境 再構築プロジェクト 作業記録</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Meiryo, 'Hiragino Kaku Gothic ProN', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 5px;
+            color: #005a9c;
+        }
+        h1 {
+            text-align: center;
+        }
+        code {
+            background-color: #eef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            border: 1px solid #cce;
+        }
+        .status {
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: white;
+        }
+        .status.complete {
+            background-color: #28a745;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .summary {
+            background-color: #eaf6ff;
+            border-left: 5px solid #007acc;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>開発環境 再構築プロジェクト 作業記録</h1>
+    <p><strong>日付:</strong> 2025年10月16日</p>
+
+    <div class="summary">
+        <h3>プロジェクト目標</h3>
+        <p>既存の開発環境の混乱を解消し、Dドライブを主軸としたクリーンで再現性の高い開発環境をゼロから構築する。</p>
+    </div>
+
+    <h2>フェーズ1: 環境クリーンアップとデータ移行</h2>
+    <ul>
+        <li><strong>Cドライブの容量確保:</strong> Cドライブの空き容量不足（17.3GB）を特定し、環境再構築の方針を決定。</li>
+        <li><strong>WSL (Ubuntu-24.04) の移行:</strong>
+            <ul>
+                <li><code>wsl --export</code> コマンドでCドライブのUbuntuをバックアップ。</li>
+                <li><code>wsl --unregister</code> コマンドでCドライブからUbuntuを完全に削除。</li>
+                <li><code>wsl --import</code> コマンドでDドライブの指定フォルダ (<code>D:\WSL\Ubuntu</code>) に復元。</li>
+                <li><strong>結果:</strong> Cドライブの空き容量が <strong>30.0GB</strong> まで回復。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+        <li><strong>Docker Desktopのデータ保存先設定:</strong>
+            <ul>
+                <li>プログラム本体はCドライブにインストールし、容量を消費する仮想ディスク（Disk image）の保存先をDドライブに変更済みであることを確認。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2>フェーズ2: 新規プロジェクトとデータベース(Docker)のセットアップ</h2>
+    <ul>
+        <li><strong>新規プロジェクト作成:</strong>
+            <ul>
+                <li>Dドライブに作業用フォルダ (<code>D:\Projects</code>) を作成。</li>
+                <li><code>npx @nestjs/cli new secure-city-api</code> コマンドで、NestJSプロジェクトを新規作成。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+        <li><strong>Docker環境の定義 (<code>docker-compose.yml</code>):</strong>
+            <ul>
+                <li>プロジェクトルートに <code>docker-compose.yml</code> を作成。</li>
+                <li>サービスとして <strong>PostgreSQL 16</strong> (<code>postgres:16-alpine</code>) とDB管理ツール <strong>Adminer</strong> を定義。</li>
+                <li>データベースのデータ永続化先を <code>D:/Projects/postgres-data</code> に設定。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+        <li><strong>環境変数の設定 (<code>.env</code>):</strong>
+            <ul>
+                <li>プロジェクトルートに <code>.env</code> ファイルを作成。</li>
+                <li><code>DATABASE_URL</code> をはじめ、JWTシークレットキーやポート番号などの設定情報を定義。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+        <li><strong>データベースコンテナの起動:</strong>
+            <ul>
+                <li><code>docker-compose up -d</code> コマンドを実行し、PostgreSQLとAdminerのコンテナを正常に起動。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2>フェーズ3: Prismaによるデータベーススキーマの適用</h2>
+    <ul>
+        <li><strong>Prismaのセットアップ:</strong>
+            <ul>
+                <li><code>npm install prisma @prisma/client</code> でPrismaをプロジェクトにインストール。</li>
+                <li><code>npx prisma init</code> で初期化し、<code>prisma/schema.prisma</code> ファイルを作成。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+        <li><strong>スキーマ定義 (<code>schema.prisma</code>):</strong>
+            <ul>
+                <li><code>prisma/schema.prisma</code> に、User, RefreshToken, Post, Commentモデルの定義を記述。</li>
+                <li>データソースとして、<code>.env</code> ファイルの <code>DATABASE_URL</code> を参照するように設定。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+        <li><strong>データベースマイグレーション:</strong>
+            <ul>
+                <li><code>npx prisma migrate dev --name init</code> コマンドを実行。</li>
+                <li><code>schema.prisma</code> の定義に基づき、Docker上のPostgreSQLデータベース内に実際のテーブル群を自動で作成。 <span class="status complete">完了</span></li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2>現在の状況と次のステップ</h2>
+    <p><strong>現在:</strong> アプリケーションの土台となるインフラ（WSL, Docker, PostgreSQL）とデータベースのテーブル構造が完全に整った状態。</p>
+    <p><strong>次のステップ:</strong> NestJSアプリケーションのコーディング（認証機能の実装など）を開始する準備が完了。
+    </p>
+
+</body>
+</html>

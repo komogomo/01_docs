@@ -1,0 +1,9 @@
+﻿⚠ [##_old] 01_Direcroty-List-20251102_v02.txt → 推定工程: 未分類（AI補助推定必要）
+⚠ [##_old] 02_Directory-List-20251102-0928.txt → 推定工程: 未分類（AI補助推定必要）
+⚠ [##_old] 03_Doc-Directory-List-20251030_v1.0.txt → 推定工程: 未分類（AI補助推定必要）
+⚠ [##_old] 04_harmonet_chapter_sort_v1.0.ps1 → 推定工程: 未分類（AI補助推定必要）
+⚠ [##_old] Directory-List-20251102-0943.txt → 推定工程: 未分類（AI補助推定必要）
+⚠ [##_old] harmonet_chapter_sort_v1.1.ps1 → 推定工程: 未分類（AI補助推定必要）
+⚠ [docs] 01_HarmoNet_FileNaming_Standard_v1.0.md → 推定工程: 未分類（AI補助推定必要）
+⚠ [docs] 02_harmonet_project_reorg_v1.0.sh → 推定工程: 未分類（AI補助推定必要）
+⚠ [Rules] 01_HarmoNet_Document_Management_Policy_v1.0.md → 推定工程: 未分類（AI補助推定必要）

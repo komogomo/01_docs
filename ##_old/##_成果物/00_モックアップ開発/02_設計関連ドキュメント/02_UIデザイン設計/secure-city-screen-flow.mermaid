@@ -1,0 +1,62 @@
+graph TD
+    Start([アプリ起動]) --> Login[ログイン画面]
+    
+    Login -->|メールアドレス入力| SendMail[メール送信完了画面]
+    SendMail -->|マジックリンククリック| Auth{認証チェック}
+    
+    Auth -->|認証成功| Home[TOP画面/ホーム]
+    Auth -->|認証失敗/期限切れ| Login
+    
+    Home -->|駐車場予約タップ| Parking[駐車場予約TOP]
+    Home -->|回覧板タップ| Bulletin[回覧板一覧]
+    Home -->|掲示板タップ| BBS[掲示板一覧]
+    Home -->|通知設定タップ| Notification[通知設定]
+    Home -->|お知らせタップ| NewsDetail[お知らせ詳細]
+    Home -->|マイページタップ| MyPage[マイページ]
+    Home -->|メニュータップ| Menu[メニュー]
+    
+    Parking -->|カレンダー選択| ParkingMap[駐車場マップ]
+    ParkingMap -->|駐車場所選択| ParkingConfirm[予約確認画面]
+    ParkingConfirm -->|予約確定| ParkingComplete[予約完了画面]
+    ParkingComplete -->|メール送信| ParkingEmail[予約確認メール]
+    ParkingComplete --> Home
+    Parking -->|予約履歴タップ| ParkingHistory[予約履歴]
+    ParkingHistory -->|予約選択| ParkingDetail[予約詳細]
+    ParkingDetail -->|キャンセル| ParkingCancel[キャンセル確認]
+    ParkingCancel --> Parking
+    
+    Bulletin -->|回覧板選択| BulletinDetail[回覧板詳細]
+    BulletinDetail -->|確認済みボタン| Bulletin
+    BulletinDetail -->|翻訳ボタン| BulletinTranslate[翻訳表示]
+    BulletinTranslate --> BulletinDetail
+    Bulletin --> Home
+    
+    BBS -->|スレッド選択| BBSThread[スレッド詳細]
+    BBSThread -->|コメント投稿| BBSComment[コメント投稿画面]
+    BBSComment --> BBSThread
+    BBSThread -->|翻訳ボタン| BBSTranslate[翻訳表示]
+    BBSTranslate --> BBSThread
+    BBS -->|新規投稿ボタン| BBSNew[新規投稿画面]
+    BBSNew -->|投稿完了| BBS
+    BBS --> Home
+    
+    Notification -->|設定変更| NotificationSave[設定保存]
+    NotificationSave --> Notification
+    Notification --> Home
+    
+    MyPage -->|言語設定| Language[言語設定]
+    Language --> MyPage
+    MyPage -->|ログアウト| Logout{ログアウト確認}
+    Logout -->|確定| Login
+    Logout -->|キャンセル| MyPage
+    MyPage --> Home
+    
+    Menu --> Home
+    NewsDetail --> Home
+    
+    style Home fill:#e1bee7
+    style Login fill:#bbdefb
+    style Parking fill:#c5e1a5
+    style Bulletin fill:#fff9c4
+    style BBS fill:#ffccbc
+    style Notification fill:#b2dfdb

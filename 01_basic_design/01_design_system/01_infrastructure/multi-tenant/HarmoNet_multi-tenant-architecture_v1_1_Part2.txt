@@ -1,0 +1,210 @@
+# HarmoNet マルチテナント設計仕様書 v1.1（Part2）
+文書バージョン: 1.1
+作成日: 2025年10月30日
+最終更新日: 2025年10月30日
+文書管理番号: HARMONET-MULTI-TENANT-001
+
+---
+
+## 第5章 API設計方針
+
+### 5.1 API構成概要
+
+HarmoNetでは、NestJSを利用したモジュラー構成のREST APIを採用する。  
+エンドポイントは全て `/api/v1/{tenant_code}/...` の形式をとり、tenant_codeによりデータスコープを分離する。
+
+**基本設計原則:**
+- テナントごとにスコープを分離（tenant_idで制御）
+- Prisma ORMによる型安全なクエリ実装
+- OpenAPI (Swagger) による自動ドキュメント生成
+- JWT認証を用いたAPI保護
+
+### 5.2 API命名規則
+| 種別 | パターン | 例 |
+|------|-----------|----|
+| GET | /api/v1/{tenant}/bbs | 掲示板一覧取得 |
+| POST | /api/v1/{tenant}/bbs | 新規投稿 |
+| PUT | /api/v1/{tenant}/bbs/{id} | 投稿更新 |
+| DELETE | /api/v1/{tenant}/bbs/{id} | 投稿削除 |
+
+APIエラーレスポンスはJSON形式で統一する。
+
+**例:**
+```json
+{
+  "status": "error",
+  "code": "TENANT_NOT_FOUND",
+  "message": "指定されたテナントが存在しません。"
+}
+```
+
+---
+
+## 第6章 認証・権限管理
+
+### 6.1 認証方式
+HarmoNetではパスワードレス認証方式（Magic Link）を採用する。  
+Supabase Authをベースに、NextAuth連携によるトークン発行を行う。
+
+**認証フロー:**
+1. ユーザーがメールアドレスを入力しログインリンク送信  
+2. Supabase Authがトークン付きリンクを生成・送信  
+3. リンクをクリック → 認証成功後、JWT発行  
+4. JWTには `tenant_id`, `role`, `lang` を含むペイロードを付与
+
+**JWTペイロード例:**
+```json
+{
+  "sub": "user-uuid",
+  "tenant_id": "tenant-uuid",
+  "role": "admin",
+  "lang": "ja",
+  "exp": 1735600000
+}
+```
+
+### 6.2 権限ロール定義
+| ロール | 権限範囲 | 操作例 |
+|--------|------------|--------|
+| system_admin | 全テナント管理 | 新規テナント作成／削除 |
+| tenant_admin | テナント内全権 | ユーザー招待・設定変更 |
+| member | 一般ユーザー | 投稿・予約・閲覧 |
+
+### 6.3 認可ポリシー
+NestJS Guard と Prisma ミドルウェアを併用してアクセス制御を実施する。  
+Guard層でロール認可、ミドルウェア層でtenant_id整合性を検証する。
+
+**例:**
+```ts
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Get('/bbs')
+async findAll(@Tenant() tenantId: string) {
+  return this.bbsService.findAll({ tenantId });
+}
+```
+
+---
+
+## 第7章 RLS運用と監査ログ設計
+
+### 7.1 Row Level Security方針
+
+**目的:**  
+RLS（Row Level Security）により、DBレイヤーでのデータ隔離を強制する。  
+これにより、アプリケーション層でのバグによる越権アクセスを防ぐ。
+
+**設定例（Supabase側）:**
+```sql
+ALTER TABLE public.bbs_posts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_rls_policy
+ON public.bbs_posts
+USING (tenant_id = auth.jwt() ->> 'tenant_id');
+```
+
+**補足:**  
+Prisma ORMはRLSを透過的に利用できる。  
+tenant_idはJWTから自動解決され、`context` に注入される。
+
+### 7.2 RLS適用対象テーブル
+- bbs_posts
+- bbs_comments
+- announcements
+- reservations
+- tenant_user
+- survey_responses
+- consumables_orders
+
+### 7.3 Prismaミドルウェア補足
+- API呼出ごとに `tenant_id` を自動挿入  
+- 管理者操作時にはシステム権限フラグを付与 (`role=system_admin`)  
+- 不整合時は `FORBIDDEN` エラーを返す
+
+### 7.4 監査ログ
+- すべての更新操作を `audit_log` テーブルに記録
+- 形式: JSONB  
+- 保持期間: 90日（Supabase Storageでローテーション）
+
+**テーブル例:**
+```sql
+CREATE TABLE audit_log (
+  id BIGSERIAL PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  user_id UUID,
+  action VARCHAR(50),
+  entity VARCHAR(50),
+  payload JSONB,
+  created_at TIMESTAMP DEFAULT now()
+);
+```
+
+### 7.5 ログ構造例
+```json
+{
+  "action": "CREATE_POST",
+  "entity": "bbs_posts",
+  "payload": {
+    "title": "新しい投稿",
+    "category": "announcement"
+  },
+  "user_id": "user-uuid",
+  "tenant_id": "tenant-uuid",
+  "timestamp": "2025-10-30T10:10:00Z"
+}
+```
+
+---
+
+## 第8章 運用環境・監視構成
+
+### 8.1 運用環境構成
+
+| 環境 | 構成 | 備考 |
+|------|------|------|
+| 開発環境 | Docker Desktop + Supabase (local) | 開発者向け環境 |
+| ステージング | Vercel + Supabase Project | 本番同等 |
+| 本番 | Vercel + Supabase (managed) | 自動バックアップ・監視 |
+
+**構成概要図:**
+
+```
+[Vercel Frontend] 
+   │
+   ├── [NestJS API]
+   │       └─ Prisma ORM → Supabase (RLS)
+   │
+   ├── [Supabase Auth / Storage]
+   ├── [SendGrid / SES]
+   └── [FCM Notifications]
+```
+
+### 8.2 バックアップ運用
+- Supabase自動バックアップ（毎日）  
+- 保管期間: 7日間  
+- 月次バックアップ: Cloud Storage に保存  
+- 復旧手順: Supabaseリストア機能利用
+
+### 8.3 監視設計
+
+| 監視項目 | 監視方法 | アラート条件 |
+|-----------|------------|---------------|
+| 稼働率 | UptimeRobot | 3分間隔でping応答 |
+| エラー発生率 | Sentry | 5%以上で通知 |
+| API応答時間 | Datadog / Vercel Monitor | 平均>2秒 |
+| DB接続数 | Supabaseモニタ | 80%以上 |
+| 翻訳API使用量 | Cloud Monitoring | 無料枠80%で警告 |
+
+### 8.4 アラート通知
+- 通知先: Slack / メール  
+- 通知内容: 発生箇所・時刻・影響範囲  
+- レベル定義: Info / Warning / Critical  
+
+### 8.5 障害対応手順
+1. 障害検知（Sentry／Slack）  
+2. 該当リリースのロールバック（Vercelロールバック機能）  
+3. Supabase接続確認・再起動  
+4. 状況共有（Slackチャンネル）  
+5. 根本原因分析・再発防止策登録
+
+---
+【次章：第9章 コスト試算および拡張フェーズ設計（Part3に続く）】

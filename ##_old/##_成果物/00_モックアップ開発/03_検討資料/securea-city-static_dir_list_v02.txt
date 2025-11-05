@@ -1,0 +1,40 @@
+﻿securea-city-static/
+├── index.html
+├── pages/
+│   ├── home/
+│   │   ├── home.html
+│   │   ├── home.css
+│   │   └── home.js
+│   ├── notice/
+│   │   ├── list.html
+│   │   ├── detail.html
+│   │   └── ...
+│   ├── board/
+│   │   ├── list.html
+│   │   ├── detail.html
+│   │   ├── new.html
+│   │   └── ...
+│   ├── booking/
+│   └── survey/
+├── css/
+│   ├── variables.css    (CSS変数定義)
+│   ├── base.css         (基本スタイル)
+│   └── components.css   (共通コンポーネント)
+└── js/
+    ├── i18n/
+    │   ├── i18n.js      (翻訳ロジック)
+    │   └── langs/
+    │            ├── ja.js
+    │            ├── en.js
+    │            └── zh.js
+    └── main.js          (共通処理)
+```
+
+## ?? home.html の作成方針
+
+この構成に基づいて、以下のファイルを作成します：
+```
+pages/home/
+├── home.html   (ホーム画面本体)
+├── home.css    (ホーム画面専用CSS)
+└── home.js     (ホーム画面専用JS)

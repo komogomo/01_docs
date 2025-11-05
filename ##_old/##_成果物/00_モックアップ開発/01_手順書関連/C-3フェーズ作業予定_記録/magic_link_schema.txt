@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // または "postgresql" / "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザーテーブル
+model User {
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  name                  String?
+  language              String                 @default("JP") // JP, EN, CN
+  isActive              Boolean                @default(true)
+  isAdmin               Boolean                @default(false)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  lastLoginAt           DateTime?
+  
+  // リレーション
+  magicLinkTokens       MagicLinkToken[]
+  auditLogs             AuditLog[]
+  
+  @@index([email])
+  @@index([isActive])
+}
+
+// マジックリンクトークンテーブル
+model MagicLinkToken {
+  id                    String                 @id @default(cuid())
+  userId                String
+  token                 String                 @unique
+  expiresAt             DateTime               // 15分後
+  isUsed                Boolean                @default(false)
+  usedAt                DateTime?
+  
+  // デバイス・セキュリティ情報
+  requestIp             String?                // IPv4/IPv6対応
+  userAgent             String?                // ブラウザ情報
+  deviceId              String?                // デバイス識別子
+  
+  createdAt             DateTime               @default(now())
+  
+  // リレーション
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([isUsed])
+}
+
+// 監査ログテーブル（セキュリティ・デバッグ用）
+model AuditLog {
+  id                    String                 @id @default(cuid())
+  userId                String?
+  action                String                 // "REQUEST_MAGIC_LINK", "VERIFY_TOKEN", "LOGIN_SUCCESS", etc
+  result                String                 // "SUCCESS", "FAILED", "EXPIRED", etc
+  detail                String?                // 詳細情報（JSON形式）
+  ipAddress             String?
+  userAgent             String?
+  createdAt             DateTime               @default(now())
+  
+  // リレーション
+  user                  User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// セッション管理テーブル（将来の拡張用）
+model Session {
+  id                    String                 @id @default(cuid())
+  userId                String
+  accessToken           String                 @unique
+  expiresAt             DateTime
+  isActive              Boolean                @default(true)
+  createdAt             DateTime               @default(now())
+  
+  @@index([userId])
+}

@@ -1,0 +1,100 @@
+# 第7章 付録・参照資料・リスク管理（v1.3）
+
+本章は **HarmoNet Technical Stack Definition v3.2** に準拠する。  
+本ドキュメント群は、HarmoNet開発における全設計資料の整合性と保守性を保証するための最終リファレンスを構成する。
+
+---
+
+## 7.1 用語集
+
+| 用語 | 説明 |
+|------|------|
+| **HarmoNet** | 地域コミュニティ支援アプリ。住民・管理者・管理会社の三者連携を目的とした情報共有基盤。 |
+| **MVP（Minimum Viable Product）** | 最小限の機能で市場適合性を検証する開発手法。 |
+| **Supabase** | オープンソースのBaaS（Backend as a Service）。PostgreSQL、Auth、Storageを統合提供。 |
+| **RLS（Row Level Security）** | PostgreSQLの機能。テナントID単位で行レベルアクセス制御を行う仕組み。 |
+| **Magic Link** | メールで送信されたワンクリック認証リンクを利用したパスワードレス認証方式。 |
+| **JWT（JSON Web Token）** | 認証情報を署名付きJSON形式で安全に伝達するトークン方式。 |
+| **Redis** | 高速インメモリキャッシュ。翻訳結果やセッション情報の保持に使用。 |
+| **PWA（Progressive Web App）** | Webアプリをネイティブアプリのように動作させる仕組み。 |
+| **i18next** | 多言語対応ライブラリ。UI翻訳を動的に切り替える。 |
+| **Edge Functions** | Supabaseのサーバレス実行環境。低遅延でAPI処理を実行。 |
+| **FCM（Firebase Cloud Messaging）** | Googleのプッシュ通知サービス。 |
+| **SendGrid** | クラウドメール配信サービス。HarmoNetの通知メールで使用。 |
+| **HEMS** | Home Energy Management System。家庭エネルギー管理システム。 |
+
+---
+
+## 7.2 関連ドキュメント
+
+| ドキュメント名 | 概要 | 保管場所 |
+|----------------|------|-----------|
+| **HarmoNet Technical Stack Definition v3.2** | 技術基盤・アーキテクチャ仕様書 | `/docs/00_architecture/` |
+| **HarmoNet UI Design Guidelines v1.1** | 画面デザインおよびスタイル仕様 | `/docs/01_basic_design/` |
+| **HarmoNet Database Schema v1.0** | テーブル定義・ER図 | `/docs/02_db_design/` |
+| **HarmoNet API Specification v1.0** | REST APIエンドポイント仕様 | `/docs/03_api_spec/` |
+| **HarmoNet Infrastructure Design v1.0** | 運用環境・監視構成 | `/docs/04_infra/` |
+| **Functional Requirements v1.3（全章）** | 機能・非機能・環境・将来展望含む | `/docs/05_requirements/` |
+
+---
+
+## 7.3 外部サービス・API一覧（v3.2準拠）
+
+| サービス | 用途 | 利用プラン | 備考 |
+|-----------|------|--------------|------|
+| **Supabase** | 認証・DB・Storage | Free〜Pro | BaaS基盤。RLS・Auth統合。 |
+| **SendGrid** | メール通知 | Free（100通/月） | 認証・お知らせ通知に使用。 |
+| **Firebase Cloud Messaging (FCM)** | プッシュ通知 | 無料 | Phase 2より導入。 |
+| **Google Cloud Translation API (Basic v2)** | 自動翻訳 | 無料枠50万文字/月 | Redisキャッシュにより最適化。 |
+| **Redis Cloud / Local Redis** | 翻訳・セッションキャッシュ | Free〜Standard | Supabaseと連携し非同期処理最適化。 |
+| **Cloudflare CDN** | 静的配信高速化 | Free | 任意導入。 |
+| **UptimeRobot** | 稼働監視 | Free | 3分間隔監視。 |
+| **Sentry** | アプリケーションエラー監視 | Free〜Pro | Vercel連携で導入済み。 |
+
+---
+
+## 7.4 リスク管理
+
+| リスク項目 | 発生確率 | 影響度 | 対策 |
+|-------------|-----------|---------|------|
+| 翻訳API使用量超過 | 低 | 中 | Redisキャッシュ・月次監視で制御 |
+| Supabaseサービス停止 | 低 | 高 | 日次バックアップ・フェイルオーバー設計 |
+| セキュリティインシデント | 中 | 高 | RLS強制適用・ログ監査・脆弱性診断 |
+| 大量アクセスによる遅延 | 低 | 中 | CDNキャッシュ・Edge Function導入 |
+| AI出力の誤翻訳 | 中 | 低 | 手動修正UI・翻訳履歴保持 |
+| **AI要約の誤生成** | 中 | 低 | 再生成ボタン・人間レビュー導入 |
+| **テナントスケール増加によるDB負荷** | 中 | 中 | Supabase Proプラン移行＋Redis分散キャッシュ |
+| 開発スケジュール遅延 | 中 | 中 | フェーズ単位リリース・優先度管理 |
+| 住民利用率低下 | 中 | 高 | UX改善・周知キャンペーン実施 |
+
+---
+
+## 7.5 文書承認
+
+| 役割 | 氏名 | 承認日 |
+|------|------|--------|
+| プロジェクトオーナー | __________________ | //__ |
+| 開発リーダー | __________________ | //__ |
+
+---
+
+## 7.6 変更履歴
+
+| バージョン | 日付 | 変更内容 | 作成者 |
+|-------------|------|-----------|---------|
+| v1.0 | 2025/10/26 | 初版作成 | TKD |
+| v1.1 | 2025/10/26 | 掲示板機能（AIモデレーション）追加 | TKD |
+| v1.2 | 2025/10/30 | Supabase／RLS対応、Phase 2〜4拡張反映 | GPT署名 |
+| **v1.3** | **2025/10/30** | Technical Stack v3.2準拠化およびリスク項目更新 | **GPT署名** |
+
+---
+
+### 7.7 注意事項
+本書はHarmoNet開発チームおよび関係者の内部資料であり、  
+**無断複製・再配布・外部共有を禁ずる。**  
+すべての内容は HarmoNet Technical Stack Definition v3.2 の技術基盤上で運用される。
+
+---
+
+*by GPT (HarmoNet PMO AI)*  
+**（End of Chapter 7）**

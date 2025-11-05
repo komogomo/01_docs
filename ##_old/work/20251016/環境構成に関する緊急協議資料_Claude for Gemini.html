@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【緊急協議】Prismaクラッシュと環境分離への移行方針</title>
+    <style>
+        body { font-family: "BIZ UDゴシック", Meiryo, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; color: #333; margin: 20px; background-color: #f7f7f7; }
+        .container { max-width: 1000px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        h1 { color: #dc3545; border-bottom: 3px solid #dc3545; padding-bottom: 10px; font-size: 26px; }
+        h2 { color: #ffc107; background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 8px 10px; margin-top: 20px; font-size: 20px; }
+        h3 { color: #007bff; margin-top: 15px; font-size: 16px; border-bottom: 1px dashed #007bff; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px 15px; border: 1px solid #ddd; text-align: left; font-size: 14px; }
+        th { background-color: #e9ecef; font-weight: bold; }
+        .success-note { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; font-weight: bold; margin-bottom: 20px; }
+        .error-log { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-top: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>【緊急協議】APIテストにおけるPrismaエンジンの強制クラッシュ問題</h1>
+        <p><strong>発信元: Gemini Pro</strong></p>
+        <p><strong>目的: Windows環境での開発続行を断念し、当初計画のAlmaLinux VMへの完全移行を決定する。</strong></p>
+
+        <div class="success-note">
+            <h3>? 確定事項（成功）</h3>
+            <ul>
+                <li><strong>フロントエンド:</strong> React NativeプロジェクトのビルドとAndroidエミュレータでの動作が完全に成功。</li>
+                <li><strong>NestJSサーバー:</strong> サーバー起動とルーティングに問題なし。</li>
+                <li><strong>通信経路:</strong> Windowsファイアウォールの設定とWSLの `curl` 使用により、外部からのリクエスト到達に成功。</li>
+            </ul>
+        </div>
+
+        <h2>I. 現在発生している問題の切り分け</h2>
+
+        <h3>1. 問題の症状</h3>
+        <p>NestJSサーバーがデータベースに最初のクエリ（ユーザー登録時の重複チェック）を投げた瞬間、Prismaのエンジンがクラッシュし、NestJSサーバーの処理が中断されます。</p>
+        <div class="error-log">
+            <p><strong>エラーコード: P5010</strong></p>
+            <p><strong>メッセージ:</strong> <code>Cannot fetch data from service: fetch failed</code></p>
+            <p><strong>詳細:</strong> Prismaがデータベース接続を管理する内部サービスが予期せず停止したため、NestJSサーバーは3回のリトライすべてに失敗しています。</p>
+        </div>
+
+        <h3>2. 実施した切り分けの経緯と結果</h3>
+        <table>
+            <thead>
+                <tr><th>試行した原因</th><th>解決策</th><th>結果</th><th>結論</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>外部通信ブロック</strong></td><td>Windowsファイアウォール解放、ウイルスバスター除外、WSL2 IPアドレス指定。</td><td>? **通信は開通**（WSLからNestJSへのリクエスト到達に成功）。</td><td>問題は通信ではなく、サーバー内部のクラッシュに確定。</td></tr>
+                <tr><td><strong>Prismaバージョン競合</strong></td><td>Prismaパッケージの強制再インストール、`npx prisma generate`の再実行。</td><td>? **解決せず**。リトライロジックがログに出るようになったが、クラッシュ自体は継続。</td><td>コード修正やnpmキャッシュでは回避不能。</td></tr>
+                <tr><td><strong>Prisma接続の不安定さ</strong></td><td>`prisma.service.ts` に接続リトライとタイムアウト設定を追加。</td><td>? **解決せず**。リトライを試みるも、接続サービスがクラッシュ。</td><td>WindowsホストでのPrismaエンジンの不安定性はコードで制御できないレベル。</td></tr>
+            </tbody>
+        </table>
+        
+        <h2>II. 解決方針の変更と協議の依頼</h2>
+        
+        <h3>1. 方針変更の提案（当初計画への回帰）</h3>
+        <p>現状、WindowsホストOSでPrisma Dev Service (PostgreSQL) を安定稼働させることは、OSのプロセス競合が原因で**不可能**と判断します。このため、当初計画していた以下の構成に、今こそ完全に移行すべきです。</p>
+        
+        <ul>
+            <li>**NestJSバックエンド**を、安定性の高い**AlmaLinux VM**内に完全に移行する。</li>
+            <li>**PostgreSQL**を、VM内で**Dockerコンテナ**として起動し、ホストOS（Windows）の干渉を完全に排除する。</li>
+            <li>WSL Ubuntuへのネイティブインストールは、サービス起動や競合リスクがあるため回避する。</li>
+        </ul>
+        
+        <h3>2. Claudeへの協議依頼</h3>
+        <p>この移行は、プロジェクトの安定稼働のために必要不可欠だとGeminiは判断しましたが、**この環境移行（Windowsホスト $\rightarrow$ AlmaLinux VM + Docker DB）への方針変更**について、Claudeのオーディエンスと最終的な承認を求めます。</p>
+        
+        <p><strong>次のアクション:</strong></p>
+        <ol>
+            <li><strong>Claudeによる方針の評価と承認。</strong></li>
+            <li>承認後、バックエンドプロジェクトの資材をAlmaLinux VMへコピーする作業に着手。</li>
+        </ol>
+    </div>
+</body>
+</html>

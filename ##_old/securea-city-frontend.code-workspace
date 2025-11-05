@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "securea-city-static",
+			"path": "securea-city-static"
+		},
+		{
+			"path": "../Projects/securea-city"
+		}
+	],
+	"settings": {}
+}

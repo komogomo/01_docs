@@ -1,0 +1,70 @@
+graph TD
+    Start([管理者ログイン]) --> AdminHome[管理者TOP画面]
+    
+    AdminHome -->|お知らせ管理| AnnouncementList[お知らせ一覧]
+    AdminHome -->|駐車場管理| ParkingAdmin[駐車場管理]
+    AdminHome -->|掲示板管理| BBSAdmin[掲示板管理]
+    AdminHome -->|ユーザー管理| UserAdmin[ユーザー管理]
+    AdminHome -->|翻訳管理| TranslationAdmin[翻訳マスタ管理]
+    
+    AnnouncementList -->|新規作成| AnnouncementCreate[お知らせ作成]
+    AnnouncementCreate -->|日本語入力完了| AnnouncementTranslate[翻訳実行]
+    AnnouncementTranslate -->|API翻訳| TranslationAPI[Google Translation API]
+    TranslationAPI -->|翻訳結果表示| AnnouncementEdit[翻訳内容確認・編集]
+    AnnouncementEdit -->|保存| AnnouncementPreview[プレビュー]
+    AnnouncementPreview -->|公開| AnnouncementPublish[公開実行]
+    AnnouncementPublish -->|プッシュ通知送信| NotificationSend[通知送信処理]
+    AnnouncementPublish -->|メール送信| EmailSend[メール送信処理]
+    AnnouncementPublish --> AnnouncementList
+    
+    AnnouncementList -->|編集| AnnouncementEditExisting[お知らせ編集]
+    AnnouncementEditExisting --> AnnouncementTranslate
+    AnnouncementList -->|削除| AnnouncementDelete[削除確認]
+    AnnouncementDelete --> AnnouncementList
+    
+    ParkingAdmin -->|予約状況確認| ParkingCalendar[カレンダー表示]
+    ParkingCalendar -->|日付選択| ParkingDayView[日別予約状況]
+    ParkingDayView -->|予約詳細| ParkingReservationDetail[予約詳細]
+    ParkingReservationDetail -->|キャンセル| ParkingCancelAdmin[管理者キャンセル]
+    ParkingCancelAdmin --> ParkingAdmin
+    
+    ParkingAdmin -->|予約代理登録| ParkingCreate[代理予約作成]
+    ParkingCreate --> ParkingAdmin
+    
+    ParkingAdmin -->|ブロック設定| ParkingBlock[予約ブロック設定]
+    ParkingBlock -->|日付・駐車場選択| ParkingBlockConfirm[ブロック確認]
+    ParkingBlockConfirm --> ParkingAdmin
+    
+    ParkingAdmin -->|利用統計| ParkingReport[統計レポート]
+    ParkingReport -->|CSV出力| ParkingExport[データエクスポート]
+    ParkingExport --> ParkingReport
+    
+    BBSAdmin -->|投稿一覧| BBSPostList[投稿管理一覧]
+    BBSPostList -->|投稿詳細| BBSPostDetail[投稿詳細]
+    BBSPostDetail -->|削除| BBSDeleteConfirm[削除確認]
+    BBSDeleteConfirm --> BBSAdmin
+    BBSPostDetail -->|通報確認| BBSReport[通報内容確認]
+    BBSReport -->|対応完了| BBSAdmin
+    
+    UserAdmin -->|ユーザー一覧| UserList[ユーザー一覧]
+    UserList -->|ユーザー詳細| UserDetail[ユーザー詳細]
+    UserDetail -->|編集| UserEdit[ユーザー情報編集]
+    UserEdit --> UserAdmin
+    UserDetail -->|強制ログアウト| UserForceLogout[セッション無効化]
+    UserForceLogout --> UserAdmin
+    
+    UserAdmin -->|新規登録| UserCreate[ユーザー新規登録]
+    UserCreate --> UserAdmin
+    
+    TranslationAdmin -->|マスタ一覧| TranslationList[翻訳マスタ一覧]
+    TranslationList -->|編集| TranslationEdit[翻訳編集]
+    TranslationEdit --> TranslationAdmin
+    TranslationList -->|新規追加| TranslationCreate[新規翻訳追加]
+    TranslationCreate --> TranslationAdmin
+    
+    style AdminHome fill:#ffccbc
+    style AnnouncementList fill:#c5e1a5
+    style ParkingAdmin fill:#bbdefb
+    style BBSAdmin fill:#f8bbd0
+    style UserAdmin fill:#d1c4e9
+    style TranslationAdmin fill:#ffe0b2

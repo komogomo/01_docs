@@ -1,0 +1,117 @@
+﻿# HarmoNet BAG-lite Pre-Implementation Report
+# Phase: 4 (Core Schema v1.1/v1.2 Audit)
+# Auditor: Gemini
+# Timestamp: 2025-11-01T21:01:12+09:00
+
+audit_summary:
+  status: WARNING
+  total_files_audited: 5
+  total_issues_found: 5
+  issues_by_severity:
+    critical: 1
+    medium: 2
+    low: 2
+  audited_files:
+    - tenant-config-part01_common-attributes_v1.1.md
+    - tenant-config-part02_roles-and-permissions_v1.1.md
+    - tenant-config-part03_login-settings_v1.1.md
+    - tenant-config-part04_home-screen_v1.2.md
+    - harmonet-tenant-config-schema_v1.1.md
+
+audit_findings:
+  - id: BAG-LITE-001
+    severity: CRITICAL
+    category: Structure Consistency Check (構造整合性チェック)
+    title: 重大なスキーマ定義の重複 (Redundant Definition)
+    description: |
+      harmonet-tenant-config-schema_v1.1.md (メインファイル) が、
+      Part 01 (tenant_common) および Part 02 (roles, permissions_matrix) の内容と
+      ほぼ完全に重複しています。
+      これにより「Single Source of Truth (信頼できる唯一の情報源)」が崩れており、
+      どちらの定義が正であるか不明瞭です。
+    files_affected:
+      - harmonet-tenant-config-schema_v1.1.md
+      - tenant-config-part01_common-attributes_v1.1.md
+      - tenant-config-part02_roles-and-permissions_v1.1.md
+    recommendation: |
+      harmonet-tenant-config-schema_v1.1.md の役割を再定義してください。
+      (例: このファイルを削除し、Partファイル群 (Part 01, 02) を正とする。
+      または、このファイルを「統合ビュー」としてのみ使用し、実際の定義はPartファイルに委譲する。)
+
+  - id: BAG-LITE-002
+    severity: MEDIUM
+    category: Dependency Mapping Check (依存関係マッピング)
+    title: 参照不整合 (Dangling Reference)
+    description: |
+      Part 04 の `header.show_language_toggle.linked_to` が
+      "Part 01: language_settings" を参照しています が、
+      `language_settings` の定義は Part 03 に存在します。
+    files_affected:
+      - tenant-config-part04_home-screen_v1.2.md
+      - tenant-config-part03_login-settings_v1.1.md
+    recommendation: |
+      Part 04 の参照先を "Part 03: language_settings" に修正してください。
+
+  - id: BAG-LITE-003
+    severity: MEDIUM
+    category: Structure Consistency Check (構造整合性チェック)
+    title: 属性値の不統一 (Inconsistent Value)
+    description: |
+      `editable_by.system_admin` の許可値がファイル間で不統一です。
+      Part 03 (Login) では `[all]` が使用されていますが、
+      Part 04 (Home) では `['*']` が使用されています。
+      Part 04 のChangeLog に基づき `['*']` が正と推定されます。
+    files_affected:
+      - tenant-config-part03_login-settings_v1.1.md (Value: [all])
+      - tenant-config-part04_home-screen_v1.2.md (Value: ['*'])
+    recommendation: |
+      Part 03 の `editable_by.system_admin` の値を `['*']` に統一してください。
+
+  - id: BAG-LITE-004
+    severity: LOW
+    category: Dependency Mapping Check (依存関係マッピング)
+    title: 未定義スキーマへの参照 (Reference to Undefined Schema)
+    description: |
+      Part 01 の `tenant_common` (created_by, updated_by) が 
+      `reference: users.id` を参照しています が、
+      Core Schema (Part 01-04) 内に `users` スキーマ（ユーザー定義）が含まれていません。
+    files_affected:
+      - tenant-config-part01_common-attributes_v1.1.md
+    recommendation: |
+      これはCore Schemaの範囲外（例: Part 0X User Schemaで定義予定）である可能性が高いですが、
+      Core Schemaのみでの完結性が欠如しているため記録します。
+      実装時に `users` スキーマの定義を必須としてください。
+
+  - id: BAG-LITE-005
+    severity: LOW
+    category: Attribute Completeness Check (属性完全性チェック)
+    title: メタ情報の記述形式の不統一 (Inconsistent Metadata Format)
+    description: |
+      各Partファイルのメタ情報（Version, Author, Phaseなど）の記述形式が統一されていません。
+      (例: Part 01はフロントマター、Part 02/04はMarkdownテーブル、Part 03はプレーンテキスト)
+    files_affected:
+      - tenant-config-part01_common-attributes_v1.1.md
+      - tenant-config-part02_roles-and-permissions_v1.1.md
+      - tenant-config-part03_login-settings_v1.1.md
+      - tenant-config-part04_home-screen_v1.2.md
+    recommendation: |
+      ドキュメントの可読性と自動解析のため、メタ情報の記述形式を統一してください。
+      (例: 全てYAMLフロントマター、またはPart 04 のような末尾のテーブル形式)
+
+bag_model_validation:
+  status: PASSED
+  behavior:
+    status: OK
+    coverage: [Part 02, Main]
+    notes: "permissions_matrix および approval_flows が明確に定義されています。"
+  attribute:
+    status: OK
+    coverage: [Part 01, Part 03, Part 04]
+    notes: "tenant_common, home_screen, session, ui_theme など、属性が詳細に定義されています。"
+  group:
+    status: OK
+    coverage: [Part 02, Main]
+    notes: "roles (system_admin, tenant_admin, general_user) が明確に定義されています。"
+  conclusion: |
+    Core Schema (Part 01-04) はBAGモデル（Behavior, Attribute, Group）の
+    基本要素を網羅しており、BAG-lite検証はパスしました。

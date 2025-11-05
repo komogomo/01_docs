@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git & GitHub 操作手順書</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      font-size: 1.1em;
+      opacity: 0.95;
+    }
+    
+    nav {
+      background: #f8f9fa;
+      padding: 20px 40px;
+      border-bottom: 2px solid #e9ecef;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    nav h2 {
+      color: #495057;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    nav a {
+      color: #667eea;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s;
+      background: white;
+      border: 1px solid #dee2e6;
+    }
+    
+    nav a:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    main {
+      padding: 40px;
+    }
+    
+    section {
+      margin-bottom: 60px;
+      scroll-margin-top: 100px;
+    }
+    
+    h2 {
+      color: #667eea;
+      font-size: 2em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+    }
+    
+    h3 {
+      color: #764ba2;
+      font-size: 1.5em;
+      margin: 30px 0 15px;
+    }
+    
+    h4 {
+      color: #495057;
+      font-size: 1.2em;
+      margin: 20px 0 10px;
+    }
+    
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+      overflow-x: auto;
+      position: relative;
+    }
+    
+    .code-block::before {
+      content: 'bash';
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 0.8em;
+      color: #a0aec0;
+      font-family: monospace;
+    }
+    
+    .code-block code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+      display: block;
+      white-space: pre;
+    }
+    
+    .inline-code {
+      background: #f1f3f5;
+      color: #e83e8c;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid;
+    }
+    
+    .alert-info {
+      background: #e7f3ff;
+      border-color: #2196F3;
+      color: #0c5ba3;
+    }
+    
+    .alert-success {
+      background: #e8f5e9;
+      border-color: #4caf50;
+      color: #2e7d32;
+    }
+    
+    .alert-warning {
+      background: #fff3e0;
+      border-color: #ff9800;
+      color: #e65100;
+    }
+    
+    .alert-danger {
+      background: #ffebee;
+      border-color: #f44336;
+      color: #c62828;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .step-number {
+      display: inline-block;
+      width: 35px;
+      height: 35px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 35px;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    
+    ul {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+    
+    li {
+      margin: 10px 0;
+    }
+    
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .checklist li::before {
+      content: '☐ ';
+      color: #667eea;
+      font-size: 1.2em;
+      margin-right: 10px;
+    }
+    
+    .example {
+      background: #f8f9fa;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    
+    .example strong {
+      color: #28a745;
+    }
+    
+    .bad-example {
+      background: #fff5f5;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    
+    .bad-example strong {
+      color: #dc3545;
+    }
+    
+    footer {
+      background: #2d3748;
+      color: white;
+      text-align: center;
+      padding: 30px;
+      margin-top: 40px;
+    }
+    
+    .emoji {
+      font-size: 1.5em;
+      margin-right: 10px;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      header h1 {
+        font-size: 1.8em;
+      }
+      
+      main {
+        padding: 20px;
+      }
+      
+      nav ul {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 Git & GitHub 操作手順書</h1>
+      <p>初心者でもわかる！完全ガイド</p>
+    </header>
+    
+    <nav>
+      <h2>📋 目次</h2>
+      <ul>
+        <li><a href="#setup">初回セットアップ</a></li>
+        <li><a href="#daily">日常の作業フロー</a></li>
+        <li><a href="#commands">よく使うコマンド</a></li>
+        <li><a href="#commit-message">コミットメッセージ</a></li>
+        <li><a href="#troubleshooting">トラブルシューティング</a></li>
+        <li><a href="#checklist">チェックリスト</a></li>
+      </ul>
+    </nav>
+    
+    <main>
+      <!-- 初回セットアップ -->
+      <section id="setup">
+        <h2>🔧 初回セットアップ（最初の1回だけ）</h2>
+        
+        <h3><span class="step-number">1</span>Gitユーザー情報の設定</h3>
+        <div class="code-block"><code># 自分の名前とメールアドレスを設定
+git config --global user.name "komogomo"
+git config --global user.email "ttakeda43@gmail.com"
+
+# 設定確認
+git config --global user.name
+git config --global user.email</code></div>
+        
+        <h3><span class="step-number">2</span>SSH鍵の作成</h3>
+        <div class="code-block"><code># SSH鍵を生成（メールアドレスは自分のものに変更）
+ssh-keygen -t ed25519 -C "ttakeda43@gmail.com"
+
+# 以下の質問が出たら、全てEnterキーを押す
+# Enter file in which to save the key: [Enter]
+# Enter passphrase: [Enter]
+# Enter same passphrase again: [Enter]
+
+# 公開鍵を表示（この内容をコピーする）
+cat ~/.ssh/id_ed25519.pub</code></div>
+        
+        <div class="alert alert-info">
+          <strong>💡 表示例:</strong><br>
+          <code class="inline-code">ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINmQZ71E...A09Mi ttakeda43@gmail.com</code><br>
+          <strong>↑ この1行全てをコピーしてください</strong>
+        </div>
+        
+        <h3><span class="step-number">3</span>GitHubにSSH鍵を登録</h3>
+        <ol>
+          <li>https://github.com/settings/keys にアクセス</li>
+          <li>「New SSH key」をクリック</li>
+          <li>入力項目:
+            <ul>
+              <li><strong>Title:</strong> <code class="inline-code">ThinkPad-X390 WSL</code>（わかりやすい名前でOK）</li>
+              <li><strong>Key:</strong> コピーした公開鍵を貼り付け</li>
+            </ul>
+          </li>
+          <li>「Add SSH key」をクリック</li>
+        </ol>
+        
+        <h3><span class="step-number">4</span>接続テスト</h3>
+        <div class="code-block"><code># GitHubへの接続確認
+ssh -T git@github.com
+
+# 初回は「yes」と入力してEnter
+# 成功すると以下のメッセージが表示される:
+# Hi komogomo! You've successfully authenticated...</code></div>
+        
+        <h3><span class="step-number">5</span>リモートURLをSSHに変更</h3>
+        <div class="code-block"><code># プロジェクトフォルダに移動
+cd /mnt/d/AIDriven/securea-demo-static
+
+# 現在のリモートURL確認
+git remote -v
+
+# SSHに変更
+git remote set-url origin git@github.com:komogomo/securea-demo-static.git
+
+# 変更確認
+git remote -v</code></div>
+        
+        <div class="alert alert-success">
+          <strong>✅ セットアップ完了！</strong><br>
+          これで今後はパスワード入力なしでプッシュできます。
+        </div>
+      </section>
+      
+      <!-- 日常の作業フロー -->
+      <section id="daily">
+        <h2>📝 日常の作業フロー</h2>
+        
+        <h3>パターンA: 1ファイルだけ変更した場合</h3>
+        <div class="code-block"><code># 1. プロジェクトフォルダに移動
+cd /mnt/d/AIDriven/securea-demo-static
+
+# 2. 変更されたファイルを確認
+git status
+
+# 3. 変更内容の詳細を確認（オプション）
+git diff ファイル名
+
+# 4. 変更をステージング
+git add ファイル名
+
+# 5. コミット
+git commit -m "fix: 説明文をここに書く"
+
+# 6. GitHubにプッシュ
+git push origin master</code></div>
+        
+        <h3>パターンB: 複数ファイルを変更した場合</h3>
+        <div class="code-block"><code># 1. プロジェクトフォルダに移動
+cd /mnt/d/AIDriven/securea-demo-static
+
+# 2. 変更されたファイルを確認
+git status
+
+# 3. 全ての変更をステージング
+git add .
+
+# 4. コミット（複数行で詳細に記述）
+git commit -m "feat: 複数の機能改善
+
+- board-detail.htmlの翻訳機能追加
+- custom.cssのスタイル修正
+- 不要なファイルを削除"
+
+# 5. GitHubにプッシュ
+git push origin master</code></div>
+        
+        <h3>パターンC: 特定のファイルだけをコミット</h3>
+        <div class="code-block"><code># 複数のファイルを変更したが、一部だけコミットしたい場合
+
+# 1. 状況確認
+git status
+
+# 2. 必要なファイルだけ追加
+git add ファイル1 ファイル2
+
+# 3. コミット
+git commit -m "fix: 掲示板と予約機能の修正"
+
+# 4. プッシュ
+git push origin master</code></div>
+      </section>
+      
+      <!-- よく使うコマンド -->
+      <section id="commands">
+        <h2>🔍 よく使うGitコマンド</h2>
+        
+        <h3>現在の状態確認</h3>
+        <div class="code-block"><code># 変更されたファイルを確認
+git status
+
+# 変更内容の詳細を確認
+git diff
+
+# 特定のファイルの変更を確認
+git diff ファイル名</code></div>
+        
+        <h3>履歴確認</h3>
+        <div class="code-block"><code># コミット履歴を表示
+git log
+
+# 簡潔に表示
+git log --oneline
+
+# 最新5件だけ表示
+git log -5</code></div>
+        
+        <h3>最新版を取得</h3>
+        <div class="code-block"><code># リモートの最新版をダウンロード＋マージ
+git pull origin master</code></div>
+      </section>
+      
+      <!-- コミットメッセージ -->
+      <section id="commit-message">
+        <h2>🎯 コミットメッセージの書き方</h2>
+        
+        <h3>基本ルール</h3>
+        <div class="code-block"><code>種類: 短い説明（50文字以内）
+
+詳細な説明（オプション）
+- 変更点1
+- 変更点2</code></div>
+        
+        <h3>種類の使い分け</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>種類</th>
+              <th>説明</th>
+              <th>例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>feat</strong></td>
+              <td>新機能追加</td>
+              <td><code>feat: カレンダー機能を追加</code></td>
+            </tr>
+            <tr>
+              <td><strong>fix</strong></td>
+              <td>バグ修正</td>
+              <td><code>fix: 言語切替が動作しない問題を修正</code></td>
+            </tr>
+            <tr>
+              <td><strong>docs</strong></td>
+              <td>ドキュメント変更</td>
+              <td><code>docs: README更新</code></td>
+            </tr>
+            <tr>
+              <td><strong>style</strong></td>
+              <td>デザイン変更</td>
+              <td><code>style: ボタンの色を変更</code></td>
+            </tr>
+            <tr>
+              <td><strong>refactor</strong></td>
+              <td>コード整理</td>
+              <td><code>refactor: 関数を分割して整理</code></td>
+            </tr>
+            <tr>
+              <td><strong>chore</strong></td>
+              <td>その他の作業</td>
+              <td><code>chore: 不要ファイルを削除</code></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h3>良い例</h3>
+        <div class="example">
+          <strong>✅ 良い例:</strong>
+          <div class="code-block"><code>git commit -m "fix: board-detail.html - 言語切替機能の実装
+
+- EmbeddedLanguageManagerクラスを追加
+- 管理組合の表示を多言語対応
+- 文字化け問題を解消"</code></div>
+        </div>
+        
+        <h3>悪い例</h3>
+        <div class="bad-example">
+          <strong>❌ 悪い例:</strong>
+          <div class="code-block"><code>git commit -m "修正"  # 何を修正したかわからない
+git commit -m "いろいろ直した"  # 具体性がない</code></div>
+        </div>
+      </section>
+      
+      <!-- トラブルシューティング -->
+      <section id="troubleshooting">
+        <h2>🆘 トラブルシューティング</h2>
+        
+        <h3>❌ ERROR: Repository not found</h3>
+        <div class="alert alert-danger">
+          <strong>原因:</strong> リモートURLが間違っている
+        </div>
+        <div class="code-block"><code># 正しいリポジトリ名を確認
+git remote -v
+
+# URLを修正
+git remote set-url origin git@github.com:ユーザー名/正しいリポジトリ名.git</code></div>
+        
+        <h3>❌ Author identity unknown</h3>
+        <div class="alert alert-danger">
+          <strong>原因:</strong> Gitユーザー情報が未設定
+        </div>
+        <div class="code-block"><code>git config --global user.name "komogomo"
+git config --global user.email "ttakeda43@gmail.com"</code></div>
+        
+        <h3>❌ Permission denied (publickey)</h3>
+        <div class="alert alert-danger">
+          <strong>原因:</strong> SSH鍵が登録されていない、または無効
+        </div>
+        <div class="code-block"><code># 1. SSH鍵が存在するか確認
+ls -la ~/.ssh/id_ed25519.pub
+
+# 2. 存在しない場合は作成
+ssh-keygen -t ed25519 -C "ttakeda43@gmail.com"
+
+# 3. 公開鍵を表示してGitHubに登録
+cat ~/.ssh/id_ed25519.pub
+
+# 4. 接続テスト
+ssh -T git@github.com</code></div>
+        
+        <h3>❌ 間違ってコミットしてしまった</h3>
+        <h4>コミット直後（プッシュ前）の場合:</h4>
+        <div class="code-block"><code># 直前のコミットを取り消す（変更は残る）
+git reset --soft HEAD~1
+
+# ファイルを修正してから再コミット
+git add .
+git commit -m "正しいコミットメッセージ"</code></div>
+        
+        <h4>プッシュ後の場合:</h4>
+        <div class="code-block"><code># 取り消しコミットを作成（履歴は残る）
+git revert HEAD
+git push origin master</code></div>
+        
+        <h3>❌ ファイルの変更を取り消したい</h3>
+        <h4>ステージング前（git add前）:</h4>
+        <div class="code-block"><code># 特定のファイルを元に戻す
+git checkout ファイル名
+
+# 全てのファイルを元に戻す
+git checkout .</code></div>
+        
+        <h4>ステージング後（git add後）:</h4>
+        <div class="code-block"><code># ステージングを解除
+git reset ファイル名
+
+# その後、変更を取り消す
+git checkout ファイル名</code></div>
+      </section>
+      
+      <!-- チェックリスト -->
+      <section id="checklist">
+        <h2>📋 チェックリスト</h2>
+        
+        <h3>毎回の作業前</h3>
+        <ul class="checklist">
+          <li>プロジェクトフォルダに移動 <code class="inline-code">cd /mnt/d/AIDriven/securea-demo-static</code></li>
+          <li>最新版を取得 <code class="inline-code">git pull origin master</code></li>
+        </ul>
+        
+        <h3>変更後</h3>
+        <ul class="checklist">
+          <li>変更確認 <code class="inline-code">git status</code></li>
+          <li>ファイル追加 <code class="inline-code">git add ファイル名</code></li>
+          <li>コミット <code class="inline-code">git commit -m "メッセージ"</code></li>
+          <li>プッシュ <code class="inline-code">git push origin master</code></li>
+          <li>GitHubで反映確認</li>
+        </ul>
+        
+        <h3>便利なエイリアス（ショートカット）</h3>
+        <div class="code-block"><code># エイリアスを設定
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.cm commit
+git config --global alias.ps push
+
+# 使用例
+git st  # git status の代わり
+git cm -m "メッセージ"  # git commit -m の代わり</code></div>
+        
+        <div class="alert alert-info">
+          <strong>💡 困ったときは:</strong><br>
+          <ol>
+            <li>エラーメッセージをそのままコピーして、Claudeに質問</li>
+            <li><code class="inline-code">git status</code> の結果も一緒に送る</li>
+            <li>何をしようとしていたかを説明</li>
+          </ol>
+          これで、いつでもサポートできます！😊
+        </div>
+      </section>
+    </main>
+    
+    <footer>
+      <p><strong>📅 作成日:</strong> 2025年10月22日</p>
+      <p><strong>💻 対象環境:</strong> WSL (Windows Subsystem for Linux)</p>
+      <p><strong>📦 リポジトリ:</strong> komogomo/securea-demo-static</p>
+      <p style="margin-top: 20px; opacity: 0.8;">Made with ❤️ by Claude</p>
+    </footer>
+  </div>
+</body>
+</html>

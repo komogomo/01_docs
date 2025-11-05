@@ -1,0 +1,68 @@
+flowchart TD
+    Start([駐車場予約画面<br/>アクセス]) --> LoadCalendar[カレンダー表示<br/>30日分]
+    
+    LoadCalendar --> SelectDate{日付選択}
+    SelectDate -->|当日より前| ErrorPast[エラー:<br/>過去日は予約不可]
+    ErrorPast --> SelectDate
+    SelectDate -->|31日以降| ErrorFuture[エラー:<br/>30日以内のみ予約可能]
+    ErrorFuture --> SelectDate
+    SelectDate -->|有効な日付| CheckAvailability[予約状況取得]
+    
+    CheckAvailability --> DisplayMap[駐車場マップ表示]
+    DisplayMap --> ShowStatus[空き状況表示<br/>青:予約可/灰:予約済/緑:自分の予約]
+    
+    ShowStatus --> UserSelect{駐車場選択}
+    UserSelect -->|予約済み駐車場| ErrorOccupied[エラー:<br/>予約済みです]
+    ErrorOccupied --> ShowStatus
+    
+    UserSelect -->|予約可能駐車場| CheckUserLimit{ユーザー制限チェック}
+    
+    CheckUserLimit -->|同日に予約あり| ErrorSameDay[エラー:<br/>同日に複数予約不可]
+    ErrorSameDay --> ShowStatus
+    
+    CheckUserLimit -->|制限OK| InputVehicle[車両ナンバー入力<br/>下4桁・任意]
+    
+    InputVehicle --> CheckContinuous{連続予約?}
+    CheckContinuous -->|はい| SelectDays[連続日数選択<br/>最大3日間]
+    SelectDays --> ValidateDays{日数チェック}
+    ValidateDays -->|3日超過| ErrorDays[エラー:<br/>最大3日間まで]
+    ErrorDays --> SelectDays
+    ValidateDays -->|OK| ConfirmScreen
+    
+    CheckContinuous -->|いいえ| ConfirmScreen[予約確認画面]
+    
+    ConfirmScreen --> DisplayDetails[予約内容表示<br/>・日付<br/>・駐車場所<br/>・料金100円/日<br/>・ナンバー]
+    
+    DisplayDetails --> UserConfirm{確定しますか?}
+    UserConfirm -->|キャンセル| ShowStatus
+    UserConfirm -->|確定| LockCheck[排他制御<br/>二重予約防止]
+    
+    LockCheck --> FinalCheck{最終確認}
+    FinalCheck -->|既に予約済み| ErrorRace[エラー:<br/>他ユーザーが予約済み]
+    ErrorRace --> ShowStatus
+    
+    FinalCheck -->|予約可能| SaveDB[(予約データ保存<br/>DB登録)]
+    
+    SaveDB --> GetUserLang[ユーザー言語設定取得<br/>JP/EN/CN]
+    GetUserLang --> PrepareEmail[メール本文作成<br/>多言語対応]
+    PrepareEmail --> SendEmail[メール送信<br/>予約確認]
+    SendEmail --> SendPush{プッシュ通知<br/>設定確認}
+    
+    SendPush -->|ON| PushNotification[プッシュ通知送信]
+    PushNotification --> CompleteScreen
+    SendPush -->|OFF| CompleteScreen[予約完了画面]
+    
+    CompleteScreen --> ShowReservation[予約内容表示<br/>・予約番号<br/>・QRコード]
+    ShowReservation --> End([完了])
+    
+    %% スタイル定義
+    style Start fill:#e3f2fd
+    style ErrorPast fill:#ffcdd2
+    style ErrorFuture fill:#ffcdd2
+    style ErrorOccupied fill:#ffcdd2
+    style ErrorSameDay fill:#ffcdd2
+    style ErrorDays fill:#ffcdd2
+    style ErrorRace fill:#ffcdd2
+    style SaveDB fill:#c8e6c9
+    style CompleteScreen fill:#c8e6c9
+    style End fill:#c8e6c9

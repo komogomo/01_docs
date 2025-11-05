@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セキュレアシティ スマートコミュニケーションアプリ 機能要件定義書</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            top: -250px;
+            right: -100px;
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            bottom: -150px;
+            left: -50px;
+            border-radius: 50%;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .document-info {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .document-info p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.2);
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        h3 {
+            color: #5a67d8;
+            font-size: 22px;
+            font-weight: 600;
+            margin: 30px 0 20px 0;
+            padding-left: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        h4 {
+            color: #6366f1;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+        }
+
+        .section-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8f9ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .mvp-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .future-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .box {
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid #f59e0b;
+        }
+
+        .note-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 5px solid #10b981;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 5px solid #ef4444;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 5px solid #3b82f6;
+        }
+
+        .security-box {
+            background: linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%);
+            border-left: 5px solid #c026d3;
+        }
+
+        ul {
+            margin: 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        li {
+            margin: 12px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .box ul li::before {
+            content: '✓';
+        }
+
+        code {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .priority-medium {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+            font-size: 14px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin: 10px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .section {
+                page-break-inside: avoid;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <div class="header">
+            <h1>セキュレアシティ<br>スマートコミュニケーションアプリ<br>機能要件定義書（統合版）</h1>
+            
+            <div class="document-info">
+                <p><strong>プロジェクト名：</strong>セキュレアシティ スマートコミュニケーションアプリ</p>
+                <p><strong>文書バージョン：</strong>2.0</p>
+                <p><strong>作成日：</strong>2025年10月14日</p>
+                <p><strong>最終更新日：</strong>2025年10月14日</p>
+            </div>
+        </div>
+
+        <!-- 1. はじめに -->
+        <div class="section">
+            <h2><span class="section-number">1</span>はじめに</h2>
+
+            <h3>1.1 本書の目的</h3>
+            <p>本書は、「セキュレアシティ向け スマートコミュニケーションアプリ」（以下、本アプリ）の開発プロジェクトにおいて、実装すべき機能要件を定義することを目的とします。本書は、プロジェクト関係者間での共通理解を形成するための基礎資料として使用されます。</p>
+
+            <h3>1.2 開発の背景と目的</h3>
+            <p>本アプリは、セキュレアシティ住民の利便性向上、コミュニティの活性化、および災害時等の安全性向上に寄与するために開発されます。運営組織からのお知らせや回覧板のデジタル化、共用施設の予約円滑化、住民間のコミュニケーション促進を実現し、より快適で安心な生活インフラを提供することを目指します。</p>
+
+            <h3>1.3 本書の構成</h3>
+            <p>本書では、機能を以下の2つに大別して記載します。</p>
+            <ul>
+                <li><strong>A. MVP（初期リリース）機能要件：</strong>初期リリースで実装する、核となる最小限の機能群（第3章〜第6章）</li>
+                <li><strong>B. 将来実装（MVP対象外）機能：</strong>初期リリースには含めず、MVPリリース後のフィードバックや運用状況に基づき、実装を検討する機能群（第9章）</li>
+            </ul>
+        </div>
+
+        <!-- 2. 開発方針 -->
+        <div class="section">
+            <h2><span class="section-number">2</span>開発方針（MVP アプローチ）</h2>
+
+            <h3>2.1 MVP（Minimum Viable Product）の採用</h3>
+            <p>本アプリの開発は、<strong>MVP（Minimum Viable Product：実用最小限の製品）</strong>のアプローチを採用します。これは、まず「核となる最小限の価値」を迅速に住民へ提供し、初期リリース後に利用者からのフィードバックに基づき、優先的に改善・追加開発（イテレーション）を行っていく手法です。</p>
+
+            <div class="info-box">
+                <strong>MVPの利点：</strong>
+                <ul>
+                    <li>早期にサービスを開始し、実際の利用状況を把握できる</li>
+                    <li>住民からのフィードバックに基づき、真に必要な機能を優先的に開発できる</li>
+                    <li>初期投資を抑え、段階的に機能を拡充できる</li>
+                    <li>市場検証を早期に行い、方向性を柔軟に修正できる</li>
+                </ul>
+            </div>
+
+            <h3>2.2 MVP機能の選定基準</h3>
+            <p>MVP機能は、以下の基準で選定されています。</p>
+            <ul>
+                <li><strong>情報伝達の基盤：</strong>運営から住民への確実な情報伝達（お知らせ・回覧板）</li>
+                <li><strong>共用施設の効率化：</strong>駐車場予約による利便性向上</li>
+                <li><strong>コミュニティ活性化：</strong>住民間の交流促進（掲示板）</li>
+                <li><strong>国際化対応：</strong>多様な住民への配慮（多言語対応）</li>
+            </ul>
+        </div>
+
+        <!-- 3. 共通基盤機能 -->
+        <div class="section">
+            <h2><span class="section-number">3</span>共通基盤機能<span class="badge mvp-badge">MVP</span></h2>
+            <p>アプリ全体の土台となる機能です。</p>
+
+            <h3>3.1 ユーザー認証機能（マジックリンク方式）</h3>
+            <p>マジックリンク方式はパスワードレスで利便性が高い反面、セキュリティやなりすまし対策、ユーザーへの通知方法に関して、いくつかの考慮が必要です。</p>
+
+            <h4>3.1.1 ログイン要求</h4>
+            <ul>
+                <li>利用者は、アプリのログイン画面に自身の登録済みメールアドレスを入力し、「ログイン」ボタンを押下する</li>
+                <li>システムは、入力されたメールアドレスがローカルユーザマスタに存在するか確認する</li>
+            </ul>
+
+            <div class="security-box">
+                <strong>セキュリティ考慮事項 1: 不正ログイン試行への対策</strong>
+                <ul>
+                    <li>短時間での連続したログイン要求（メール送信リクエスト）に対しては、<strong>レートリミット</strong>を設ける</li>
+                    <li>システムは、メールアドレスの存在有無を外部に推測されないよう、マスタに存在しないメールアドレスが入力された場合でも、「メールを送信しました」といった同一のメッセージを表示する</li>
+                </ul>
+            </div>
+
+            <h4>3.1.2 メール送信</h4>
+            <ul>
+                <li>ユーザマスタ内のメールアドレスが入力内容と一致する場合、システムは一時的（例：15分間有効）かつ一回限りの認証用URL（マジックリンク）を生成し、該当メールアドレス宛に送信する</li>
+            </ul>
+
+            <div class="security-box">
+                <strong>セキュリティ考慮事項 2: マジックリンクの生成と管理</strong>
+                <ul>
+                    <li>生成する認証用URLは、<strong>予測困難なランダムな文字列（トークン）</strong>を含むものとし、SSL/TLSで保護された通信（HTTPS）でアクセスさせる</li>
+                    <li>マジックリンクの<strong>有効期限（15分）</strong>は、システム内の認証テーブルで厳密に管理する</li>
+                    <li>マジックリンクは一回限りの使用とし、使用後は即座に無効化する</li>
+                </ul>
+            </div>
+
+            <h4>3.1.3 認証実行</h4>
+            <ul>
+                <li>利用者は受信したメールを開き、マジックリンク（ログインURL）をクリック（またはタップ）する</li>
+                <li>システムはリンクの有効性（期限切れ、使用済みでないか）を検証し、有効であれば利用者を認証済み状態（ログイン状態）にし、アプリのTOP画面に遷移させる</li>
+            </ul>
+
+            <div class="security-box">
+                <strong>セキュリティ考慮事項 3: セッション管理とデバイス情報</strong>
+                <ul>
+                    <li>ログイン成功後、アプリに紐づく<strong>セッショントークン</strong>を発行し、セキュアに管理する</li>
+                    <li>ログイン実行時の<strong>デバイス情報やIPアドレス</strong>をログとして記録する（監査証跡と不正アクセス検出のため）</li>
+                    <li>利用者がマジックリンクを使用した際、メールに記載されたデバイス（例：PC）と、アプリが起動しているデバイス（例：スマートフォン）が異なる場合でもログインが成立するよう、<strong>クロスデバイス対応</strong>を確保する</li>
+                </ul>
+            </div>
+
+            <h4>3.1.4 ログアウト機能</h4>
+            <ul>
+                <li>利用者はアプリ内のボタンから任意にログアウトできる</li>
+            </ul>
+
+            <div class="security-box">
+                <strong>セキュリティ考慮事項 4: 強制ログアウトとセッションの無効化</strong>
+                <ul>
+                    <li>ログアウト時、システムはアプリに保存されているセッショントークンをサーバー側で即座に無効化する</li>
+                    <li>管理者は、特定ユーザーに対して<strong>強制的にログアウト</strong>させ、セッションを無効化する機能を持つことを検討する（セキュリティインシデント対応のため）</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <strong>全体的な考慮事項 5: ユーザーへの通知</strong>
+                <ul>
+                    <li><strong>メールの配信可能性向上：</strong>マジックリンクメールが迷惑メールに分類されないよう、SPF/DKIM/DMARCといったメール認証設定を適切に行う</li>
+                    <li><strong>なりすまし対策：</strong>ログイン要求メールには、要求された日時を明記し、<strong>「心当たりのない場合は、このメールを破棄してください」</strong>といった注意書きを添える</li>
+                </ul>
+            </div>
+
+            <h3>3.2 マルチランゲージ機能（多言語対応）</h3>
+            <p>ユーザーのプロファイル設定（JP/EN/CN）に基づき、固定文言の表示言語を切り替える。固定文言は多言語マスターテーブルで管理する。詳細は第7章「多言語対応の詳細仕様」を参照。</p>
+
+            <h3>3.3 通知（メール）送信機能</h3>
+            <p>各機能（お知らせ、予約等）と連携し、設定されたメールアドレスへ通知を自動送信する。（SMTPリレーや外部API連携）</p>
+
+            <h3>3.4 通知（プッシュ）機能</h3>
+            <p><strong>（MVPに含めることを推奨）</strong>最新のお知らせや安否確認（将来）の際に、スマートデバイスへプッシュ通知を送信する。</p>
+            <ul>
+                <li>iOS、Android両プラットフォーム対応</li>
+                <li>プッシュ通知の許可設定管理</li>
+                <li>通知のカテゴリ別管理（後述の通知設定機能と連携）</li>
+            </ul>
+        </div>
+
+        <!-- 4. TOP画面 -->
+        <div class="section">
+            <h2><span class="section-number">4</span>TOP画面（ホーム）<span class="badge mvp-badge">MVP</span></h2>
+            <p>ログイン直後に表示されるポータル画面です。</p>
+
+            <h3>4.1 ログイン情報表示</h3>
+            <p>ヘッダーエリアに、ログイン中の<strong>[自治体名]と[ユーザー名]</strong>を表示する。</p>
+
+            <h3>4.2 最新のお知らせ表示</h3>
+            <ul>
+                <li>「お知らせ・回覧板機能」で登録された最新の通知をN件（例：3件）表示する</li>
+                <li>未読/既読状態が表示され、タイトルタップで詳細画面へ遷移する</li>
+                <li>「一覧を見る」ボタンからリスト画面へ遷移する</li>
+            </ul>
+
+            <h3>4.3 機能タイルボタン表示</h3>
+            <p>MVP対象機能への導線となるアイコンボタンを配置する。</p>
+            <ul>
+                <li>駐車場予約</li>
+                <li>回覧板</li>
+                <li>掲示板</li>
+                <li>通知設定</li>
+            </ul>
+        </div>
+
+        <!-- 5. MVP機能要件 -->
+        <div class="section">
+            <h2><span class="section-number">5</span>MVP機能要件</h2>
+
+            <h3>5.1 お知らせ・回覧板機能<span class="badge mvp-badge">MVP</span></h3>
+            <p>運営側から住民への一方向の情報伝達（Push型）を担います。</p>
+
+            <h4>5.1.1 管理者側機能</h4>
+            <ul>
+                <li>お知らせ（回覧板）の新規作成、編集、削除</li>
+                <li>カテゴリ設定（例：重要、イベント、メンテナンス、回覧）</li>
+                <li>公開日時、公開終了日時の設定</li>
+                <li>作成時、住民へのプッシュ通知およびメール通知の送信指定</li>
+                <li>多言語対応：日本語で入力後、「翻訳」ボタンで英語・中国語版を自動生成（Google Translation API使用）</li>
+                <li>翻訳内容の確認・修正機能</li>
+            </ul>
+
+            <h4>5.1.2 住民側機能</h4>
+            <ul>
+                <li>お知らせ一覧の閲覧（カテゴリ別、時系列）</li>
+                <li>お知らせ詳細の閲覧（自身の言語設定に応じた表示）</li>
+                <li>（回覧板の場合）「確認済み（既読）」ボタンの押下機能</li>
+                <li>未読/既読状態の管理</li>
+            </ul>
+
+            <h3>5.2 駐車場予約機能<span class="badge mvp-badge">MVP</span></h3>
+            <p>集会所に設置されたゲスト用駐車場（全12台）の予約管理システムを提供します。</p>
+
+            <h4>5.2.1 住民側機能</h4>
+
+            <div class="feature-box">
+                <strong>予約状況確認</strong>
+                <ul>
+                    <li>予約カレンダー（日単位）を表示し、日付を選択できる</li>
+                    <li>駐車場MAP（表側：F1〜F6、裏側：B1〜B6）を視覚的に表示する</li>
+                    <li>選択した日付における、各駐車場所の空き状況をリアルタイムで色分け表示する
+                        <ul>
+                            <li>青：予約可能</li>
+                            <li>グレー：予約済み（他ユーザー）</li>
+                            <li>緑：予約済み（自分の予約）</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="feature-box">
+                <strong>新規予約</strong>
+                <ul>
+                    <li>カレンダーで日付を選択し、MAP上で希望の駐車場所を選択して予約を行う</li>
+                    <li>車両ナンバープレートの下4桁（数字）を<strong>任意</strong>で入力できる</li>
+                    <li>予約内容の確認画面を表示し、最終確認後に予約確定</li>
+                </ul>
+            </div>
+
+            <div class="feature-box">
+                <strong>予約管理</strong>
+                <ul>
+                    <li>自身の予約履歴（未来および過去）を一覧で確認できる</li>
+                    <li>自身の予約（未来のもの）をキャンセルできる</li>
+                    <li>予約詳細（日付、場所、料金、ナンバー）の確認</li>
+                </ul>
+            </div>
+
+            <div class="feature-box">
+                <strong>通知</strong>
+                <ul>
+                    <li>予約完了時、予約キャンセル時に、内容確認のメールを自動送信する</li>
+                    <li>送信先：利用者のメールアドレス</li>
+                    <li>送信元：理事会（運営）メールアドレス</li>
+                    <li>利用者の言語設定に応じた多言語メールを送信する</li>
+                </ul>
+            </div>
+
+            <h4>5.2.2 管理者側機能</h4>
+            <ul>
+                <li>全予約状況（全ユーザーの予約）を一覧およびカレンダー形式で確認できる</li>
+                <li>管理者権限による、予約の代理登録、変更、削除ができる</li>
+                <li>メンテナンス等で、特定の日付や特定の駐車場所を<strong>「予約不可」としてブロック</strong>できる</li>
+                <li>利用統計の基本レポート表示（オプション）</li>
+            </ul>
+
+            <h4>5.2.3 予約ルール・主要仕様</h4>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>仕様</th>
+                </tr>
+                <tr>
+                    <td>予約単位</td>
+                    <td>1日単位（時間単位の予約は対応しない）</td>
+                </tr>
+                <tr>
+                    <td>予約可能期間</td>
+                    <td>予約操作を行う当日から30日先まで。過去日の予約は不可</td>
+                </tr>
+                <tr>
+                    <td>駐車場の配置</td>
+                    <td>表側：F1〜F6（6台）、裏側：B1〜B6（6台）、合計12台</td>
+                </tr>
+                <tr>
+                    <td>利用料金</td>
+                    <td>1日あたり100円（税込）<br>※アプリ上での決済機能は搭載しない</td>
+                </tr>
+                <tr>
+                    <td>車両ナンバー入力</td>
+                    <td>任意入力（下4桁の数字）</td>
+                </tr>
+            </table>
+
+            <h4>5.2.4 予約制限ルール（MVP）</h4>
+            <ul>
+                <li>同一ユーザーが、同日に複数の駐車場所を予約することは不可</li>
+                <li>1回の予約操作における連続予約は、最大3日間まで可能</li>
+                <li>同一ユーザーの重複予約を防止する</li>
+            </ul>
+
+            <h4>5.2.5 通知メール仕様</h4>
+            <ul>
+                <li><strong>送信タイミング：</strong>予約完了時、予約キャンセル時</li>
+                <li><strong>メール内容：</strong>
+                    <ul>
+                        <li>予約日時</li>
+                        <li>駐車場所（表側/裏側、駐車番号）</li>
+                        <li>利用料金</li>
+                        <li>車両ナンバー（任意入力した場合）</li>
+                        <li>利用上の注意事項</li>
+                        <li>問い合わせ先</li>
+                    </ul>
+                </li>
+                <li><strong>多言語対応：</strong>利用者の言語設定（JP/EN/CN）に応じた言語で送信</li>
+            </ul>
+
+            <h3>5.3 掲示板（BBS）機能<span class="badge mvp-badge">MVP</span></h3>
+            <p>住民間の双方向コミュニケーション（Pull型）を担います。</p>
+
+            <h4>5.3.1 共通機能</h4>
+            <ul>
+                <li>スレッド（投稿）の新規作成（タイトル、本文、簡易な画像添付）</li>
+                <li>スレッドへのコメント（返信）投稿</li>
+                <li>自身の投稿・コメントの削除</li>
+                <li>不適切な投稿の<strong>「通報」機能</strong></li>
+                <li>投稿・コメントの一覧表示（時系列、カテゴリ別）</li>
+            </ul>
+
+            <h4>5.3.2 Google Cloud Translation API連携</h4>
+            <ul>
+                <li>ユーザー自身の表示言語と異なる言語で書かれた投稿・コメントに対し、「翻訳」ボタンを表示する</li>
+                <li>ボタン押下で翻訳結果をインライン表示する</li>
+                <li>翻訳結果は一時的に表示し、原文との切り替えが可能</li>
+            </ul>
+
+            <h4>5.3.3 掲示板の種類（権限制御）</h4>
+            <ul>
+                <li><strong>全体板：</strong>全住民が閲覧・投稿可能</li>
+                <li><strong>グループ板：</strong>自身が所属する自治体（グループ）のメンバーのみが閲覧・投稿可能</li>
+                <li><strong>個別板：</strong>（MVPでは見送りを推奨）「運営への問い合わせ」であれば、「問い合わせフォーム」として実装し、住民と管理者間のみで閲覧可能なスレッドとする</li>
+            </ul>
+
+            <h3>5.4 通知設定機能<span class="badge mvp-badge">MVP</span></h3>
+            <p>ユーザーが受け取る通知を制御する画面です。</p>
+
+            <h4>5.4.1 基本設定</h4>
+            <ul>
+                <li>プッシュ通知のON/OFF（全体）</li>
+                <li>メール通知のON/OFF（全体）</li>
+            </ul>
+
+            <h4>5.4.2 詳細設定（推奨）</h4>
+            <p>機能ごとの詳細設定が可能</p>
+            <table>
+                <tr>
+                    <th>機能</th>
+                    <th>プッシュ通知</th>
+                    <th>メール通知</th>
+                </tr>
+                <tr>
+                    <td>お知らせ・回覧板</td>
+                    <td>ON/OFF</td>
+                    <td>ON/OFF</td>
+                </tr>
+                <tr>
+                    <td>駐車場予約</td>
+                    <td>ON/OFF</td>
+                    <td>ON/OFF</td>
+                </tr>
+                <tr>
+                    <td>掲示板</td>
+                    <td>ON/OFF</td>
+                    <td>ON/OFF</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 6. 多言語対応の詳細仕様 -->
+        <div class="section">
+            <h2><span class="section-number">6</span>多言語対応の詳細仕様<span class="badge mvp-badge">MVP</span></h2>
+
+            <h3>6.1 対応言語</h3>
+            <table>
+                <tr>
+                    <th>言語</th>
+                    <th>言語コード</th>
+                    <th>対象ユーザー</th>
+                    <th>文字種</th>
+                </tr>
+                <tr>
+                    <td>日本語</td>
+                    <td>ja / JP</td>
+                    <td>日本人住民</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>英語</td>
+                    <td>en / EN</td>
+                    <td>英語圏住民</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>中国語</td>
+                    <td>zh-CN / CN</td>
+                    <td>中国本土出身住民</td>
+                    <td>簡体字</td>
+                </tr>
+            </table>
+
+            <div class="note-box">
+                <strong>注記：</strong>中国語は簡体字を採用する。繁体字（台湾、香港）対応は将来的な拡張として検討する。
+            </div>
+
+            <h3>6.2 翻訳方式の2層構造</h3>
+
+            <h4>6.2.1 静的コンテンツの翻訳（第1層）</h4>
+            <p><strong>対象：</strong>UI要素（ボタン、ラベル、メニュー、エラーメッセージなど）</p>
+            <p><strong>実装方式：</strong>翻訳マスタテーブルによる事前定義方式</p>
+
+            <div class="info-box">
+                <strong>翻訳マスタテーブル構造：</strong>
+                <table style="margin-top: 10px;">
+                    <tr>
+                        <th>カラム</th>
+                        <th>データ型</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>translation_key</td>
+                        <td>VARCHAR</td>
+                        <td>翻訳キー（Primary Key）</td>
+                    </tr>
+                    <tr>
+                        <td>ja_text</td>
+                        <td>TEXT</td>
+                        <td>日本語テキスト</td>
+                    </tr>
+                    <tr>
+                        <td>en_text</td>
+                        <td>TEXT</td>
+                        <td>英語テキスト</td>
+                    </tr>
+                    <tr>
+                        <td>cn_text</td>
+                        <td>TEXT</td>
+                        <td>中国語テキスト</td>
+                    </tr>
+                    <tr>
+                        <td>category</td>
+                        <td>VARCHAR</td>
+                        <td>カテゴリ（UI、エラー、通知等）</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td>TIMESTAMP</td>
+                        <td>更新日時</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p><strong>運用フロー：</strong></p>
+            <ul>
+                <li>開発時に翻訳マスタを人力で作成</li>
+                <li>AIツールを使用した品質チェック（翻訳の正確性、一貫性）</li>
+                <li>ネイティブスピーカーによる最終確認</li>
+                <li>マスタデータはDBで管理し、メンテナンス可能とする</li>
+            </ul>
+
+            <h4>6.2.2 動的コンテンツの翻訳（第2層）</h4>
+            <p><strong>対象：</strong>管理者が投稿するお知らせ、イベント情報、利用規約など</p>
+            <p><strong>実装方式：</strong>Google Cloud Translation API（Basic v2）</p>
+
+            <div class="feature-box">
+                <strong>Google Cloud Translation API 選定理由：</strong>
+                <ol>
+                    <li><strong>サービスの持続性</strong>
+                        <ul>
+                            <li>Googleの中核サービスの一つとして13年以上の実績</li>
+                            <li>サービス終了リスクが極めて低い</li>
+                            <li>API仕様が安定しており、破壊的変更が少ない</li>
+                        </ul>
+                    </li>
+                    <li><strong>コストの優位性</strong>
+                        <ul>
+                            <li>月間50万文字まで無料</li>
+                            <li>マンション規模での利用（月3.6万文字想定）は無料枠内で運用可能</li>
+                            <li>超過時も100万文字あたり$20（約3,000円）と低コスト</li>
+                        </ul>
+                    </li>
+                    <li><strong>技術的優位性</strong>
+                        <ul>
+                            <li>APIが非常にシンプルで実装が容易</li>
+                            <li>130言語以上に対応（将来の拡張性）</li>
+                            <li>高速レスポンス、高い稼働率</li>
+                            <li>豊富なドキュメントと実装事例</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <h3>6.3 翻訳フロー</h3>
+
+            <h4>6.3.1 管理者投稿時の翻訳フロー</h4>
+            <ol>
+                <li>管理者が日本語でコンテンツを入力</li>
+                <li>「翻訳」ボタンを押下</li>
+                <li>Google Translation APIに日本語テキストを送信
+                    <ul>
+                        <li>日本語 → 英語への翻訳リクエスト</li>
+                        <li>日本語 → 中国語（簡体字）への翻訳リクエスト</li>
+                    </ul>
+                </li>
+                <li>翻訳結果を編集画面に表示（約3〜5秒）</li>
+                <li>管理者が翻訳内容を確認し、必要に応じて修正</li>
+                <li>3言語版のコンテンツをデータベースに保存</li>
+            </ol>
+
+            <h4>6.3.2 住民側の掲示板投稿翻訳フロー</h4>
+            <ol>
+                <li>住民が自分の言語と異なる投稿を閲覧</li>
+                <li>投稿の横に表示された「翻訳」ボタンを押下</li>
+                <li>Google Translation APIに翻訳リクエストを送信</li>
+                <li>翻訳結果をインライン表示（原文との切り替え可能）</li>
+            </ol>
+
+            <h4>6.3.3 翻訳の最適化（コスト削減策）</h4>
+            <ul>
+                <li><strong>翻訳キャッシュ：</strong>同じ文章を再翻訳しない仕組み（キャッシュテーブル使用）</li>
+                <li><strong>差分翻訳：</strong>編集時は変更された部分のみを翻訳</li>
+                <li><strong>バッチ処理：</strong>複数のテキストをまとめて1回のAPIコールで翻訳</li>
+                <li><strong>文字数カウンター：</strong>翻訳前に文字数を表示し、コスト意識を促す</li>
+                <li><strong>使用量モニタリング：</strong>月間使用量を監視し、無料枠の80%でアラート</li>
+            </ul>
+
+            <h3>6.4 言語切り替え機能</h3>
+            <ul>
+                <li>アプリ内のヘッダー部分に言語選択ボタンを配置（JP / EN / CN）</li>
+                <li>任意の画面から即座に言語切り替え可能</li>
+                <li>選択した言語設定をユーザーマスタに保存</li>
+                <li>初回起動時は端末の言語設定から自動判定</li>
+                <li>言語変更時は画面全体が即座に切り替わる</li>
+            </ul>
+
+            <h3>6.5 多言語対応の範囲</h3>
+            <table>
+                <tr>
+                    <th>対象</th>
+                    <th>翻訳方式</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td>ボタン・ラベル・メニュー</td>
+                    <td>翻訳マスタ</td>
+                    <td>事前定義された静的翻訳</td>
+                </tr>
+                <tr>
+                    <td>エラーメッセージ</td>
+                    <td>翻訳マスタ</td>
+                    <td>事前定義された静的翻訳</td>
+                </tr>
+                <tr>
+                    <td>システム通知</td>
+                    <td>翻訳マスタ</td>
+                    <td>定型文として事前定義</td>
+                </tr>
+                <tr>
+                    <td>お知らせ・イベント情報</td>
+                    <td>Google Translation API</td>
+                    <td>管理者投稿時に動的翻訳</td>
+                </tr>
+                <tr>
+                    <td>利用規約・ヘルプ</td>
+                    <td>Google Translation API</td>
+                    <td>初回作成時に翻訳、以降は固定</td>
+                </tr>
+                <tr>
+                    <td>掲示板投稿</td>
+                    <td>Google Translation API</td>
+                    <td>住民が「翻訳」ボタン押下時</td>
+                </tr>
+                <tr>
+                    <td>メール通知本文</td>
+                    <td>翻訳マスタ + 動的挿入</td>
+                    <td>テンプレートは翻訳マスタ、可変部分は変数</td>
+                </tr>
+            </table>
+
+            <h3>6.6 日付・数値表記の国際化対応</h3>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>日本語（JP）</th>
+                    <th>英語（EN）</th>
+                    <th>中国語（CN）</th>
+                </tr>
+                <tr>
+                    <td>日付形式</td>
+                    <td>2025年10月14日</td>
+                    <td>October 14, 2025</td>
+                    <td>2025年10月14日</td>
+                </tr>
+                <tr>
+                    <td>曜日</td>
+                    <td>月火水木金土日</td>
+                    <td>Mon Tue Wed Thu Fri Sat Sun</td>
+                    <td>周一周二周三周四周五周六周日</td>
+                </tr>
+                <tr>
+                    <td>通貨表示</td>
+                    <td>¥100</td>
+                    <td>¥100 (JPY)</td>
+                    <td>¥100</td>
+                </tr>
+            </table>
+
+            <h3>6.7 コスト試算</h3>
+            <div class="info-box">
+                <strong>月間翻訳文字数の試算：</strong>
+                <table style="margin-top: 10px;">
+                    <tr>
+                        <th>項目</th>
+                        <th>文字数</th>
+                        <th>頻度</th>
+                        <th>月間合計</th>
+                    </tr>
+                    <tr>
+                        <td>お知らせ投稿</td>
+                        <td>500文字</td>
+                        <td>月10件</td>
+                        <td>5,000文字</td>
+                    </tr>
+                    <tr>
+                        <td>イベント情報</td>
+                        <td>300文字</td>
+                        <td>月5件</td>
+                        <td>1,500文字</td>
+                    </tr>
+                    <tr>
+                        <td>予約通知メール</td>
+                        <td>200文字</td>
+                        <td>月100件</td>
+                        <td>20,000文字</td>
+                    </tr>
+                    <tr>
+                        <td>掲示板投稿翻訳</td>
+                        <td>100文字</td>
+                        <td>月100回</td>
+                        <td>10,000文字</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>合計</strong></td>
+                        <td><strong>36,500文字/月</strong></td>
+                    </tr>
+                </table>
+                <p style="margin-top: 15px;"><strong>結論：</strong>Google Translation APIの無料枠（月50万文字）内で十分運用可能。コストは<strong>実質¥0</strong>。</p>
+            </div>
+        </div>
+
+        <!-- 7. 技術要件 -->
+        <div class="section">
+            <h2><span class="section-number">7</span>技術要件</h2>
+
+            <h3>7.1 外部サービス連携</h3>
+            <table>
+                <tr>
+                    <th>サービス名</th>
+                    <th>用途</th>
+                    <th>料金</th>
+                </tr>
+                <tr>
+                    <td>Google Cloud Translation API (Basic v2)</td>
+                    <td>動的コンテンツの自動翻訳</td>
+                    <td>月50万文字まで無料<br>超過時: $20/100万文字</td>
+                </tr>
+                <tr>
+                    <td>メール配信サービス</td>
+                    <td>予約通知、リマインダー配信</td>
+                    <td>検討中（SendGrid、Amazon SES等）</td>
+                </tr>
+                <tr>
+                    <td>プッシュ通知サービス</td>
+                    <td>スマートデバイスへの通知</td>
+                    <td>Firebase Cloud Messaging（基本無料）</td>
+                </tr>
+            </table>
+
+            <h3>7.2 データベース要件</h3>
+            <table>
+                <tr>
+                    <th>テーブル名</th>
+                    <th>用途</th>
+                </tr>
+                <tr>
+                    <td>users</td>
+                    <td>ユーザー情報（住民情報、メールアドレス、言語設定）</td>
+                </tr>
+                <tr>
+                    <td>magic_links</td>
+                    <td>認証用マジックリンクの管理（トークン、有効期限、使用済みフラグ）</td>
+                </tr>
+                <tr>
+                    <td>sessions</td>
+                    <td>セッション管理（セッショントークン、デバイス情報、IPアドレス）</td>
+                </tr>
+                <tr>
+                    <td>parking_reservations</td>
+                    <td>駐車場予約情報（予約ID、ユーザーID、予約日、駐車場所、車両ナンバー、ステータス）</td>
+                </tr>
+                <tr>
+                    <td>parking_blocks</td>
+                    <td>駐車場の予約不可設定（日付、駐車場所、理由）</td>
+                </tr>
+                <tr>
+                    <td>announcements</td>
+                    <td>お知らせ情報（カテゴリ、公開日時、公開終了日時）</td>
+                </tr>
+                <tr>
+                    <td>announcement_contents</td>
+                    <td>お知らせの多言語コンテンツ（お知らせID、言語、タイトル、本文）</td>
+                </tr>
+                <tr>
+                    <td>bbs_threads</td>
+                    <td>掲示板スレッド（投稿者、タイトル、本文、カテゴリ）</td>
+                </tr>
+                <tr>
+                    <td>bbs_comments</td>
+                    <td>掲示板コメント（スレッドID、投稿者、本文）</td>
+                </tr>
+                <tr>
+                    <td>translation_master</td>
+                    <td>静的UI要素の多言語マスタ（翻訳キー、日本語、英語、中国語）</td>
+                </tr>
+                <tr>
+                    <td>translation_cache</td>
+                    <td>翻訳APIのキャッシュ（原文、翻訳結果、言語ペア）</td>
+                </tr>
+                <tr>
+                    <td>notification_settings</td>
+                    <td>ユーザーごとの通知設定（プッシュ、メール、機能別）</td>
+                </tr>
+            </table>
+
+            <h3>7.3 セキュリティ要件</h3>
+            <ul>
+                <li>Google Cloud APIキーの安全な管理（環境変数、秘密管理サービス使用）</li>
+                <li>ユーザー認証・認可機能（マジックリンク方式）</li>
+                <li>個人情報の暗号化保存</li>
+                <li>HTTPS通信の必須化</li>
+                <li>API使用量の監視とレート制限</li>
+                <li>不正ログイン試行の検出とブロック</li>
+                <li>セッショントークンの安全な管理</li>
+                <li>クロスサイトスクリプティング（XSS）対策</li>
+                <li>SQLインジェクション対策</li>
+            </ul>
+        </div>
+
+        <!-- 8. 非機能要件 -->
+        <div class="section">
+            <h2><span class="section-number">8</span>非機能要件</h2>
+
+            <h3>8.1 パフォーマンス</h3>
+            <ul>
+                <li>ページ読み込み時間：3秒以内</li>
+                <li>翻訳処理時間：5秒以内（500文字の場合）</li>
+                <li>同時アクセス対応：100ユーザー</li>
+                <li>データベースクエリ応答時間：1秒以内</li>
+            </ul>
+
+            <h3>8.2 可用性</h3>
+            <ul>
+                <li>稼働率：99%以上（年間停止時間：約87時間以内）</li>
+                <li>メンテナンス時間：月1回、深夜時間帯（2:00-4:00）</li>
+                <li>バックアップ：日次（7日分保持）</li>
+            </ul>
+
+            <h3>8.3 ユーザビリティ</h3>
+            <ul>
+                <li>直感的なUI設計</li>
+                <li>スマートフォン・タブレット・PC対応（レスポンシブデザイン）</li>
+                <li>アクセシビリティ対応（WCAG 2.1 レベルAA準拠）</li>
+                <li>3クリック以内で主要機能にアクセス可能</li>
+            </ul>
+
+            <h3>8.4 拡張性</h3>
+            <ul>
+                <li>将来的な機能追加を考慮したモジュール設計</li>
+                <li>ユーザー数の増加に対応可能なスケーラブルなアーキテクチャ</li>
+                <li>追加言語対応の容易性</li>
+            </ul>
+        </div>
+
+        <!-- 9. 将来実装機能 -->
+        <div class="section">
+            <h2><span class="section-number">9</span>将来実装（MVP対象外）機能<span class="badge future-badge">将来実装</span></h2>
+            <p>MVPリリース後の住民フィードバックや運営ニーズに基づき、順次開発を検討する機能群です。</p>
+
+            <h3>9.1 駐車場予約機能の拡張</h3>
+
+            <h4>9.1.1 予約変更機能</h4>
+            <ul>
+                <li>予約の日付または駐車場所の変更を可能とする</li>
+                <li>MVPでは「キャンセル→再予約」で対応</li>
+            </ul>
+
+            <h4>9.1.2 予約リマインダー機能</h4>
+            <ul>
+                <li>利用前日の確認通知（18:00に送信）</li>
+                <li>利用当日の朝の通知（8:00に送信）</li>
+                <li>通知設定のON/OFF機能</li>
+            </ul>
+
+            <h4>9.1.3 予約制限ルールの強化</h4>
+            <ul>
+                <li>同一ユーザーの「月間」予約回数の上限設定</li>
+                <li>特定ユーザーの長期占有防止</li>
+            </ul>
+
+            <h4>9.1.4 管理者向けレポート機能</h4>
+            <ul>
+                <li>駐車場稼働率の分析</li>
+                <li>人気の日時、時間帯の統計</li>
+                <li>利用者別の予約履歴</li>
+                <li>CSV/PDFでのエクスポート機能</li>
+            </ul>
+
+            <h4>9.1.5 駐車場情報の充実</h4>
+            <ul>
+                <li>各駐車スペースの写真表示</li>
+                <li>車両サイズ制限情報（大型車可否など）</li>
+                <li>屋根の有無などの設備情報</li>
+                <li>詳細な利用規約の表示</li>
+            </ul>
+
+            <h3>9.2 施設予約機能の拡張</h3>
+            <ul>
+                <li>集会所の予約（駐車場予約と同様のシステム）</li>
+                <li>ゲストルーム、会議室などの予約</li>
+                <li>時間単位の予約対応</li>
+            </ul>
+
+            <h3>9.3 監視カメラ参照機能</h3>
+            <ul>
+                <li>共用部の監視カメラ映像のライブ配信</li>
+                <li>録画映像の参照（一定期間）</li>
+                <li>権限管理（管理者のみ、または全住民）</li>
+            </ul>
+
+            <h3>9.4 住居メンテナンス機能</h3>
+
+            <h4>9.4.1 管理者側機能</h4>
+            <ul>
+                <li>住宅設備機器の製品型番、画像、価格情報をマスタ登録</li>
+                <li>注文内容の確認、および販売元への発注処理</li>
+                <li>在庫管理機能</li>
+            </ul>
+
+            <h4>9.4.2 住民側機能</h4>
+            <ul>
+                <li>製品カタログの閲覧</li>
+                <li>注文カートへの追加、削除</li>
+                <li>カート内容の参照と「注文確定」（決済機能なし）</li>
+                <li>注文確定時、管理者および販売元へのメール通知</li>
+            </ul>
+
+            <h3>9.5 安否確認機能</h3>
+            <ul>
+                <li>災害発生時などに、運営から全住民へ安否確認を一斉送信</li>
+                <li>住民が「無事」「軽傷」「重傷」などのステータスを回答・登録</li>
+                <li>未回答者への自動リマインド</li>
+                <li>回答状況の集計・閲覧（管理者）</li>
+                <li>緊急連絡先への自動通知</li>
+            </ul>
+
+            <h3>9.6 HEMS参照機能</h3>
+            <ul>
+                <li>各住戸のHEMS（Home Energy Management System）とAPI連携</li>
+                <li>電力使用量のグラフ表示</li>
+                <li>月別、日別の比較機能</li>
+                <li>省エネアドバイスの提供</li>
+            </ul>
+
+            <h3>9.7 生活サポート機能</h3>
+            <ul>
+                <li>ゴミ出しカレンダー（収集日・分別ルールの確認）</li>
+                <li>管理会社への連絡（設備故障、トラブル報告、写真添付可能）</li>
+                <li>宅配ボックス利用通知（荷物到着の通知連携）</li>
+            </ul>
+
+            <h3>9.8 管理・経理機能</h3>
+            <ul>
+                <li>管理費等の確認（支払い状況、領収書の確認）</li>
+                <li>総会資料の閲覧（議事録、収支報告などのデジタル配布）</li>
+                <li>オンライン決済機能の追加</li>
+            </ul>
+        </div>
+
+        <!-- 10. 制約事項 -->
+        <div class="section">
+            <h2><span class="section-number">10</span>制約事項</h2>
+            <ul>
+                <li>決済機能は初期リリースでは非対応（利用料金が低額のため）</li>
+                <li>中国語は簡体字のみ対応（繁体字は将来検討）</li>
+                <li>翻訳APIの月間無料枠（50万文字）を超えた場合、従量課金が発生する</li>
+                <li>駐車場の物理的な台数制限（12台）</li>
+                <li>マジックリンクの有効期限は15分間（セキュリティ上の制約）</li>
+                <li>同時接続ユーザー数は100ユーザーまで（初期構成）</li>
+            </ul>
+        </div>
+
+        <!-- 11. 今後の検討事項 -->
+        <div class="section">
+            <h2><span class="section-number">11</span>今後の検討事項</h2>
+            <ul>
+                <li>Google Cloudアカウントの作成および設定手順の策定</li>
+                <li>Translation APIキーの取得と安全な管理方法の決定</li>
+                <li>翻訳結果の品質評価基準の策定</li>
+                <li>管理者向け翻訳編集機能の詳細仕様策定</li>
+                <li>繁体字対応の必要性調査（台湾・香港出身住民の居住状況確認）</li>
+                <li>決済機能追加の検討（利用状況を見て判断）</li>
+                <li>プッシュ通知サービスの選定（Firebase Cloud Messaging等）</li>
+                <li>メール配信サービスの選定（SendGrid、Amazon SES等）</li>
+                <li>ホスティング環境の選定（AWS、GCP、Azure等）</li>
+                <li>開発言語・フレームワークの選定</li>
+            </ul>
+        </div>
+
+        <!-- 12. 開発スケジュール -->
+        <div class="section">
+            <h2><span class="section-number">12</span>開発スケジュール（暫定）</h2>
+            <div class="info-box">
+                <table>
+                    <tr>
+                        <th>フェーズ</th>
+                        <th>期間</th>
+                        <th>主な成果物</th>
+                    </tr>
+                    <tr>
+                        <td>要件定義</td>
+                        <td>2025年Q4</td>
+                        <td>本要件定義書の確定</td>
+                    </tr>
+                    <tr>
+                        <td>設計・開発</td>
+                        <td>2026年Q1</td>
+                        <td>MVP機能の実装完了</td>
+                    </tr>
+                    <tr>
+                        <td>テスト・調整</td>
+                        <td>2026年Q1末</td>
+                        <td>品質確認、バグ修正</td>
+                    </tr>
+                    <tr>
+                        <td>MVP リリース</td>
+                        <td>2026年Q2初旬</td>
+                        <td>初期リリース、住民への公開</td>
+                    </tr>
+                    <tr>
+                        <td>フィードバック収集・改善</td>
+                        <td>2026年Q2-Q3</td>
+                        <td>利用状況分析、機能改善</td>
+                    </tr>
+                    <tr>
+                        <td>機能拡張（第2フェーズ）</td>
+                        <td>2026年Q4以降</td>
+                        <td>将来実装機能の追加開発</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- フッター -->
+        <div class="footer">
+            <hr style="margin-bottom: 30px; border: none; border-top: 2px solid #e5e7eb;">
+            
+            <p style="font-weight: 600; font-size: 16px; margin-bottom: 15px;">
+                <strong>文書管理番号：</strong>SEC-APP-REQ-002
+            </p>
+            <p style="margin-bottom: 20px;">
+                <strong>承認者：</strong>____________________　<strong>日付：</strong>____________________
+            </p>
+            
+            <div class="warning-box" style="margin-top: 30px; text-align: left;">
+                <strong>重要事項：</strong>
+                <p>本要件定義書の内容は、実装前に関係者全員（理事会、管理会社、開発チーム）でレビューし、合意を得る必要があります。また、実装過程で新たな要件が発覚した場合は、本文書を更新し、バージョン管理を行います。</p>
+            </div>
+            
+            <p style="margin-top: 30px; font-size: 12px; color: #999;">
+                本資料は機密情報を含みます。無断での複製・配布を禁じます。
+            </p>
+        </div>
+    </div>
+</body>
+</html>

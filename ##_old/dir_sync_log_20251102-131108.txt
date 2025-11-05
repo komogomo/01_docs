@@ -1,0 +1,33 @@
+[2025-11-02 13:11:08] [INFO] ========================================
+[2025-11-02 13:11:08] [INFO] HarmoNet Directory Sync v3.2r1 開始
+[2025-11-02 13:11:08] [INFO] Root: D:\AIDriven\##_成果物\01_プロダクト開発\03_HarmoNetDoc
+[2025-11-02 13:11:08] [INFO] Phase 1: 章番号リネーム開始
+[2025-11-02 13:11:08] [INFO] 作成: 01_docs\99_archive
+[2025-11-02 13:11:08] [INFO] マージ: 01_phase6-full-audit-order_v1.0.md → 01_docs\00_project\01_phase6-full-audit-order_v1.0.md
+[2025-11-02 13:11:08] [INFO] マージ: 02_harmonet-docs-directory-definition_v3.0.md → 01_docs\00_project\02_harmonet-docs-directory-definition_v3.0.md
+[2025-11-02 13:11:08] [INFO] マージ: 03_harmonet-nonfunctional-design-phase7_v1.0.md → 01_docs\00_project\03_harmonet-nonfunctional-design-phase7_v1.0.md
+[2025-11-02 13:11:08] [INFO] マージ: 04_harmonet-phase4-ai-collaboration-guideline_v1.0.md → 01_docs\00_project\04_harmonet-phase4-ai-collaboration-guideline_v1.0.md
+[2025-11-02 13:11:08] [INFO] マージ: 05_harmonet-phase8-test-strategy_v1.0.md → 01_docs\00_project\05_harmonet-phase8-test-strategy_v1.0.md
+[2025-11-02 13:11:08] [INFO] マージ: 06_harmonet-team-collaboration-guideline_v1.0.md → 01_docs\00_project\06_harmonet-team-collaboration-guideline_v1.0.md
+[2025-11-02 13:11:08] [INFO] マージ: 07_phase6-start-log_v1.0.md → 01_docs\00_project\07_phase6-start-log_v1.0.md
+[2025-11-02 13:11:09] [INFO] 退避: 01_docs\01_project → 01_docs\99_archive\01_project_20251102-131108
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\04_integration → 01_docs\02_integration
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\06_tenant → 01_docs\04_tenant
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\07_audit → 01_docs\06_audit
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\03_basic_design → 01_docs\01_basic_design
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\08_common → 01_docs\common
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\05_operation_preparation → 01_docs\03_operation_preparation
+[2025-11-02 13:11:09] [INFO] リネーム: 01_docs\02_requirements → 01_docs\00_requirements
+[2025-11-02 13:11:09] [INFO] Phase 2: ルート直下ファイルの移動開始
+[2025-11-02 13:11:09] [INFO] 移動: harmonet-docs-directory-definition_v3.2.md → 01_docs\00_project\harmonet-docs-directory-definition_v3.2.md
+[2025-11-02 13:11:09] [INFO] 移動: schema-definition-overview_v1.0.md → 01_docs\01_basic_design\schema-definition-overview_v1.0.md
+[2025-11-02 13:11:09] [INFO] 移動: harmonet-document-policy_latest.md → 01_docs\00_project\harmonet-document-policy_latest.md
+[2025-11-02 13:11:09] [INFO] 情報: HarmoNet 開発方針共有メモ(2025-11-01).md は存在しません(スキップ)
+[2025-11-02 13:11:09] [INFO] Phase 3: ディレクトリ名修正開始
+[2025-11-02 13:11:09] [WARN] 警告: 03_rules が既にあるためリネームしませんでした
+[2025-11-02 13:11:09] [INFO] Phase 4: 必要なディレクトリの作成開始
+[2025-11-02 13:11:09] [INFO] 作成: 01_docs\05_implementation
+[2025-11-02 13:11:09] [INFO] 情報: 01_docs\99_archive は既に存在します(スキップ)
+[2025-11-02 13:11:09] [INFO] ========================================
+[2025-11-02 13:11:09] [INFO] HarmoNet Directory Sync v3.2r1 完了
+[2025-11-02 13:11:09] [INFO] 成功: 17 件 / 失敗: 0 件

@@ -1,0 +1,103 @@
+graph TB
+    subgraph "ユーザー端末"
+        MobileApp[モバイルアプリ<br/>iOS/Android]
+        WebApp[Webアプリ<br/>PC/タブレット]
+    end
+    
+    subgraph "認証システム"
+        AuthService[認証サービス]
+        MagicLink[マジックリンク生成]
+        SessionMgr[セッション管理]
+    end
+    
+    subgraph "アプリケーションサーバー"
+        APIGateway[APIゲートウェイ]
+        
+        subgraph "コアサービス"
+            AnnouncementSvc[お知らせサービス]
+            ParkingSvc[駐車場予約サービス]
+            BBSSvc[掲示板サービス]
+            NotificationSvc[通知サービス]
+            UserSvc[ユーザー管理サービス]
+        end
+        
+        subgraph "多言語対応"
+            TranslationSvc[翻訳サービス]
+            TranslationCache[翻訳キャッシュ]
+            TranslationMaster[(翻訳マスタDB)]
+        end
+    end
+    
+    subgraph "データベース"
+        MainDB[(メインDB)]
+        CacheDB[(Redis Cache)]
+    end
+    
+    subgraph "外部サービス"
+        GoogleAPI[Google Translation API]
+        EmailService[メール配信サービス<br/>SendGrid/SES]
+        PushService[プッシュ通知<br/>Firebase CM]
+    end
+    
+    subgraph "メール受信"
+        UserEmail[ユーザーメールボックス]
+    end
+    
+    %% ユーザー認証フロー
+    MobileApp -->|1. ログイン要求| AuthService
+    WebApp -->|1. ログイン要求| AuthService
+    AuthService -->|2. メールアドレス確認| MainDB
+    AuthService -->|3. マジックリンク生成| MagicLink
+    MagicLink -->|4. 認証メール送信| EmailService
+    EmailService -->|5. メール配信| UserEmail
+    UserEmail -->|6. リンククリック| AuthService
+    AuthService -->|7. トークン検証| MainDB
+    AuthService -->|8. セッション発行| SessionMgr
+    SessionMgr -->|9. セッション保存| CacheDB
+    
+    %% API通信フロー
+    MobileApp -->|API Request| APIGateway
+    WebApp -->|API Request| APIGateway
+    APIGateway -->|認証チェック| SessionMgr
+    SessionMgr -->|セッション確認| CacheDB
+    
+    APIGateway --> AnnouncementSvc
+    APIGateway --> ParkingSvc
+    APIGateway --> BBSSvc
+    APIGateway --> NotificationSvc
+    APIGateway --> UserSvc
+    
+    %% 各サービスのDB接続
+    AnnouncementSvc -->|CRUD| MainDB
+    ParkingSvc -->|CRUD| MainDB
+    BBSSvc -->|CRUD| MainDB
+    NotificationSvc -->|CRUD| MainDB
+    UserSvc -->|CRUD| MainDB
+    
+    %% 多言語対応フロー
+    AnnouncementSvc -->|翻訳要求| TranslationSvc
+    BBSSvc -->|翻訳要求| TranslationSvc
+    
+    TranslationSvc -->|1. キャッシュ確認| TranslationCache
+    TranslationCache -->|キャッシュなし| GoogleAPI
+    GoogleAPI -->|翻訳結果| TranslationCache
+    TranslationCache -->|翻訳結果| TranslationSvc
+    
+    TranslationSvc -->|静的翻訳取得| TranslationMaster
+    
+    %% 通知フロー
+    AnnouncementSvc -->|お知らせ公開| NotificationSvc
+    ParkingSvc -->|予約完了/キャンセル| NotificationSvc
+    NotificationSvc -->|メール送信| EmailService
+    NotificationSvc -->|プッシュ送信| PushService
+    
+    EmailService -->|配信| UserEmail
+    PushService -->|配信| MobileApp
+    
+    style MobileApp fill:#e3f2fd
+    style WebApp fill:#e3f2fd
+    style AuthService fill:#fff3e0
+    style TranslationSvc fill:#f3e5f5
+    style GoogleAPI fill:#c8e6c9
+    style MainDB fill:#ffccbc
+    style CacheDB fill:#ffccbc

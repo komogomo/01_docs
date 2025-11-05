@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メール送信完了 - SECUREA City (共通定義 v1.1 適用)</title>
+    <style>
+        /* ===================================
+           HarmoNet Design System v1.0
+           + common-contents v1.1 準拠
+        =================================== */
+        
+        /* CSS Variables - HarmoNet Design System */
+        :root {
+            /* Background Colors */
+            --color-bg-base: #F9FAFB;
+            --color-bg-card: #FFFFFF;
+            --color-bg-border: #E5E7EB;
+            
+            /* Text Colors */
+            --color-text-primary: #1F2937;
+            --color-text-secondary: #6B7280;
+            --color-text-tertiary: #9CA3AF;
+            
+            /* Action Colors */
+            --color-action-blue: #2563EB;
+            --color-action-blue-hover: #1d4ed8;
+            
+            /* State Colors */
+            --color-success: #16A34A;
+            --color-success-light: rgba(22, 163, 74, 0.1);
+            --color-info: #3B82F6;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            
+            /* Border Radius */
+            --radius-sm: 0.5rem; /* 8px */
+            --radius-md: 1rem; /* 16px */
+            /* ★ common-contents (rounded-2xl) 準拠のため追加 */
+            --radius-xl: 1.5rem; /* 24px */
+            
+            /* Typography */
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+        }
+
+        /* Reset and Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'BIZ UDGothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: var(--color-bg-base);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header (★ common-header_v1.1.md 準拠) */
+        .page-header {
+            background: var(--color-bg-card);
+            border-bottom: 1px solid var(--color-bg-border);
+            /* ★ common-header 準拠 */
+            padding: 0 20px;
+            height: 60px;
+        }
+
+        .page-header__container {
+            max-width: 1024px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%; /* 親の高さ(60px)に合わせる */
+        }
+
+        .app-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        /* Language Switcher (common-header準拠) */
+        .language-switcher {
+            display: flex;
+            gap: var(--spacing-xs);
+            background: var(--color-bg-base);
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--color-action-blue);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .lang-btn--active {
+            background: var(--color-bg-card);
+            color: var(--color-action-blue);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+        }
+
+        .email-sent-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* Card (★ common-contents-layout_v1.1.md 準拠) */
+        .email-sent-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-bg-border);
+            /* ★ common-contents (rounded-2xl) 準拠 */
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl) var(--spacing-xl);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        /* Success Icon (固有スタイル) */
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-lg);
+            background: var(--color-success-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-icon svg {
+            width: 48px;
+            height: 48px;
+            color: var(--color-success);
+        }
+
+        /* Success Message (固有スタイル) */
+        .success-message {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .success-message__title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .success-message__text {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.75;
+        }
+
+        /* Demo Section (固有スタイル) */
+        .demo-section {
+            background: var(--color-bg-base);
+            border: 1px solid var(--color-bg-border);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .demo-section__text {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .btn-magic-link {
+            width: 100%;
+            background: var(--color-action-blue);
+            color: white;
+            border: none;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-magic-link:hover {
+            background: var(--color-action-blue-hover);
+        }
+
+        .btn-magic-link:active {
+            transform: translateY(1px);
+        }
+
+        .demo-note {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+            margin-top: var(--spacing-sm);
+        }
+
+        /* Resend Button (固有スタイル) */
+        .btn-resend {
+            width: 100%;
+            background: transparent;
+            color: var(--color-action-blue);
+            border: 1px solid var(--color-bg-border);
+            padding: 12px var(--spacing-md);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-resend:hover {
+            background: var(--color-bg-base);
+            border-color: var(--color-action-blue);
+        }
+
+        .btn-resend:active {
+            transform: translateY(1px);
+        }
+
+        /* Footer (固有スタイル) */
+        .page-footer {
+            background: var(--color-bg-card);
+            border-top: 1px solid var(--color-bg-border);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .footer-links {
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .footer-link {
+            color: var(--color-action-blue);
+            text-decoration: none;
+            margin: 0 var(--spacing-sm);
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer-copyright {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .page-header {
+                /* 共通定義(60px)が優先されるため、このセクションは 
+                   実際には common-header のレスポンシブ定義で上書きされるべきだが、
+                   元のファイルの記述を維持 */
+                padding: var(--spacing-sm) var(--spacing-md);
+            }
+
+            .app-title {
+                font-size: var(--font-size-base);
+            }
+
+            .lang-btn {
+                padding: 4px 10px;
+                font-size: var(--font-size-xs);
+            }
+
+            .email-sent-card {
+                padding: var(--spacing-xl) var(--spacing-lg);
+            }
+
+            .success-message__title {
+                font-size: var(--font-size-lg);
+            }
+
+            .main-content {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="page-header__container">
+            <h1 class="app-title">セキュレアシティ</h1>
+            <div class="language-switcher">
+                <button class="lang-btn lang-btn--active" data-lang="ja">JA</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="cn">CN</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="email-sent-container">
+            <div class="email-sent-card">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+
+                <div class="success-message">
+                    <h2 class="success-message__title">メールを送信しました</h2>
+                    <p class="success-message__text">
+                        入力されたメールアドレス宛にログインリンクを送信しました。<br>
+                        メールボックスをご確認ください。
+                    </S>
+                </div>
+
+                <div class="demo-section">
+                    <p class="demo-section__text">デモ:下のボタンをクリックしてログインをシミュレートできます</p>
+                    
+                    <button class="btn-magic-link" onclick="handleMagicLink()">
+                        マジックリンクをクリック(デモ)
+                    </button>
+                    
+                    <p class="demo-note">※ 実際の場合は、メール内のリンクをクリックしてログインします</p>
+                </div>
+
+                <button class="btn-resend" onclick="handleResend()">
+                    再送信する
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <div class="footer-links">
+            <a href="#" class="footer-link">利用規約</a>
+            |
+            <a href="#" class="footer-link">プライバシーポリシー</a>
+            |
+            <a href="#" class="footer-link">お問い合わせ</a>
+        </div>
+        <p class="footer-copyright">© 2025 SECUREA City. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.lang-btn').forEach(b => {
+                    b.classList.remove('lang-btn--active');
+                });
+                this.classList.add('lang-btn--active');
+                
+                const lang = this.getAttribute('data-lang');
+                console.log('Language switched to:', lang);
+                // 実際の実装では、ここで多言語切替処理を実行
+            });
+        });
+
+        // Magic link demo
+        function handleMagicLink() {
+            alert('デモモード:HOME画面に遷移します\n\n実際のアプリでは、メール内のリンクをクリックすると自動的にログインされます。');
+            // 実際の実装では、HOME画面にリダイレクト
+            // window.location.href = '/pages/home/home.html';
+        }
+
+        // Resend email
+        function handleResend() {
+            alert('メールを再送信しました!\n\nメールボックスをご確認ください。');
+            // 実際の実装では、メール再送信APIを呼び出し
+        }
+    </script>
+</body>
+</html>
