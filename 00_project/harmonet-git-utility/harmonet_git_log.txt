@@ -8,3 +8,4 @@
 
 v4.4→v4.5
 2025-11-05 18:35:38 : [自動検出: 01_docs] Commit/Push - fix: Rename gitignore to .gitignore and remove Google Drive temp files
+2025-11-05 18:38:40 : [自動検出: 01_docs] Commit/Push - fix: Remove desktop.ini from Git tracking
