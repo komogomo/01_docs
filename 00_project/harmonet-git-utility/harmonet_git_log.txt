@@ -13,3 +13,4 @@ v4.4→v4.5
 
 Windsurf向けのコーディング規約を作成。
 2025-11-06 09:19:39 : [自動検出: 01_docs] Commit/Push - コーディング規約にPrismaORMは本章対象外として説明を記載
+2025-11-06 11:10:22 : [自動検出: 01_docs] Commit/Push - home-feature-design-ch01_v1.1.txt → home-feature-design-ch01_v1.1.mdに拡張子を変更
