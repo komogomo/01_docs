@@ -12,3 +12,4 @@ v4.4→v4.5
 2025-11-06 01:58:04 : [自動検出: 01_docs] Commit/Push - /01_docs/03_rules/harmonet-coding-standard_v1.0.md
 
 Windsurf向けのコーディング規約を作成。
+2025-11-06 09:19:39 : [自動検出: 01_docs] Commit/Push - コーディング規約にPrismaORMは本章対象外として説明を記載
