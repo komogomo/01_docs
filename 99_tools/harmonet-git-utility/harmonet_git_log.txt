@@ -1,0 +1,19 @@
+2025-11-05 10:27:43 : [設計書リポジトリ (01_docs)] Commit/Push - GIT UTIL TEST
+2025-11-05 11:34:10 : [設計書リポジトリ (01_docs)] Commit/Push - Git Utility test
+2025-11-05 11:50:02 : [設計書リポジトリ (01_docs)] Commit/Push - tool test 2
+2025-11-05 14:49:52 : [自動検出: 01_docs] Commit/Push - harmonet-technical-stack-definition_v3.6.md に環境構成を変更。
+2025-11-05 16:01:17 : [自動検出: 01_docs] Commit/Push - github 利用ルールを記載
+2025-11-05 18:03:19 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - Prisma環境復旧完了 - スキーマとマイグレーション履歴を修正
+2025-11-05 18:27:45 : [自動検出: 01_docs] Commit/Push - git utiity のコメント入力を複数行にする改修を実施
+
+v4.4→v4.5
+2025-11-05 18:35:38 : [自動検出: 01_docs] Commit/Push - fix: Rename gitignore to .gitignore and remove Google Drive temp files
+2025-11-05 18:38:40 : [自動検出: 01_docs] Commit/Push - fix: Remove desktop.ini from Git tracking
+2025-11-06 01:58:04 : [自動検出: 01_docs] Commit/Push - /01_docs/03_rules/harmonet-coding-standard_v1.0.md
+
+Windsurf向けのコーディング規約を作成。
+2025-11-06 09:19:39 : [自動検出: 01_docs] Commit/Push - コーディング規約にPrismaORMは本章対象外として説明を記載
+2025-11-06 11:10:22 : [自動検出: 01_docs] Commit/Push - home-feature-design-ch01_v1.1.txt → home-feature-design-ch01_v1.1.mdに拡張子を変更
+2025-11-06 11:57:20 : [自動検出: 01_docs] Commit/Push - harmonet-naming-matrix_v2.0_final.md新規作成
+2025-11-06 21:53:54 : [自動検出: 01_docs] Commit/Push - 日次作業
+日次作業更新

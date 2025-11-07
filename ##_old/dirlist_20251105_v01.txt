@@ -1,6 +1,0 @@
-Folder PATH listing for volume ボリューム
-Volume serial number is 8AC9-85EB
-D:\AIDRIVEN\01_DOCS\-F
-Invalid path - \AIDRIVEN\01_DOCS\-F
-No subfolders exist 
-
