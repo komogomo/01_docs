@@ -1,0 +1,342 @@
+﻿# HarmoNet ER Entity Definition v1.1
+# Phase5 Step 5-3/5-4 (ER Diagram & Table Definition Input)
+# Source: v1.0 + Gemini Review Integration
+# Author: Tachikoma (HarmoNet PMO / Architect)
+# Created: 2025-11-04
+# Last Updated: 2025-11-04
+# Version: 1.1
+# Document ID: HNM-ERDEF-20251104
+# Status: Phase5 完整合版 (Gemini監査4項目反映)
+
+meta:
+  schema_version: 1.1
+  tenant_model: multi-tenant (RLS)
+  db_engine: PostgreSQL (Supabase)
+  conventions:
+    id_type: uuid
+    timestamps: [created_at, updated_at]
+    common_fields: [tenant_id, status]
+    status_enum: [active, inactive, archived]
+
+entities:
+
+  # --- 1. Tenant Management ---
+  tenants:
+    description: "テナント基本情報"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_code: {type: string, unique: true}
+      tenant_name: {type: string}
+      timezone: {type: string}
+      is_active: {type: boolean, default: true}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+      status: {type: string, enum: [active, inactive, archived], default: active}
+
+  tenant_settings:
+    description: "テナント設定(JSON)"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      config_json: {type: jsonb}
+      default_language: {type: string, default: ja}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+      status: {type: string, enum: [active, inactive, archived], default: active}
+
+  tenant_features:
+    description: "機能フラグ"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      feature_key: {type: string}
+      enabled: {type: boolean, default: true}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+      status: {type: string, enum: [active, inactive, archived], default: active}
+
+  # --- 2. Users / Auth ---
+  users:
+    description: "ユーザー基本情報（Supabase auth.users と1:1）"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id, nullable: true}
+      email: {type: string, unique: true}
+      display_name: {type: string}
+      language: {type: string, default: ja}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+      status: {type: string, enum: [active, inactive, archived], default: active}
+
+  user_tenants:
+    description: "ユーザーとテナントの所属関係"
+    fields:
+      user_id: {type: uuid, ref: users.id}
+      tenant_id: {type: uuid, ref: tenants.id}
+      joined_at: {type: timestamp, default: now}
+      status: {type: string, enum: [active, inactive, archived], default: active}
+    constraints:
+      primary_key: [user_id, tenant_id]
+
+  user_roles:
+    description: "ユーザーごとのロール割り当て"
+    fields:
+      user_id: {type: uuid, ref: users.id}
+      tenant_id: {type: uuid, ref: tenants.id}
+      role_id: {type: uuid, ref: roles.id}
+      assigned_at: {type: timestamp, default: now}
+    constraints:
+      unique: [user_id, tenant_id, role_id]
+
+  user_profiles:
+    description: "ユーザープロファイル設定"
+    fields:
+      user_id: {type: uuid, ref: users.id}
+      tenant_id: {type: uuid, ref: tenants.id}
+      preferences: {type: jsonb}
+      updated_at: {type: timestamp, default: now}
+
+  # --- 3. Roles / Permissions ---
+  roles:
+    description: "ロールマスタ"
+    fields:
+      id: {type: uuid, primary: true}
+      role_key: {type: string, unique: true}
+      name: {type: string}
+      scope: {type: string, enum: [global, tenant]}
+      permissions_ref: {type: string, nullable: true}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  role_inheritances:
+    description: "ロール継承関係"
+    fields:
+      parent_role_id: {type: uuid, ref: roles.id}
+      child_role_id: {type: uuid, ref: roles.id}
+    constraints:
+      primary_key: [parent_role_id, child_role_id]
+
+  permissions:
+    description: "権限マスタ"
+    fields:
+      id: {type: uuid, primary: true}
+      permission_key: {type: string, unique: true}
+      resource: {type: string}
+      action: {type: string}
+
+  role_permissions:
+    description: "ロール権限紐付け"
+    fields:
+      role_id: {type: uuid, ref: roles.id}
+      permission_id: {type: uuid, ref: permissions.id}
+    constraints:
+      unique: [role_id, permission_id]
+
+  # --- 4. Board ---
+  board_categories:
+    description: "掲示板カテゴリ"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      category_key: {type: string}
+      category_name: {type: string}
+      requires_approval: {type: boolean, default: false}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+      status: {type: string, enum: [active, inactive, archived], default: active}
+
+  board_posts:
+    description: "掲示板投稿"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      author_id: {type: uuid, ref: users.id}
+      category_id: {type: uuid, ref: board_categories.id}
+      title: {type: string}
+      content: {type: text}
+      tags: {type: text[]}
+      status: {type: string, enum: [draft, pending, published, archived], default: draft}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  board_comments:
+    description: "投稿コメント"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      post_id: {type: uuid, ref: board_posts.id}
+      author_id: {type: uuid, ref: users.id}
+      content: {type: text}
+      parent_comment_id: {type: uuid, nullable: true}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  board_reactions:
+    description: "投稿リアクション"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      post_id: {type: uuid, ref: board_posts.id}
+      user_id: {type: uuid, ref: users.id}
+      reaction_type: {type: string, enum: [like, report, bookmark]}
+      created_at: {type: timestamp, default: now}
+    constraints:
+      unique: [post_id, user_id, reaction_type]
+
+  board_attachments:
+    description: "添付ファイル（PDFプレビュー対応）"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      post_id: {type: uuid, ref: board_posts.id}
+      file_url: {type: string}
+      file_name: {type: string}
+      file_type: {type: string}
+      file_size: {type: integer}
+      created_at: {type: timestamp, default: now}
+
+  board_approval_logs:
+    description: "承認履歴"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      post_id: {type: uuid, ref: board_posts.id}
+      approver_id: {type: uuid, ref: users.id}
+      action: {type: string, enum: [approve, reconsider]}
+      comment: {type: text}
+      acted_at: {type: timestamp, default: now}
+
+  # --- 5. Announcements ---
+  announcements:
+    description: "お知らせ"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      title: {type: string}
+      content: {type: text}
+      target_mode: {type: string, enum: [all, group, role, user], default: all}
+      valid_from: {type: date, default: now}
+      valid_until: {type: date, nullable: true}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  announcement_reads:
+    description: "お知らせ既読管理"
+    fields:
+      announcement_id: {type: uuid, ref: announcements.id}
+      user_id: {type: uuid, ref: users.id}
+      read_at: {type: timestamp}
+    constraints:
+      unique: [announcement_id, user_id]
+
+  # --- 6. Facilities / Reservations ---
+  facilities:
+    description: "施設マスタ"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      facility_name: {type: string}
+      facility_type: {type: string}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  facility_settings:
+    description: "施設別の利用ルール設定"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      facility_id: {type: uuid, ref: facilities.id}
+      fee_per_day: {type: numeric, precision: 8, scale: 2, nullable: true}
+      fee_unit: {type: string, enum: [day, hour], default: day}
+      max_consecutive_days: {type: integer, default: 3}
+      reservable_until_months: {type: integer, default: 1}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  facility_reservations:
+    description: "施設予約"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      facility_id: {type: uuid, ref: facilities.id}
+      slot_id: {type: uuid, ref: facility_slots.id, nullable: true}
+      user_id: {type: uuid, ref: users.id}
+      start_at: {type: timestamptz}
+      end_at: {type: timestamptz}
+      status: {type: string, enum: [pending, confirmed, canceled], default: pending}
+      created_at: {type: timestamp, default: now}
+      updated_at: {type: timestamp, default: now}
+
+  # --- 7. Translation / Cache ---
+  translation_cache:
+    description: "翻訳キャッシュ（Redis失効後の永続履歴）"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      content_type: {type: string}
+      content_id: {type: uuid}
+      language: {type: string}
+      translated_text: {type: text}
+      expires_at: {type: timestamp}
+    constraints:
+      unique: [tenant_id, content_type, content_id, language]
+
+  # --- 8. Notifications ---
+  notifications:
+    description: "通知履歴"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      user_id: {type: uuid, ref: users.id}
+      type: {type: string}
+      title: {type: string}
+      content: {type: text}
+      sent_at: {type: timestamp, default: now}
+      read_at: {type: timestamp, nullable: true}
+
+  user_notification_settings:
+    description: "ユーザー通知設定"
+    fields:
+      user_id: {type: uuid, ref: users.id}
+      tenant_id: {type: uuid, ref: tenants.id}
+      notification_type: {type: string}
+      enabled: {type: boolean, default: true}
+      updated_at: {type: timestamp, default: now}
+    constraints:
+      unique: [user_id, tenant_id, notification_type]
+
+  # --- 9. Audit / Moderation ---
+  audit_logs:
+    description: "監査ログ"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      user_id: {type: uuid, ref: users.id}
+      action_type: {type: string}
+      target_resource: {type: string}
+      target_id: {type: uuid, nullable: true}
+      ip_address: {type: string}
+      user_agent: {type: string}
+      timestamp: {type: timestamp, default: now}
+
+  moderation_logs:
+    description: "AIモデレーションログ"
+    fields:
+      id: {type: uuid, primary: true}
+      tenant_id: {type: uuid, ref: tenants.id}
+      content_type: {type: string}
+      content_id: {type: uuid}
+      ai_score: {type: numeric, precision: 5, scale: 2}
+      flagged_reason: {type: text}
+      decision: {type: string, enum: [allow, mask, block], default: allow}
+      decided_by: {type: string, enum: [system, human], default: system}
+      decided_at: {type: timestamp, default: now}
+      reviewed_by: {type: uuid, ref: users.id, nullable: true}
+
+# --- ChangeLog ---
+# v1.1 (2025-11-04)
+# - ADD facility_settings テーブル（Gemini指摘①対応）
+# - REMOVE user_profiles.notification_settings （Gemini指摘②対応）
+# - CLARIFY translation_cache コメント（Gemini指摘③対応）
+# - REMOVE user_tenants.role_default （Gemini指摘④対応）
+# - VERIFIED Supabase/Prisma 整合済

@@ -1,6 +1,6 @@
 # 第3章: ログイン画面詳細
 
-**Document:** LOGIN画面 機能設計書 v1.1  
+**Document:** LOGIN画面 機能設計書 v1.2
 **Chapter:** 3 of 6  
 **Last Updated:** 2025/10/27  
 **Design System:** HarmoNet Design System v1

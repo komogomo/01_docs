@@ -1,0 +1,437 @@
+﻿// HarmoNet Prisma Schema v1.0
+// Source: ER Entity Definition v1.2 + Gemini生成版 + Tachikoma統合修正
+// Created: 2025-11-04
+// Last Updated: 2025-11-04
+// Author: Tachikoma (HarmoNet PMO / Architect)
+// Document ID: HNM-PRISMA-20251104
+// Status: Phase5 Final整合版 (Claude入力用 / Supabase Push適合)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//// --- ENUMS ----------------------------------------------------------
+
+enum Status {
+  active
+  inactive
+  archived
+}
+
+enum ReactionType {
+  like
+  report
+  bookmark
+}
+
+enum ApprovalAction {
+  approve
+  reconsider
+}
+
+enum FacilityFeeUnit {
+  day
+  hour
+}
+
+enum DecisionType {
+  allow
+  mask
+  block
+}
+
+enum DecisionSource {
+  system
+  human
+}
+
+//// --- 1. TENANT MANAGEMENT -----------------------------------------
+
+model tenants {
+  id           String   @id @default(uuid())
+  tenant_code  String   @unique
+  tenant_name  String
+  timezone     String?
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  status       Status   @default(active)
+  tenant_settings   tenant_settings[]
+  tenant_features   tenant_features[]
+}
+
+model tenant_settings {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  config_json     Json?
+  default_language String  @default("ja")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  status          Status   @default(active)
+  tenant          tenants  @relation(fields: [tenant_id], references: [id])
+}
+
+model tenant_features {
+  id         String   @id @default(uuid())
+  tenant_id  String
+  feature_key String
+  enabled    Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  status     Status   @default(active)
+  tenant     tenants  @relation(fields: [tenant_id], references: [id])
+}
+
+//// --- 2. USERS / AUTH -----------------------------------------------
+
+model users {
+  id           String   @id @default(uuid())
+  tenant_id    String?
+  email        String   @unique
+  display_name String
+  language     String   @default("ja")
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  status       Status   @default(active)
+  tenant       tenants? @relation(fields: [tenant_id], references: [id])
+  user_profiles user_profiles?
+  user_roles    user_roles[]
+}
+
+model user_tenants {
+  user_id   String
+  tenant_id String
+  joined_at DateTime @default(now())
+  status    Status   @default(active)
+
+  @@id([user_id, tenant_id])
+}
+
+model user_roles {
+  user_id   String
+  tenant_id String
+  role_id   String
+  assigned_at DateTime @default(now())
+
+  user   users?   @relation(fields: [user_id], references: [id])
+  tenant tenants? @relation(fields: [tenant_id], references: [id])
+  role   roles?   @relation(fields: [role_id], references: [id])
+
+  @@unique([user_id, tenant_id, role_id])
+}
+
+model user_profiles {
+  user_id    String
+  tenant_id  String
+  preferences Json?
+  updated_at DateTime @default(now())
+
+  user   users   @relation(fields: [user_id], references: [id])
+  tenant tenants @relation(fields: [tenant_id], references: [id])
+}
+
+//// --- 3. ROLES / PERMISSIONS ---------------------------------------
+
+model roles {
+  id              String   @id @default(uuid())
+  role_key        String   @unique
+  name            String
+  scope           String   @default("tenant") // global or tenant
+  permissions_ref String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  role_permissions role_permissions[]
+}
+
+model role_inheritances {
+  parent_role_id String
+  child_role_id  String
+
+  @@id([parent_role_id, child_role_id])
+}
+
+model permissions {
+  id              String   @id @default(uuid())
+  permission_key  String   @unique
+  resource        String
+  action          String
+  role_permissions role_permissions[]
+}
+
+model role_permissions {
+  role_id       String
+  permission_id String
+
+  role        roles       @relation(fields: [role_id], references: [id])
+  permission  permissions @relation(fields: [permission_id], references: [id])
+
+  @@unique([role_id, permission_id])
+}
+
+//// --- 4. BOARD -------------------------------------------------------
+
+model board_categories {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  category_key    String
+  category_name   String
+  requires_approval Boolean @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  status          Status   @default(active)
+  tenant          tenants  @relation(fields: [tenant_id], references: [id])
+  board_posts     board_posts[]
+}
+
+model board_posts {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  author_id   String
+  category_id String
+  title       String
+  content     String
+  tags        String[]
+  status      String   @default("draft")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  tenant   tenants        @relation(fields: [tenant_id], references: [id])
+  author   users          @relation(fields: [author_id], references: [id])
+  category board_categories @relation(fields: [category_id], references: [id])
+  board_comments  board_comments[]
+  board_reactions board_reactions[]
+  board_attachments board_attachments[]
+  board_approval_logs board_approval_logs[]
+}
+
+model board_comments {
+  id                String   @id @default(uuid())
+  tenant_id         String
+  post_id           String
+  author_id         String
+  content           String
+  parent_comment_id String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+  tenant            tenants  @relation(fields: [tenant_id], references: [id])
+  post              board_posts @relation(fields: [post_id], references: [id])
+  author            users    @relation(fields: [author_id], references: [id])
+}
+
+model board_reactions {
+  id           String   @id @default(uuid())
+  tenant_id    String
+  post_id      String
+  user_id      String
+  reaction_type ReactionType
+  created_at   DateTime @default(now())
+  tenant       tenants  @relation(fields: [tenant_id], references: [id])
+  post         board_posts @relation(fields: [post_id], references: [id])
+  user         users    @relation(fields: [user_id], references: [id])
+
+  @@unique([post_id, user_id, reaction_type])
+}
+
+model board_attachments {
+  id         String   @id @default(uuid())
+  tenant_id  String
+  post_id    String
+  file_url   String
+  file_name  String
+  file_type  String
+  file_size  Int
+  created_at DateTime @default(now())
+
+  tenant tenants @relation(fields: [tenant_id], references: [id])
+  post   board_posts @relation(fields: [post_id], references: [id])
+}
+
+model board_approval_logs {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  post_id     String
+  approver_id String
+  action      ApprovalAction
+  comment     String?
+  acted_at    DateTime @default(now())
+
+  tenant   tenants @relation(fields: [tenant_id], references: [id])
+  post     board_posts @relation(fields: [post_id], references: [id])
+  approver users @relation(fields: [approver_id], references: [id])
+}
+
+//// --- 5. ANNOUNCEMENTS ---------------------------------------------
+
+model announcements {
+  id           String   @id @default(uuid())
+  tenant_id    String
+  title        String
+  content      String
+  target_mode  String   @default("all")
+  valid_from   DateTime @default(now())
+  valid_until  DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  tenant       tenants  @relation(fields: [tenant_id], references: [id])
+  announcement_reads announcement_reads[]
+}
+
+model announcement_reads {
+  announcement_id String
+  user_id         String
+  read_at         DateTime
+
+  announcement announcements @relation(fields: [announcement_id], references: [id])
+  user          users         @relation(fields: [user_id], references: [id])
+
+  @@unique([announcement_id, user_id])
+}
+
+//// --- 6. FACILITIES / RESERVATIONS ---------------------------------
+
+model facilities {
+  id            String   @id @default(uuid())
+  tenant_id     String
+  facility_name String
+  facility_type String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+  tenant        tenants  @relation(fields: [tenant_id], references: [id])
+  facility_slots facility_slots[]
+  facility_reservations facility_reservations[]
+  facility_settings facility_settings?
+}
+
+model facility_settings {
+  id                    String   @id @default(uuid())
+  tenant_id             String
+  facility_id           String
+  fee_per_day           Decimal?
+  fee_unit              FacilityFeeUnit @default(day)
+  max_consecutive_days  Int      @default(3)
+  reservable_until_months Int    @default(1)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @default(now())
+  tenant                tenants  @relation(fields: [tenant_id], references: [id])
+  facility              facilities @relation(fields: [facility_id], references: [id])
+}
+
+model facility_slots {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  facility_id String
+  slot_key    String
+  slot_name   String
+  status      Status   @default(active)
+  tenant      tenants  @relation(fields: [tenant_id], references: [id])
+  facility    facilities @relation(fields: [facility_id], references: [id])
+}
+
+model facility_reservations {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  facility_id String
+  slot_id     String?
+  user_id     String
+  start_at    DateTime
+  end_at      DateTime
+  status      String   @default("pending")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+  tenant      tenants  @relation(fields: [tenant_id], references: [id])
+  facility    facilities @relation(fields: [facility_id], references: [id])
+  user        users @relation(fields: [user_id], references: [id])
+}
+
+//// --- 7. TRANSLATION / TTS CACHE -----------------------------------
+
+model translation_cache {
+  id             String   @id @default(uuid())
+  tenant_id      String
+  content_type   String
+  content_id     String
+  language       String
+  translated_text String
+  expires_at     DateTime? // デフォルト30日を想定。Prismaでは式指定不可のためアプリ層で設定。
+  tenant         tenants  @relation(fields: [tenant_id], references: [id])
+
+  @@unique([tenant_id, content_type, content_id, language])
+}
+
+model tts_cache {
+  id           String   @id @default(uuid())
+  tenant_id    String
+  content_type String
+  content_id   String
+  language     String
+  voice_type   String   @default("default")
+  audio_url    String
+  duration_sec Decimal?
+  expires_at   DateTime? // デフォルト30日を想定。アプリ層で設定。
+  created_at   DateTime  @default(now())
+  tenant       tenants   @relation(fields: [tenant_id], references: [id])
+
+  @@unique([tenant_id, content_type, content_id, language])
+}
+
+//// --- 8. NOTIFICATIONS ---------------------------------------------
+
+model notifications {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  user_id     String
+  type        String
+  title       String
+  content     String
+  sent_at     DateTime @default(now())
+  read_at     DateTime?
+  tenant      tenants  @relation(fields: [tenant_id], references: [id])
+  user        users    @relation(fields: [user_id], references: [id])
+}
+
+model user_notification_settings {
+  user_id            String
+  tenant_id          String
+  notification_type  String
+  enabled            Boolean  @default(true)
+  updated_at         DateTime @default(now())
+  user               users    @relation(fields: [user_id], references: [id])
+  tenant             tenants  @relation(fields: [tenant_id], references: [id])
+
+  @@unique([user_id, tenant_id, notification_type])
+}
+
+//// --- 9. AUDIT / MODERATION ----------------------------------------
+
+model audit_logs {
+  id             String   @id @default(uuid())
+  tenant_id      String
+  user_id        String
+  action_type    String
+  target_resource String
+  target_id      String?
+  ip_address     String?
+  user_agent     String?
+  timestamp      DateTime @default(now())
+  tenant         tenants  @relation(fields: [tenant_id], references: [id])
+  user           users    @relation(fields: [user_id], references: [id])
+}
+
+model moderation_logs {
+  id            String   @id @default(uuid())
+  tenant_id     String
+  content_type  String
+  content_id    String
+  ai_score      Decimal?
+  flagged_reason String?
+  decision      DecisionType  @default(allow)
+  decided_by    DecisionSource @default(system)
+  decided_at    DateTime @default(now())
+  reviewed_by   String?
+  tenant        tenants @relation(fields: [tenant_id], references: [id])
+}
