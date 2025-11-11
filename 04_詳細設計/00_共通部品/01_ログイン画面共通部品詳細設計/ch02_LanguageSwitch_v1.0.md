@@ -1,11 +1,12 @@
 # ch02: LanguageSwitch コンポーネント詳細設計書 v1.0
 
-**Document ID:** HNM-LOGIN-COMMON-C02-LANGUAGESWITCH  
-**Version:** 1.0  
-**Created:** 2025-11-09  
-**Component ID:** C-02  
-**Component Name:** LanguageSwitch  
-**Design System:** HarmoNet Design System v1  
+**Document ID:** HNM-LOGIN-COMMON-C02-LANGUAGESWITCH
+**Version:** 1.0
+**Created:** 2025-11-09
+**Component ID:** C-02
+**Component Name:** LanguageSwitch
+**Design System:** HarmoNet Design System v1
+**Status:** ✅ 初版
 
 ---
 
@@ -13,668 +14,152 @@
 
 ### 1.1 目的
 
-ログイン画面およびログイン後の全画面で使用する言語切替UIコンポーネント。  
-ユーザーが日本語(JA) / 英語(EN) / 中国語(ZH)を選択でき、画面全体の翻訳を即座に切り替える。
+HarmoNet 全画面（ログイン含む）で使用される **言語切替 UI コンポーネント**。
+ユーザーが日本語（JA）・英語（EN）・中国語（ZH）の3言語を一目で認識・選択できるようにし、押下1回で即座に切り替えられることを目的とする。
 
-### 1.2 主要機能
+### 1.2 設計方針
 
-1. **現在言語の表示**: JA / EN / CN の表示
-2. **ドロップダウンメニュー**: 3言語の選択肢を表示
-3. **言語切替処理**: next-intl による静的翻訳辞書の切替
-4. **状態永続化**: localStorage + user_profiles への保存
+```
+・3ボタン並列（JA／EN／中文）構成
+・選択中言語を青強調、非選択をグレー表示
+・StaticI18nProvider経由で即時翻訳反映
+・48×48px以上のタップ領域確保（モバイル操作最適化）
+・シンプル・自然・誤操作防止のHarmoNet UX準拠
+```
 
 ### 1.3 配置位置
 
-- **位置**: AppHeader右端（通知アイコンの右隣）
-- **表示**: 全画面共通（ログイン画面含む）
+* **位置:** AppHeader（C-01）右端
+* **表示:** 全画面共通（ログイン／認証後問わず）
 
 ---
 
 ## 2. 依存関係
 
-### 2.1 親コンポーネント
-
-| コンポーネント | 関係 | 備考 |
-|--------------|------|------|
-| **AppHeader** (C-01) | 親 | ヘッダー内に配置 |
-
-### 2.2 連携コンポーネント
-
-| コンポーネント | 関係 | 備考 |
-|--------------|------|------|
-| **StaticI18nProvider** (C-03) | 協調 | 翻訳コンテキスト提供 |
-
-### 2.3 外部ライブラリ
-
-| ライブラリ | バージョン | 用途 |
-|-----------|-----------|------|
-| **next-intl** | 3.x | 静的翻訳管理 |
-| **@headlessui/react** | 2.x | アクセシブルなドロップダウンUI |
+| コンポーネント                   | 関係 | 備考                                        |
+| ------------------------- | -- | ----------------------------------------- |
+| AppHeader (C-01)          | 親  | ヘッダー右端に配置                                 |
+| StaticI18nProvider (C-03) | 協調 | `useI18n()` による `locale` / `setLocale` 提供 |
 
 ---
 
-## 3. Props定義
+## 3. Props 定義
 
-### 3.1 インターフェース
-
-```typescript
-/**
- * LanguageSwitch コンポーネントのProps
- */
-export interface LanguageSwitchProps {
-  /**
-   * 追加CSSクラス
-   */
-  className?: string;
-
-  /**
-   * テスト用ID
-   */
-  testId?: string;
-
-  /**
-   * 言語変更時のコールバック
-   * @param locale - 新しい言語コード (ja | en | zh)
-   */
-  onLanguageChange?: (locale: Locale) => void;
-}
-
-/**
- * サポートする言語
- */
+```ts
 export type Locale = 'ja' | 'en' | 'zh';
 
-/**
- * 言語オプション定義
- */
-export interface LanguageOption {
-  /**
-   * 言語コード
-   */
-  code: Locale;
-
-  /**
-   * 表示名（短縮形）
-   */
-  label: string;
-
-  /**
-   * 表示名（完全形）
-   */
-  fullName: string;
-
-  /**
-   * アイコン（絵文字）
-   */
-  icon: string;
+export interface LanguageSwitchProps {
+  /** カスタムクラス名（任意） */
+  className?: string;
+  /** テストID（任意） */
+  testId?: string;
 }
-```
-
-### 3.2 デフォルト値
-
-```typescript
-const defaultProps: Partial<LanguageSwitchProps> = {
-  testId: 'language-switch',
-  onLanguageChange: undefined,
-};
-```
-
-### 3.3 言語オプション定義
-
-```typescript
-const LANGUAGE_OPTIONS: LanguageOption[] = [
-  {
-    code: 'ja',
-    label: 'JA',
-    fullName: '日本語',
-    icon: '🇯🇵',
-  },
-  {
-    code: 'en',
-    label: 'EN',
-    fullName: 'English',
-    icon: '🇬🇧',
-  },
-  {
-    code: 'zh',
-    label: 'CN',
-    fullName: '中文',
-    icon: '🇨🇳',
-  },
-];
 ```
 
 ---
 
 ## 4. UI構成
 
-### 4.1 レイアウト構造
+### 4.1 レイアウト
 
 ```
-┌─────────────────┐
-│  JA ▼           │  ← ボタン（現在言語 + 下矢印）
-└─────────────────┘
-        ↓ クリック時
-┌─────────────────┐
-│ ✓ 日本語 (JA)   │  ← 選択中（チェックマーク + 背景色）
-├─────────────────┤
-│   English (EN)  │
-├─────────────────┤
-│   中文 (CN)     │
-└─────────────────┘
+[ JA ] [ EN ] [ 中文 ]
 ```
 
-### 4.2 ボタン仕様
+* 横並び（`flex-row`）配置。
+* 各ボタンの間隔：8px（`gap-2`）。
 
-| 項目 | 値 |
-|------|-----|
-| **幅** | 70px |
-| **高さ** | 40px |
-| **背景色** | 透明（hover時: `#F9FAFB`） |
-| **ボーダー** | なし |
-| **角丸** | 8px (rounded-lg) |
-| **フォントサイズ** | 14px |
-| **フォントウェイト** | 600 (Semibold) |
-| **テキスト色** | `#6B7280` (gray-600) |
+### 4.2 ビジュアル仕様（HarmoNet準拠）
 
-### 4.3 ドロップダウンメニュー仕様
+| 状態 | 背景色 | 文字色 | 枠線 | 備考 |
+|------|----------|----------|-------|
+| 選択中 | `#DBEAFE`（blue-100） | `#2563EB`（blue-600） | 1px solid `#2563EB` | フォーカスリング有効 |
+| 非選択 | `#FFFFFF` | `#6B7280`（gray-500） | 1px solid `#E5E7EB` | hover時 `#F9FAFB` |
 
-| 項目 | 値 |
-|------|-----|
-| **幅** | 160px |
-| **背景色** | `#FFFFFF` |
-| **ボーダー** | 1px solid `#E5E7EB` |
-| **影** | `0 4px 6px -1px rgba(0, 0, 0, 0.1)` |
-| **角丸** | 8px (rounded-lg) |
-| **各項目の高さ** | 40px |
-| **ホバー時の背景色** | `#F9FAFB` |
-| **選択中の背景色** | `#DBEAFE` (blue-100) |
-| **選択中のテキスト色** | `#2563EB` (blue-600) |
+フォント：BIZ UDゴシック（Semibold）
+角丸：`rounded-lg`（8px）
+最小タップ領域：48×48px
 
 ---
 
-## 5. ロジック構造
+## 5. ロジック設計
 
-### 5.1 状態管理
-
-```typescript
-/**
- * コンポーネント内部状態
- */
-interface LanguageSwitchState {
-  /**
-   * ドロップダウンの開閉状態
-   */
-  isOpen: boolean;
-
-  /**
-   * 現在選択中の言語
-   */
-  currentLocale: Locale;
-}
-```
-
-### 5.2 言語切替フロー
-
-```
-1. ユーザーがメニューから言語選択
-   ↓
-2. useRouter().push() でロケール切替
-   ↓
-3. next-intlが翻訳辞書を切替
-   ↓
-4. localStorage に保存
-   ↓
-5. （ログイン中の場合）user_profiles更新
-   ↓
-6. onLanguageChangeコールバック実行
-   ↓
-7. 画面全体が新しい言語で再レンダリング
-```
-
-### 5.3 永続化処理
-
-```typescript
-/**
- * 言語設定を保存
- */
-const saveLanguagePreference = async (locale: Locale) => {
-  // localStorage に保存（即座）
-  localStorage.setItem('selectedLanguage', locale);
-
-  // ログイン中の場合、user_profiles に保存（非同期）
-  if (session?.user?.id) {
-    try {
-      await fetch('/api/users/preferences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          preferences: {
-            language: locale,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error('Failed to save language preference:', error);
-      // エラーは無視（localhostorageには保存済み）
-    }
-  }
-};
-```
-
----
-
-## 6. 実装例
-
-### 6.1 コンポーネント本体
-
-```typescript
-// src/components/common/LanguageSwitch/LanguageSwitch.tsx
-
+```tsx
 'use client';
-
-import React, { useState } from 'react';
-import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
-import { Menu } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import type { LanguageSwitchProps, Locale, LanguageOption } from './LanguageSwitch.types';
-
-const LANGUAGE_OPTIONS: LanguageOption[] = [
-  { code: 'ja', label: 'JA', fullName: '日本語', icon: '🇯🇵' },
-  { code: 'en', label: 'EN', fullName: 'English', icon: '🇬🇧' },
-  { code: 'zh', label: 'CN', fullName: '中文', icon: '🇨🇳' },
-];
+import React from 'react';
+import { useI18n } from '@/components/common/StaticI18nProvider';
+import type { LanguageSwitchProps, Locale } from './LanguageSwitch.types';
 
 export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({
   className = '',
   testId = 'language-switch',
-  onLanguageChange,
 }) => {
-  const locale = useLocale() as Locale;
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const currentLanguage = LANGUAGE_OPTIONS.find((lang) => lang.code === locale);
-
-  const handleLanguageChange = (newLocale: Locale) => {
-    // 1. next-intl でロケール切替
-    const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
-    router.push(newPathname);
-
-    // 2. localStorage に保存
-    localStorage.setItem('selectedLanguage', newLocale);
-
-    // 3. コールバック実行
-    onLanguageChange?.(newLocale);
-
-    // 4. HTML lang属性更新
-    document.documentElement.lang = newLocale;
-  };
+  const { locale, setLocale } = useI18n();
+  const buttons: { code: Locale; label: string }[] = [
+    { code: 'ja', label: 'JA' },
+    { code: 'en', label: 'EN' },
+    { code: 'zh', label: '中文' },
+  ];
 
   return (
-    <Menu as="div" className={`relative ${className}`} data-testid={testId}>
-      {/* ボタン */}
-      <Menu.Button
-        className="
-          flex items-center gap-1
-          px-3 py-2
-          text-sm font-semibold text-gray-600
-          hover:bg-gray-50
-          rounded-lg
-          transition-colors
-        "
-        aria-label="言語を選択"
-        data-testid={`${testId}-button`}
-      >
-        <span>{currentLanguage?.label}</span>
-        <ChevronDownIcon className="w-4 h-4" aria-hidden="true" />
-      </Menu.Button>
-
-      {/* ドロップダウンメニュー */}
-      <Menu.Items
-        className="
-          absolute right-0 mt-2
-          w-40
-          bg-white
-          border border-gray-200
-          rounded-lg
-          shadow-lg
-          overflow-hidden
-          z-50
-        "
-        data-testid={`${testId}-menu`}
-      >
-        {LANGUAGE_OPTIONS.map((language) => (
-          <Menu.Item key={language.code}>
-            {({ active }) => (
-              <button
-                className={`
-                  w-full px-4 py-2
-                  text-left text-sm
-                  flex items-center justify-between
-                  ${active ? 'bg-gray-50' : ''}
-                  ${language.code === locale ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}
-                `}
-                onClick={() => handleLanguageChange(language.code)}
-                data-testid={`${testId}-option-${language.code}`}
-              >
-                <span className="flex items-center gap-2">
-                  <span>{language.icon}</span>
-                  <span>{language.fullName} ({language.label})</span>
-                </span>
-                {language.code === locale && (
-                  <span className="text-blue-600">✓</span>
-                )}
-              </button>
-            )}
-          </Menu.Item>
-        ))}
-      </Menu.Items>
-    </Menu>
+    <div className={`flex gap-2 ${className}`} data-testid={testId}>
+      {buttons.map(({ code, label }) => {
+        const active = locale === code;
+        return (
+          <button
+            key={code}
+            onClick={() => setLocale(code)}
+            className={`min-w-[48px] min-h-[48px] rounded-lg border text-sm font-semibold px-3 py-2 transition-colors focus-visible:ring-2 focus-visible:ring-blue-600 ${
+              active
+                ? 'bg-blue-50 text-blue-600 border-blue-600'
+                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+            }`}
+            aria-label={`${label}に切り替え`}
+            aria-pressed={active}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
   );
 };
-
-LanguageSwitch.displayName = 'LanguageSwitch';
-```
-
-### 6.2 型定義ファイル
-
-```typescript
-// src/components/common/LanguageSwitch/LanguageSwitch.types.ts
-
-export type Locale = 'ja' | 'en' | 'zh';
-
-export interface LanguageOption {
-  code: Locale;
-  label: string;
-  fullName: string;
-  icon: string;
-}
-
-export interface LanguageSwitchProps {
-  className?: string;
-  testId?: string;
-  onLanguageChange?: (locale: Locale) => void;
-}
-```
-
-### 6.3 エクスポート
-
-```typescript
-// src/components/common/LanguageSwitch/index.ts
-
-export { LanguageSwitch } from './LanguageSwitch';
-export type { LanguageSwitchProps, Locale, LanguageOption } from './LanguageSwitch.types';
 ```
 
 ---
 
-## 7. テスト観点
+## 6. テスト観点
 
-### 7.1 ユニットテスト
-
-```typescript
-// src/components/common/LanguageSwitch/LanguageSwitch.test.tsx
-
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { LanguageSwitch } from './LanguageSwitch';
-
-// next-intl のモック
-jest.mock('next-intl', () => ({
-  useLocale: () => 'ja',
-}));
-
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
-  usePathname: () => '/ja/home',
-}));
-
-describe('LanguageSwitch', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it('現在の言語を表示', () => {
-    render(<LanguageSwitch />);
-    expect(screen.getByText('JA')).toBeInTheDocument();
-  });
-
-  it('ボタンクリックでメニューを表示', () => {
-    render(<LanguageSwitch />);
-    
-    const button = screen.getByRole('button', { name: /言語を選択/ });
-    fireEvent.click(button);
-
-    expect(screen.getByText('日本語 (JA)')).toBeInTheDocument();
-    expect(screen.getByText('English (EN)')).toBeInTheDocument();
-    expect(screen.getByText('中文 (CN)')).toBeInTheDocument();
-  });
-
-  it('選択中の言語にチェックマークを表示', () => {
-    render(<LanguageSwitch />);
-    
-    const button = screen.getByRole('button', { name: /言語を選択/ });
-    fireEvent.click(button);
-
-    const jaOption = screen.getByTestId('language-switch-option-ja');
-    expect(jaOption).toHaveTextContent('✓');
-  });
-
-  it('言語選択時にlocalStorageに保存', async () => {
-    render(<LanguageSwitch />);
-    
-    const button = screen.getByRole('button', { name: /言語を選択/ });
-    fireEvent.click(button);
-
-    const enOption = screen.getByTestId('language-switch-option-en');
-    fireEvent.click(enOption);
-
-    await waitFor(() => {
-      expect(localStorage.getItem('selectedLanguage')).toBe('en');
-    });
-  });
-
-  it('onLanguageChangeコールバックを実行', async () => {
-    const onLanguageChange = jest.fn();
-    render(<LanguageSwitch onLanguageChange={onLanguageChange} />);
-    
-    const button = screen.getByRole('button', { name: /言語を選択/ });
-    fireEvent.click(button);
-
-    const enOption = screen.getByTestId('language-switch-option-en');
-    fireEvent.click(enOption);
-
-    await waitFor(() => {
-      expect(onLanguageChange).toHaveBeenCalledWith('en');
-    });
-  });
-});
-```
-
-### 7.2 統合テスト観点
-
-| テスト項目 | 確認内容 |
-|-----------|---------|
-| **言語切替の即時反映** | 選択後、画面全体の翻訳が変更される |
-| **永続化** | ページリロード後も選択言語が保持される |
-| **user_profiles連携** | ログイン中、user_profilesに保存される |
-| **next-intl連携** | ロケール切替でURLが変更される |
+| テストID    | 観点    | 期待結果                               |
+| -------- | ----- | ---------------------------------- |
+| T-C02-01 | 初期表示  | 現在のロケールが青強調で表示される                  |
+| T-C02-02 | 切替操作  | 押下で選択が即切り替わり、翻訳が即反映される             |
+| T-C02-03 | 非選択状態 | 非選択ボタンがグレー表示、hoverで淡灰背景            |
+| T-C02-04 | A11y  | `aria-pressed`・`aria-label` が適切に設定 |
+| T-C02-05 | スタイル  | 枠線・角丸・フォーカスリングが正しく表示               |
 
 ---
 
-## 8. Storybook構成
+## 7. アクセシビリティ
 
-### 8.1 ストーリー定義
-
-```typescript
-// src/components/common/LanguageSwitch/LanguageSwitch.stories.tsx
-
-import type { Meta, StoryObj } from '@storybook/react';
-import { LanguageSwitch } from './LanguageSwitch';
-
-const meta: Meta<typeof LanguageSwitch> = {
-  title: 'Common/LanguageSwitch',
-  component: LanguageSwitch,
-  parameters: {
-    layout: 'centered',
-  },
-  tags: ['autodocs'],
-};
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-// 日本語選択中
-export const Japanese: Story = {
-  args: {},
-};
-
-// 英語選択中（モック）
-export const English: Story = {
-  args: {},
-  parameters: {
-    nextIntl: {
-      locale: 'en',
-    },
-  },
-};
-
-// 中国語選択中（モック）
-export const Chinese: Story = {
-  args: {},
-  parameters: {
-    nextIntl: {
-      locale: 'zh',
-    },
-  },
-};
-
-// コールバック付き
-export const WithCallback: Story = {
-  args: {
-    onLanguageChange: (locale) => {
-      console.log(`Language changed to: ${locale}`);
-    },
-  },
-};
-```
+* 各ボタンに `aria-pressed` で選択状態を通知。
+* `aria-label` によってスクリーンリーダーが「日本語に切り替え」などを読み上げる。
+* フォーカスリングは `focus-visible:ring-blue-600` を標準。
+* コントラスト比 7.2:1（WCAG AAA 準拠）。
 
 ---
 
-## 9. アクセシビリティ
+## 8. 注意事項
 
-### 9.1 ARIA属性
-
-| 要素 | ARIA属性 | 値 |
-|------|---------|-----|
-| ボタン | `aria-label` | "言語を選択" |
-| ボタン | `aria-haspopup` | "true" |
-| ボタン | `aria-expanded` | "true" / "false" |
-| メニュー | `role` | "menu" |
-| 各オプション | `role` | "menuitem" |
-
-### 9.2 キーボード操作
-
-| キー | 動作 |
-|------|------|
-| **Enter / Space** | メニューを開く |
-| **↓** | 次の言語へ移動 |
-| **↑** | 前の言語へ移動 |
-| **Enter** | 言語を選択してメニューを閉じる |
-| **Esc** | メニューを閉じる |
-
-### 9.3 スクリーンリーダー対応
-
-```typescript
-// 言語切替時の通知
-<div role="status" aria-live="polite" className="sr-only">
-  {`言語を${currentLanguage?.fullName}に切り替えました`}
-</div>
-```
+* 外部UIライブラリ（shadcn/ui, HeadlessUI）への依存禁止。
+* `setLocale()` は StaticI18nProvider (C-03) に実装必須。
+* SSR/CSR 両環境で翻訳切替を正しく反映させること。
+* レイアウト崩れ防止のため `flex` 配置は固定化。
 
 ---
 
-## 10. パフォーマンス考慮
+## 9. 改訂履歴
 
-### 10.1 最適化ポイント
-
-1. **メモ化**:
-   - `LANGUAGE_OPTIONS`は定数として定義
-   - `currentLanguage`は`useMemo`で計算
-
-2. **遅延実行**:
-   - user_profiles更新は非同期（画面表示をブロックしない）
-
-3. **バンドルサイズ**:
-   - `@headlessui/react`のみを使用（軽量）
-   - アイコンは絵文字（外部ライブラリ不要）
-
----
-
-## 11. エラーハンドリング
-
-### 11.1 想定エラー
-
-| エラー | 対処 |
-|--------|------|
-| **user_profiles更新失敗** | エラーログ出力、localStorageは保存済みなので継続可能 |
-| **無効なlocale** | デフォルト（ja）にフォールバック |
-| **next-intl未初期化** | エラー境界でキャッチ |
-
----
-
-## 12. 今後の拡張
-
-### 12.1 自動翻訳連携構想
-
-将来的に、動的コンテンツ（投稿本文等）の自動翻訳機能と連携:
-
-```typescript
-// 言語切替時に動的コンテンツも翻訳
-onLanguageChange={(locale) => {
-  translateDynamicContent(locale);
-}}
-```
-
-### 12.2 言語検出機能
-
-初回訪問時、ブラウザ言語設定から自動判定:
-
-```typescript
-const detectLanguage = (): Locale => {
-  const browserLang = navigator.language.split('-')[0];
-  if (['ja', 'en', 'zh'].includes(browserLang)) {
-    return browserLang as Locale;
-  }
-  return 'ja'; // デフォルト
-};
-```
-
----
-
-## 13. 関連ドキュメント
-
-| ドキュメント名 | 説明 |
-|--------------|------|
-| `common-i18n_v1.0.md` | 多言語対応全体仕様 |
-| `common-header_v1.1.md` | AppHeader仕様 |
-| `common-design-system_v1.1.md` | HarmoNetデザインシステム |
-| `common-accessibility_v1.0.md` | アクセシビリティ基準 |
-| `ch01_AppHeader_v1.0.md` | 親コンポーネント設計書 |
-
----
-
-## 14. 改訂履歴
-
-| バージョン | 日付 | 更新者 | 更新内容 |
-|-----------|------|--------|---------|
-| v1.0 | 2025-11-09 | Claude | 新規作成 |
-
----
-
-**Document ID:** HNM-LOGIN-COMMON-C02-LANGUAGESWITCH  
-**Status:** ✅ Draft  
-**Next Review:** Phase9実装開始時
+| Version | Date       | Author          | Summary          |
+| ------- | ---------- | --------------- | ---------------- |
+| 1.0     | 2025-11-09 | TKD / Tachikoma | 正式3ボタン並列仕様として確定。 |
