@@ -1,0 +1,6 @@
+ContextKey: **HarmoNet_PasskeyButton_DesignUpdate_v1.0** 
+・フォーマットは遵守願います。
+・記述密度はWindsurfの精度・品質維持のため落とさないでください。 
+・PJファイルニアップしているharmonet_detail_design_agenda_standard_v1.0.mdがフォーマットです。 
+・画面出力は「内部モード（canmoreテキスト生成モード）」を使用してください。 
+・初版を作成するため、バージョンはv1.0でおねがいします。

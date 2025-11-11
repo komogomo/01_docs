@@ -112,3 +112,8 @@ GoTrue バージョン: 2.139（WebAuthn対応確認済み）
 | v1.0     | 2025-10-27     | TKE                 | Securea版：Magic Link単体構成                                       |
 | v1.1       | 2025-11-09     | TKD + Tachikoma     | HarmoNet版：Magic Link + Passkey統合 |
 | **v1.1.1** | **2025-11-10** | **TKD + Tachikoma** | **GoTrueバージョン（2.139）明記。**        |
+
+---
+
+**[← 第00章に戻る](login-feature-design-ch00-index_latest.md)  |  [第2章へ →](login-feature-design-ch02_latest.md)**
+

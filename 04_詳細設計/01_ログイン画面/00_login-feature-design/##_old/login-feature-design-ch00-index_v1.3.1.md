@@ -97,3 +97,7 @@ graph TD
 | v1.2     | 2025-10-28     | Gemini              | 共通エラーハンドリング追加                                                     |
 | v1.3     | 2025-11-09     | TKD + Tachikoma | HarmoNet Phase9再設計：Magic Link ＋ Passkey 統合、テナントID廃止、共通部品構成反映。 |
 | **v1.3.1** | **2025-11-10** | **TKD + Tachikoma** | **命名体系注記追加（C-xxとchxxの明確区分）。**              |
+
+---
+
+**[第1章へ →](login-feature-design-ch01_latest.md)**

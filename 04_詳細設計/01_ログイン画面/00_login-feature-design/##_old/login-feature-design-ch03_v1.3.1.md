@@ -140,3 +140,7 @@ tenant_id識別フロー詳細（Phase9制約）
 | v1.2     | 2025-10-29     | Gemini              | コールバック構成・テナント検証追加                                                         |
 | v1.3     | 2025-11-09     | TKD + Tachikoma     | Supabase Authセッション化、Magic Link＋Passkey統合 |
 | **v1.3.1** | **2025-11-10** | **TKD + Tachikoma** | **tenant_id識別フロー詳細を追記。**                 |
+
+---
+
+**[← 第2章に戻る](login-feature-design-ch02_latest.md)  |  [第4章へ →](login-feature-design-ch04_latest.md)**
