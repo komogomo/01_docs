@@ -37,12 +37,12 @@ Phase9以降の仕様では、**Magic Link + Passkey（Corbado連携）による
 
 | 章番号  | ファイル名                             | 内容                                |
 | ---- | --------------------------------- | --------------------------------- |
-| ch01 | login-feature-design-ch01_v1.0.md | UI構成・コンポーネント配置                    |
-| ch02 | login-feature-design-ch02_v1.0.md | 状態管理とフォーム動作（Magic Link + Passkey） |
-| ch03 | login-feature-design-ch03_v1.0.md | 認証構成（Supabase OTP + CorbadoAuth）  |
-| ch04 | login-feature-design-ch04_v1.0.md | SessionHandler設計（/api/session）    |
-| ch05 | login-feature-design-ch05_v1.0.md | セキュリティ設計（Cookie・RLS・ThreatModel）  |
-| ch06 | login-feature-design-ch06_v1.0.md | PasskeyAuthTrigger設計（A-02）        |
+| ch01 | login-feature-design-ch01-ui_*.*.md | UI構成・コンポーネント配置                    |
+| ch02 | login-feature-design-ch02-state_v*.*.md | 状態管理とフォーム動作（Magic Link + Passkey） |
+| ch03 | login-feature-design-ch03-auth_v*.*.md | 認証構成（Supabase OTP + CorbadoAuth）  |
+| ch04 | login-feature-design-ch04-session_v*.*.md | SessionHandler設計（/api/session）    |
+| ch05 | login-feature-design-ch05-security_v*.*.md | セキュリティ設計（Cookie・RLS・ThreatModel）  |
+| ch06 | login-feature-design-ch06-passkey_v*.*.md | PasskeyAuthTrigger設計（A-02）        |
 
 ---
 
