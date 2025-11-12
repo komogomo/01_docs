@@ -1,6 +1,6 @@
 # 第6章 制約条件・将来展望（v1.3）
 
-本章は **HarmoNet Technical Stack Definition v3.2** に準拠する。  
+本章は **HarmoNet Technical Stack Definition v4.1** に準拠する。  
 HarmoNetは Supabase / Prisma / NestJS / React / Tailwind / Redis / Vercel を基盤とする  
 マルチテナント型の住宅コミュニティ支援アプリケーションとして設計されている。
 
