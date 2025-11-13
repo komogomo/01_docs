@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HarmoNet Login Mock</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f9fafb;
+      font-family: -apple-system, BlinkMacSystemFont, "BIZ UDPGothic", sans-serif;
+      color: #111;
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+    }
+    .logo {
+      height: 32px;
+      background: #ccc;
+      border-radius: 6px;
+      width: 120px;
+    }
+
+    /* Language Switch */
+    .lang {
+      display: flex;
+      gap: 8px;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.08);
+      font-size: 13px;
+    }
+    .lang button {
+      border: none;
+      background: none;
+      padding: 4px 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+    .lang button.active {
+      background: #e0e7ff;
+      color: #3b82f6;
+    }
+
+    /* Main */
+    main {
+      padding-top: 120px;
+      padding-bottom: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .title-block {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .title-block h1 {
+      font-size: 24px;
+      margin: 6px 0;
+    }
+    .title-block p {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    /* Login card */
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      border: 1px solid #f0f0f0;
+    }
+    .login-card h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+      padding: 0 12px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+    }
+    button.login-btn {
+      width: 100%;
+      height: 48px;
+      background: #2563eb;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button.login-btn:hover {
+      background: #3b82f6;
+    }
+
+    .bottom-note {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo"></div>
+
+    <!-- Language Switch -->
+    <div class="lang">
+      <button class="active">JA</button>
+      <button>EN</button>
+      <button>ZH</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- Title Block -->
+    <div class="title-block">
+      <h1>HarmoNet</h1>
+      <p>入居者専用コミュニティアプリ</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+      <h2>ログイン</h2>
+      <input type="email" placeholder="メールアドレス" />
+      <button class="login-btn">ログインリンクを送信</button>
+    </div>
+
+    <div class="bottom-note">
+      このアプリは複数画面で構成されています。<br />
+      右上のボタンで言語を切り替えられます。
+    </div>
+  </main>
+
+  <footer>
+    © 2025 HarmoNet. All rights reserved.
+  </footer>
+
+</body>
+</html>
