@@ -28,3 +28,5 @@ Windsurf向けのコーディング規約を作成。
 2025-11-13 00:51:26 : [自動検出: 01_docs] Commit/Push - 日次更新
 2025-11-13 00:52:06 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - ログイン画面コンポーネントのStorybook上での動作確認完了
 2025-11-13 16:29:06 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - FRONTENDディレクトリ構成を正規化
+2025-11-13 21:16:11 : [自動検出: 01_docs] Commit/Push - ログイン画面のデザイン作成指示書。
+2025-11-13 21:16:58 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - ログイン画面のデザインとレイアウト修正

@@ -1,0 +1,25 @@
+[CodeAgent_Report]
+Agent: Windsurf
+Task: AuthCallbackHandler-Cleanup
+Attempts: 1
+AverageScore: 9.6
+TypeCheck: Passed
+Lint: Passed
+Tests: 100% (8/8 suites, 35/35 tests)
+References:
+ - WS-AuthCallbackHandler-Cleanup_v1.0
+ - harmonet-frontend-directory-guideline_v1.0
+ - app/auth/callback/page.tsx
+ - src/components/auth/AuthCallbackHandler/AuthCallbackHandler.tsx
+ - login/AuthCallbackHandler/*.tsx
+[Generated_Files]
+ - Added: src/components/auth/AuthCallbackHandler/AuthCallbackHandler.tsx
+ - Added: src/components/auth/AuthCallbackHandler/AuthCallbackHandler.test.tsx
+ - Updated: app/auth/callback/page.tsx (import path → official)
+ - Deleted: src/components/login/AuthCallbackHandler/AuthCallbackHandler.tsx (after backup creation)
+ - Deleted: src/components/login/AuthCallbackHandler/AuthCallbackHandler.test.tsx (after backup creation)
+Summary:
+ - AST/grep-based analysis found reference from app/auth/callback only.
+ - Component and test moved to official auth path; all imports unified to @/src/components/auth/AuthCallbackHandler/AuthCallbackHandler.
+ - Backups were created in the same directory before removing originals, following the backup rule.
+ - Type-check, lint, tests, and Storybook all succeeded; no UI/logic changes were made.
