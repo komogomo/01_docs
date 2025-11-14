@@ -1,18 +1,18 @@
 Folder PATH listing for volume ボリューム
 Volume serial number is 8AC9-85EB
 D:.
-|   AIDrive-01_docs-directory-list-20251111-1621.txt
 |   AIDrive-01_docs-directory-list-20251113-0859.txt
+|   AIDrive-01_docs-directory-list-20251113-1412.txt
 |   
 +---##_old
 |       AIDrive-01_docs-directory-list-20251109-1624.txt
 |       AIDrive-01_docs-directory-list-20251110-2215.txt
+|       AIDrive-01_docs-directory-list-20251111-1621.txt
 |       directory-20251109-0125.txt
 |       directory-20251109-1136.txt
 |       directory-20251109-1146.txt
 |       
 +---00_プロジェクト管理
-|   |   AIDrive-01_docs-directory-list-20251110-1827.txt
 |   |   harmonet-external-sdk-risk-matrix_v1.0.md
 |   |   
 |   \---01_運用ガイドライン
@@ -20,11 +20,14 @@ D:.
 |       |   harmonet-frontend-directory-guideline_v1.0.md
 |       |   harmonet-naming-matrix_v2.0_final.md
 |       |   harmonet-storybook-tailwind-troubleshooting_v1.0.md
+|       |   Windsurf 実行指示書テンプレート v1.1.md
+|       |   タチコマ資料アップロード依頼テンプレート v1.0.md
 |       |   
 |       +---##_old
 |       |       harmonet-coding-standard_v1.0.md
 |       |       harmonet-naming-matrix_v2.0.md
 |       |       harmonet-naming-matrix_v2.0_consolidated.md
+|       |       Windsurf 実行指示書テンプレート v1.0.md
 |       |       
 |       +---01-ALL-AI
 |       |       AI Collaborative Development Guideline v1.1.md
@@ -274,6 +277,8 @@ D:.
 |   |   |   A-00_LoginPage-detail-design_v1.0.md
 |   |   |   C-00_LoginPage_C-00_v1.0.md
 |   |   |   LoginFeature_v1.0_FinalizationReport.md
+|   |   |   MagicLinkForm-detail-design_v1.1.md
+|   |   |   PasskeyAuthTrigger-detail-design_v1.1.md
 |   |   |   新しいチャット用.txt
 |   |   |   
 |   |   +---##_old
@@ -323,7 +328,6 @@ D:.
 |   |   |   |   MagicLinkForm-detail-design_ch07-security_v1.1.md
 |   |   |   |   MagicLinkForm-detail-design_ch08-test_v1.1.md
 |   |   |   |   MagicLinkForm-detail-design_ch09-changelog_v1.1.md
-|   |   |   |   MagicLinkForm-detail-design_v1.1.md
 |   |   |   |   
 |   |   |   \---##_old
 |   |   |           MagicLinkForm-detail-design_ch00-index_v1.0.md
@@ -361,7 +365,6 @@ D:.
 |   |       |   PasskeyAuthTrigger-detail-design_ch07-security_v1.1.md
 |   |       |   PasskeyAuthTrigger-detail-design_ch08-test_v1.1.md
 |   |       |   PasskeyAuthTrigger-detail-design_ch09-meta_v1.1.md
-|   |       |   PasskeyAuthTrigger-detail-design_v1.1.md
 |   |       |   
 |   |       \---##_old
 |   |               HarmoNet_Phase9_LoginComponents_Review_v1_0.md
@@ -402,48 +405,57 @@ D:.
 |   |   \---03_アンケート集計結果画面
 |   +---98_名ページ画面
 |   \---99_管理者画面
-+---05_品質チェック
-|       CodeAgent_Report_AppFooter_v1.0.md
-|       CodeAgent_Report_AppHeader_v1.0.md
-|       CodeAgent_Report_AppHeader_v1.1.md
-|       CodeAgent_Report_FooterShortcutBar_v1.0.md
-|       CodeAgent_Report_LanguageSwitch_v1.1.md
-|       CodeAgent_Report_layout統合修正版_v1.0.md
-|       CodeAgent_Report_LoginModule_v1.0.md
-|       CodeAgent_Report_MagicLinkForm_v1.0.md
-|       CodeAgent_Report_MagicLinkForm_WS-A01_v1.0.md
-|       CodeAgent_Report_ReorganizeFrontendStructure_v1.0.md
-|       CodeAgent_Report_StaticI18nProvider_v1.0.md
-|       
 +---05_製造
 |   \---01_Windsurf-作業指示書
-|       |   WS-LoginLayoutIntegration_v1.0.md
-|       |   WS-RemoveRootPage_v1.0.md
+|       |   # WS-LoginLayoutIntegration_v1.0.md
 |       |   
-|       +---2025-11-09
-|       |       WS-001_Windsurf実行指示書_ch01_AppHeader_C-01_v1.0.md
-|       |       WS-002_Windsurf実行指示書_ch02_LanguageSwitch_C-02_v1.1.md
-|       |       WS-003_Windsurf実行指示書_ch03_StaticI18nProvider_C-03_v1.0.md
-|       |       WS-004_Windsurf実行指示書_ch04_AppFooter_C-04_v1.0.md
-|       |       WS-005_Windsurf実行指示書_ch05_FooterShortcutBar_C-05_v1.0.md
-|       |       
-|       +---2025-11-11
-|       |       WS-006_Windsurf実行指示書_LoginModule_v1.0.md
-|       |       WS-007_Windsurf実行指示書_LoginPage_v1.0.md
-|       |       WS-008_Windsurf修正指示書_layout統合_v1.0.md
-|       |       WS-009_Windsurf修正指示書_tailwind-postcss統合_v1.0.md
-|       |       WS-010_Windsurf実行指示書_C-00_LoginPage_Build_Root_v1.1.md
-|       |       WS-011_Windsurf実行指示書_C-02_LanguageSwitch_Rebuild_v1.0.md
-|       |       WS-012_Windsurf修正指示書_A-01_MagicLinkForm_i18nFix_v1.0.md
-|       |       
-|       +---2025-11-12
-|       |       WS-A01_MagicLinkForm_v1.0.md
-|       |       WS-A01_Windsurf実行指示書_A-01_MagicLinkForm_v1.0.md
-|       |       
-|       \---2025-11-13
-|               WS-SYSTEM ReorganizeFrontendStructure v1.0.md
-|               
-+---06_環境構築
+|       \---2025-11
+|           +---2025-11-09
+|           |       WS-001_Windsurf実行指示書_ch01_AppHeader_C-01_v1.0.md
+|           |       WS-002_Windsurf実行指示書_ch02_LanguageSwitch_C-02_v1.1.md
+|           |       WS-003_Windsurf実行指示書_ch03_StaticI18nProvider_C-03_v1.0.md
+|           |       WS-004_Windsurf実行指示書_ch04_AppFooter_C-04_v1.0.md
+|           |       WS-005_Windsurf実行指示書_ch05_FooterShortcutBar_C-05_v1.0.md
+|           |       
+|           +---2025-11-11
+|           |       WS-006_Windsurf実行指示書_LoginModule_v1.0.md
+|           |       WS-007_Windsurf実行指示書_LoginPage_v1.0.md
+|           |       WS-008_Windsurf修正指示書_layout統合_v1.0.md
+|           |       WS-009_Windsurf修正指示書_tailwind-postcss統合_v1.0.md
+|           |       WS-010_Windsurf実行指示書_C-00_LoginPage_Build_Root_v1.1.md
+|           |       WS-011_Windsurf実行指示書_C-02_LanguageSwitch_Rebuild_v1.0.md
+|           |       WS-012_Windsurf修正指示書_A-01_MagicLinkForm_i18nFix_v1.0.md
+|           |       
+|           +---2025-11-12
+|           |       WS-A01_MagicLinkForm_v1.0.md
+|           |       WS-A01_Windsurf実行指示書_A-01_MagicLinkForm_v1.0.md
+|           |       
+|           +---2025-11-13
+|           |       WS-LoginLayoutIntegration_v1.0.md
+|           |       WS-RemoveRootPage_v1.0.md
+|           |       WS-SYSTEM ReorganizeFrontendStructure v1.0.md
+|           |       
+|           \---2025-11-14
+|                   WS-AuthCallbackHandler-Cleanup_v1.0.md
+|                   
++---06_品質チェック
+|   |   CodeAgent_Report_AuthCallbackHandler-Cleanup_20251114.txt
+|   |   CodeAgent_Report_LoginLayoutIntegration_v1.0.md
+|   |   
+|   \---2025-11
+|           CodeAgent_Report_AppFooter_v1.0.md
+|           CodeAgent_Report_AppHeader_v1.0.md
+|           CodeAgent_Report_AppHeader_v1.1.md
+|           CodeAgent_Report_FooterShortcutBar_v1.0.md
+|           CodeAgent_Report_LanguageSwitch_v1.1.md
+|           CodeAgent_Report_layout統合修正版_v1.0.md
+|           CodeAgent_Report_LoginModule_v1.0.md
+|           CodeAgent_Report_MagicLinkForm_v1.0.md
+|           CodeAgent_Report_MagicLinkForm_WS-A01_v1.0.md
+|           CodeAgent_Report_ReorganizeFrontendStructure_v1.0.md
+|           CodeAgent_Report_StaticI18nProvider_v1.0.md
+|           
++---07_環境構築
 |   |   01_bag-pre-impl-report_fixed.yaml
 |   |   02_bag-lite-audit-review-report_v1.0.md
 |   |   02_harmonet-next-task-phase5_v1.0.md

@@ -30,3 +30,6 @@ Windsurf向けのコーディング規約を作成。
 2025-11-13 16:29:06 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - FRONTENDディレクトリ構成を正規化
 2025-11-13 21:16:11 : [自動検出: 01_docs] Commit/Push - ログイン画面のデザイン作成指示書。
 2025-11-13 21:16:58 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - ログイン画面のデザインとレイアウト修正
+2025-11-14 14:09:12 : [自動検出: 01_docs] Commit/Push - ディレクトリ修正。05_が重複していた。
+2025-11-14 14:10:17 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - UI統合。正規ログイン画面のlogin/page.tsxに各コンポーネントのインポートパスを修正。
+2025-11-15 00:53:18 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - Passkey用テーブル追加のため、DB reset & migration & seed再投入
