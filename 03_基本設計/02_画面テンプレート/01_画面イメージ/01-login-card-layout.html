@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmony Network - ログイン</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'BIZ UDPGothic', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #2563EB;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: #F9FAFB;
+            border-color: #2563EB;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .input-section {
+            margin-bottom: 32px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .login-card {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .login-card:hover {
+            background: #EFF6FF;
+            border-color: #2563EB;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .login-card:active {
+            transform: translateY(0);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 28px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px 20px;
+            background: #2563EB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-button:hover {
+            background: #1D4ED8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: #9CA3AF;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 32px 24px;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">H</div>
+            <span>HarmoNET</span>
+        </div>
+        <div class="lang-switch">
+            <button class="lang-btn">JA</button>
+            <button class="lang-btn">EN</button>
+            <button class="lang-btn">ZH</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="title-section">
+            <h1 class="main-title">Harmony Network</h1>
+            <p class="subtitle">入居者専用コミュニティアプリ</p>
+        </div>
+
+        <div class="login-container">
+            <div class="input-section">
+                <label class="input-label">メールアドレスを入力してください</label>
+                <input 
+                    type="email" 
+                    class="login-input" 
+                    placeholder="name@example.com"
+                >
+            </div>
+
+            <div class="cards-container">
+                <!-- メールログインカード -->
+                <button class="login-card">
+                    <div class="card-icon">✉️</div>
+                    <h3 class="card-title">メールでログイン</h3>
+                </button>
+
+                <!-- Passkeyログインカード -->
+                <button class="login-card">
+                    <div class="card-icon">🔐</div>
+                    <h3 class="card-title">Passkeyでログイン</h3>
+                </button>
+            </div>
+        </div>
+
+        <p class="footer-note">
+            このアプリは居住者専用で提供されています。<br>
+            全ての中学生以上の居住者が利用できます。
+        </p>
+    </main>
+</body>
+</html>
