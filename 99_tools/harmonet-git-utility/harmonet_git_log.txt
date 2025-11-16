@@ -34,3 +34,4 @@ Windsurf向けのコーディング規約を作成。
 2025-11-14 14:10:17 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - UI統合。正規ログイン画面のlogin/page.tsxに各コンポーネントのインポートパスを修正。
 2025-11-15 00:53:18 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - Passkey用テーブル追加のため、DB reset & migration & seed再投入
 2025-11-15 00:54:02 : [自動検出: 01_docs] Commit/Push - Passkey仕様変更というか大きな考慮漏れのため、再設計途中の日次更新
+2025-11-16 04:11:16 : [自動検出: 01_docs] Commit/Push - Magiclink、Passkey分離化に伴うログイン画面関係資料更新
