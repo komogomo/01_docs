@@ -106,12 +106,12 @@ graph TD
   B -->|passkey_enabled=false| F[signInWithOtp]
   E --> G[Supabase Session確立]
   F --> G
-  G --> H[Redirect /home]
+  G --> H[Redirect /mypage]
 ```
 
 * **AppHeader (C-01)** 下部に配置されるメインフォーム。
 * `Corbado SDK` を介してパスキー認証を実行。
-* `Supabase Auth` のセッション確立を共通化し、ログイン後の動線を `/home` に統一。
+* `Supabase Auth` のセッション確立を共通化し、ログイン後の動線を `/mypage` に統一。
 * UIトーン・翻訳仕様は既存の Phase9 共通方針に完全準拠。
 
 ---

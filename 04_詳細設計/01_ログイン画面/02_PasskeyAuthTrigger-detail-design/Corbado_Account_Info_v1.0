@@ -1,0 +1,30 @@
+Passkey Giihub
+
+Corbado Settings
+
+External Name:HarmoNet
+
+Corbado API access
+Project ID (HTTP basic auth username):pro-7248593760809448075
+Frontend API URL:https://pro-7248593760809448075.frontendapi.cloud.corbado.io
+Backend API URL:https://backendapi.cloud.corbado.io
+
+API cecrets
+Username:pro-7248593760809448075
+
+
+
+
+
+NEXT_PUBLIC_CORBADO_PROJECT_ID=pro-7248593760809448075
+CORBADO_API_SECRET=corbado1_xT...Hf
+NEXT_PUBLIC_SUPABASE_URL=https://<your_supabase>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<your_supabase_service_role_key>  # server-only
+
+
+
+PS D:\Projects\HarmoNet> node .\tools\gen_supabase_keys.js
+---- COPY THESE INTO YOUR .env (server-only) ----
+JWT_SECRET=a52eddb803a6d907df2a08d8ca24a679e58d6846824c1fa821f87d3b1fe65841
+ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTc2MzM2ODQ2OCwiZXhwIjoyMDc4NzI4NDY4fQ.2XN8hMxRIU164p39L8o1VUGxMjYavHO-sNxxyNJDr0s
+SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNzYzMzY4NDY4LCJleHAiOjIwNzg3Mjg0Njh9.QZoF1lteAaXDZySaerwX1hu7ROQwyllGTaP8NErIXxA

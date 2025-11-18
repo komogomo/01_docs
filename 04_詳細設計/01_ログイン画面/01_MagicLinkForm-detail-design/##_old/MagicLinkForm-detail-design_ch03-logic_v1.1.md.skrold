@@ -22,7 +22,7 @@ MagicLinkForm (A-01) は、ユーザー入力のメールアドレスを基に�
 | 自動判定  | Supabaseの `user_profiles.passkey_enabled` を参照し、Corbado または Supabase APIを自動選択 |
 | 統合処理  | `handleLogin()` で両方式を一括処理                                                    |
 | 新状態追加 | `passkey_auth`, `success`, `error_auth` を導入                                  |
-| 結果統合  | Supabaseセッション確立後、共通リダイレクト `/home`                                          |
+| 結果統合  | Supabaseセッション確立後、共通リダイレクト `/mypage`                                          |
 
 本章では、入力検証・状態管理・主要ロジック・例外ハンドリング・i18n連携を含む完全なロジック構成を定義する。
 

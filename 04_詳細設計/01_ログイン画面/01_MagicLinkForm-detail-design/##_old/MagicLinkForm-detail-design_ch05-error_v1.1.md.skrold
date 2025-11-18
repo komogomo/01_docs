@@ -141,7 +141,7 @@ describe('MagicLinkForm (Unified Auth)', () => {
 * CI環境では `npm run test:unit` にて全テスト自動実行。
 * Windsurf CodeAgent の自己採点機構 (`AverageScore >= 9.0`) と連動。
 * `coverageThreshold` 設定により品質下限を強制。
-* 次期拡張として Playwright E2E による **login→home 遷移実証** を追加予定。
+* 次期拡張として Playwright E2E による **login→mypage 遷移実証** を追加予定。
 
 ---
 

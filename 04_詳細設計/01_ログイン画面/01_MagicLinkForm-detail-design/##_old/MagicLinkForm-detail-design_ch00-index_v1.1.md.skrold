@@ -74,7 +74,7 @@ sequenceDiagram
     F->>S: signInWithOtp({ email })
   end
   S-->>F: 成功応答（セッション確立）
-  F-->>U: /home へ遷移
+  F-->>U: /mypage へ遷移
 ```
 
 ---

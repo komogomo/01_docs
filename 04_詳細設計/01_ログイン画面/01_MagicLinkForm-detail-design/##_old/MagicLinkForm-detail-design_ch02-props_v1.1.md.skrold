@@ -93,7 +93,7 @@ sequenceDiagram
     F->>S: signInWithOtp({ email, options })
     S-->>F: 成功 → 状態=sent
   end
-  F->>U: 成功メッセージ or リダイレクト(`/home`)
+  F->>U: 成功メッセージ or リダイレクト(`/mypage`)
   F->>Parent: onSent()
 ```
 

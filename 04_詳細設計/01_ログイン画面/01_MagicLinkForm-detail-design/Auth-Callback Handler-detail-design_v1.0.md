@@ -1,0 +1,449 @@
+# HarmoNet 詳細設計書 - AuthCallbackHandler (/auth/callback) v1.0
+
+**Document ID:** HARMONET-COMPONENT-A03-AUTHCALLBACKHANDLER-DESIGN
+**Version:** 1.0
+**Supersedes:** — (初版)
+**Created:** 2025-11-18
+**Author:** Tachikoma
+**Reviewer:** TKD
+**Status:** Draft（MagicLink 認証 → 認可統合版 / 技術スタック v4.3 準拠）
+
+---
+
+## 第1章 概要
+
+### 1.1 目的
+
+AuthCallbackHandler（A-03）は、HarmoNet のログインフローにおける **「認証 → 認可」結節点** を担うコンポーネントである。
+
+* Supabase MagicLink による **認証完了直後** に呼び出される `/auth/callback` 画面として動作する。
+* Supabase Auth が発行したセッション情報をもとに、HarmoNet の **ユーザマスタ / テナント情報に基づく認可判定** を行う。
+* 認可に成功した場合のみ、ユーザーをアプリケーション内部（例：`/home`）へ遷移させる。
+* 認可に失敗した場合は Supabase セッションを破棄し、ログイン画面にエラー付きで戻す。
+
+本コンポーネントの役割は、あくまで
+
+> 「MagicLink で認証された “メールアドレスの持ち主” が、HarmoNet のユーザマスタ上で有効なユーザーかどうかを判定すること」
+
+であり、UI 表示は最小限（ローディング中表示＋数行のメッセージ）に留める。
+
+### 1.2 スコープ
+
+本詳細設計書のスコープは以下とする。
+
+* 対象コンポーネント
+
+  * `/auth/callback` に対応するページコンポーネント
+  * 仮称: **AuthCallbackHandler (A-03)**
+* 対象機能
+
+  * Supabase Auth セッションの取得
+  * ユーザマスタ（`users`）の存在確認
+  * テナント紐付け（`user_tenants`）の確認
+  * 認可結果に応じた画面遷移（/home または /login へのリダイレクト）
+
+対象外（別設計書）:
+
+* MagicLinkForm (A-01) の UI / 送信ロジック
+* LoginPage (A-00) の UI レイアウト
+* Passkey（廃案済み）
+* DB スキーマ詳細（`schema.prisma` に準拠）
+* RLS ポリシー定義（DB 設計側で管理）
+
+### 1.3 前提条件
+
+* 認証方式は **MagicLink（Supabase Auth signInWithOtp）** のみとする。
+* Passkey は廃案済みであり、/auth/callback での Passkey 分岐は一切存在しない。
+* ユーザマスタおよびテナント構造は以下テーブルにより定義済みである。
+
+  * `users`
+  * `user_tenants`
+  * `tenants`
+* HarmoNet の運用要件:
+
+  * 利用者は **管理者がユーザマスタに事前登録したユーザーのみ** であり、未登録ユーザーがログインすることは許可されない。
+  * マルチテナント境界は `tenant_id` によって管理される。
+
+### 1.4 関連ドキュメント
+
+* HarmoNet 機能要件定義書 v1.4
+* HarmoNet 非機能要件定義書 v1.0
+* HarmoNet 技術スタック定義書 v4.3
+* ログイン画面 バックエンド基本設計書 v1.0
+* HarmoNet 詳細設計書 - LoginPage (A-00) v1.3
+* HarmoNet 詳細設計書 - MagicLinkForm (A-01) v1.3
+* schema.prisma（`users`, `user_tenants`, `tenants` 等）
+
+---
+
+## 第2章 機能設計
+
+### 2.1 機能要約
+
+AuthCallbackHandler の機能を 1 段落でまとめると以下の通りである。
+
+> Supabase MagicLink による認証後に `/auth/callback` へ遷移したユーザーの Supabase セッションからメールアドレスを取得し、HarmoNet のユーザマスタおよびテナント紐付けテーブルを照会する。ユーザマスタに存在し、かつ有効なテナントへ紐付いている場合のみ、ログイン成功として `/home` へ遷移させる。いずれかを満たさない場合は Supabase セッションを破棄し、ログイン画面 `/login` にエラー付きで戻す。
+
+### 2.2 入出力仕様（Props / Context / Hooks）
+
+AuthCallbackHandler は Next.js App Router のページコンポーネントとして実装されることを前提とし、外部から Props を受け取らない。
+
+* 入力
+
+  * Supabase Auth セッション（Cookie／ヘッダ経由）
+  * URL クエリ（`error` など、Supabase が付与する可能性のあるパラメータ）
+* 出力
+
+  * 成功時: `/home` へのリダイレクト
+  * 失敗時: `/login?error=unauthorized` などのエラーパラメータ付きリダイレクト
+  * ローディング中の簡易 UI 表示（SSR/CSR どちらでも違和感のない設計）
+
+### 2.3 処理フロー（認証 → 認可）
+
+#### 正常系フロー（ユーザマスタ登録済みの場合）
+
+```mermaid
+sequenceDiagram
+  participant B as ブラウザ
+  participant A as AuthCallbackHandler
+  participant SA as Supabase Auth
+  participant DB as Supabase DB
+
+  B->>A: /auth/callback にアクセス
+  A->>SA: getSession() でセッション取得
+  SA-->>A: session (user.email, user.id)
+  A->>DB: users テーブルで email 照会
+  DB-->>A: 該当ユーザ行 (user_id)
+  A->>DB: user_tenants で user_id に紐づく tenant を取得
+  DB-->>A: 有効な tenant_id / role
+  A->>A: 認可 OK と判定
+  A-->>B: /home へリダイレクト
+```
+
+#### 異常系フロー（ユーザマスタ未登録 / テナント紐付けなし）
+
+```mermaid
+sequenceDiagram
+  participant B as ブラウザ
+  participant A as AuthCallbackHandler
+  participant SA as Supabase Auth
+  participant DB as Supabase DB
+
+  B->>A: /auth/callback にアクセス
+  A->>SA: getSession()
+  SA-->>A: session (user.email)
+  A->>DB: users で email 照会
+  DB-->>A: 該当ユーザなし または 無効ユーザ
+  A->>SA: signOut()
+  A-->>B: /login?error=unauthorized へリダイレクト
+```
+
+### 2.4 依存関係
+
+* Supabase Auth JS SDK
+* Supabase JS クライアント（DB 参照用）
+* Next.js App Router（`redirect` / `useRouter` など）
+* HarmoNet 共通ログユーティリティ（INFO/ERROR ログ出力）
+
+### 2.5 副作用と再レンダー設計
+
+* AuthCallbackHandler は、ページ表示時に 1 回だけ以下の副作用を発生させる。
+
+  * Supabase セッションの取得
+  * DB 照会（users / user_tenants）
+  * 認可結果に応じたリダイレクト
+* 再レンダーは最小限とし、認可ロジックは SSR（サーバーコンポーネント）側で完結させることを基本とする。
+
+### 2.6 人間操作に基づく UT 観点（最小セット）
+
+| 観点ID      | 操作                                  | 期待結果                                          | テスト目的                 |
+| --------- | ----------------------------------- | --------------------------------------------- | --------------------- |
+| UT-A03-01 | 管理者が登録済みユーザーのメールで MagicLink ログイン    | `/auth/callback` 経由で `/home` に遷移する          | 認証→認可→遷移が正常に動作することの確認 |
+| UT-A03-02 | ユーザマスタ未登録のメールで MagicLink を試行        | `/login?error=unauthorized` に戻り、セッションが破棄されている | 未登録ユーザーを締め出せていることの確認  |
+| UT-A03-03 | user_tenants に tenant 紐付けがないユーザー    | 同上（未認可扱い）                                     | テナント未紐付ユーザーを締め出す確認    |
+| UT-A03-04 | セッションが存在しない状態で /auth/callback へアクセス | `/login?error=no_session` に戻る                 | 不正アクセス／直アクセス排除        |
+
+---
+
+## 第3章 構造設計
+
+### 3.1 コンポーネント構成図
+
+```mermaid
+graph TD
+  A[LoginPage (A-00)] --> B[MagicLinkForm (A-01)]
+  B --> C[Supabase MagicLink 認証]
+  C --> D[/auth/callback (A-03: AuthCallbackHandler)]
+  D --> E[/home]
+```
+
+### 3.2 コンポーネント構成
+
+AuthCallbackHandler は Next.js App Router のページとして実装される。
+
+```text
+app/
+  auth/
+    callback/
+      page.tsx   # AuthCallbackHandler (A-03)
+```
+
+### 3.3 依存データ構造（概要）
+
+```prisma
+model users {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  display_name String
+  // ... 略
+  user_tenants user_tenants[]
+}
+
+model user_tenants {
+  user_id   String
+  tenant_id String
+  joined_at DateTime @default(now())
+  status    status   @default(active)
+
+  user   users   @relation(fields: [user_id], references: [id])
+  tenant tenants @relation(fields: [tenant_id], references: [id])
+
+  @@id([user_id, tenant_id])
+}
+```
+
+詳細なカラムは `schema.prisma` に委譲し、本書では上記のように **メールアドレス → users → user_tenants → tenant_id** の導出が可能であることのみ前提とする。
+
+### 3.4 Props・イベント
+
+* Props: なし（Next.js ページ）
+* イベント:
+
+  * ページマウント時（SSR 実行時）に認可ロジックを実行する。
+  * ローディング中はシンプルなメッセージ（例: `"ログイン処理中です"`）を表示する程度とし、複雑な UI は持たない。
+
+### 3.5 i18n キー仕様（想定）
+
+AuthCallbackHandler は UI 表示が最小なため、以下程度を想定する。
+
+* `auth.callback.processing` : ログイン処理中のメッセージ
+* `auth.callback.error.unauthorized` : 未認可ユーザー向けのメッセージ（/login 側で利用）
+* `auth.callback.error.no_session` : セッション不在時のメッセージ
+
+メッセージの詳細仕様は LoginPage / メッセージ仕様書側で定義し、本書ではキーの存在のみ明示する。
+
+---
+
+## 第4章 実装設計
+
+### 4.1 ファイル構成
+
+```text
+app/
+  auth/
+    callback/
+      page.tsx        # AuthCallbackHandler (A-03)
+```
+
+### 4.2 コード構成（サーバーコンポーネント想定）
+
+以下は概念レベルの擬似コードであり、実装時は Supabase + Next.js v4.3 の公式ヘルパーに合わせて修正する。
+
+```tsx
+// app/auth/callback/page.tsx
+
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/src/lib/supabase/server';
+import { logInfo, logError } from '@/src/lib/logger';
+
+export default async function AuthCallbackPage() {
+  const supabase = createSupabaseServerClient();
+
+  // 1. セッション取得
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session || !session.user?.email) {
+    logError('auth.callback.no_session', {});
+    redirect('/login?error=no_session');
+  }
+
+  const email = session.user.email;
+
+  // 2. ユーザマスタ照会
+  const { data: user } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email)
+    .eq('status', 'active')
+    .single();
+
+  if (!user) {
+    await supabase.auth.signOut();
+    logError('auth.callback.unauthorized.user_not_found', { email });
+    redirect('/login?error=unauthorized');
+  }
+
+  // 3. テナント紐付け確認
+  const { data: membership } = await supabase
+    .from('user_tenants')
+    .select('tenant_id')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  if (!membership?.tenant_id) {
+    await supabase.auth.signOut();
+    logError('auth.callback.unauthorized.no_tenant', { userId: user.id });
+    redirect('/login?error=unauthorized');
+  }
+
+  // 4. 認可成功（ログ記録）
+  logInfo('auth.callback.authorized', {
+    userId: user.id,
+    tenantId: membership.tenant_id,
+  });
+
+  // 5. アプリのトップ（例: /home）へ遷移
+  redirect('/home');
+}
+```
+
+※ JWT への `tenant_id` 反映や RLS の詳細は DB 設計側の責務とし、AuthCallbackHandler は **「ユーザマスタ上で有効なユーザーかどうかの最終チェック」** に責務を限定する。
+
+### 4.3 エラーハンドリング
+
+* セッション不在
+
+  * `no_session` エラーとして `/login` に戻す。
+* ユーザマスタ未登録
+
+  * `unauthorized` エラーとして扱い、セッションを破棄して `/login` に戻す。
+* テナント紐付けなし
+
+  * 同上（`unauthorized` で統一）。
+* DB エラー
+
+  * ログに `auth.callback.db_error` を出力し、`/login?error=server_error` などにフォールバック。
+
+---
+
+## 第5章 UI仕様
+
+AuthCallbackHandler は **ロジック重視の技術コンポーネント** であり、UI は最小限に留める。
+
+### 5.1 JSX構造
+
+SSR 完全リダイレクトを採用する場合、実際にはユーザーが /auth/callback の画面を見ることはほぼないが、CSR フォールバックや遅延が発生した際に備え、簡易 UI を定義しておく。
+
+```tsx
+// ローディング中に一瞬だけ表示される可能性のある UI 例
+
+export default function AuthCallbackFallback() {
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-white">
+      <p className="text-sm text-gray-600">
+        ログイン処理中です…
+      </p>
+    </main>
+  );
+}
+```
+
+### 5.2 状態別 UI
+
+* 実運用上、/auth/callback は即座にリダイレクトを行うため、成功/失敗の詳細メッセージは `/login` 画面側のメッセージ仕様に委譲する。
+* /auth/callback 画面でエラー詳細を表示することはしない（URL パラメータのみで伝達）。
+
+---
+
+## 第6章 ロジック仕様
+
+### 6.1 状態遷移表
+
+| 状態                 | 入力イベント               | 遷移先                           | 備考                        |
+| ------------------ | -------------------- | ----------------------------- | ------------------------- |
+| `idle`             | /auth/callback へアクセス | `checking_session`            | SSR で処理開始                 |
+| `checking_session` | セッション取得成功            | `checking_user`               | email 取得                  |
+| `checking_session` | セッション取得失敗            | `redirect_login_no_session`   | `/login?error=no_session` |
+| `checking_user`    | users 照会でヒット         | `checking_tenant`             |                           |
+| `checking_user`    | users 照会で未ヒット        | `redirect_login_unauthorized` | セッション破棄                   |
+| `checking_tenant`  | tenant 紐付けあり         | `authorized`                  | `/home` へ               |
+| `checking_tenant`  | tenant 紐付けなし         | `redirect_login_unauthorized` | セッション破棄                   |
+
+### 6.2 テスト設計（ロジック観点）
+
+| ID         | シナリオ                       | 期待結果                                    |
+| ---------- | -------------------------- | --------------------------------------- |
+| UT-A03-L01 | セッションあり・ユーザマスタあり・テナントあり    | `/home` へリダイレクト                       |
+| UT-A03-L02 | セッションあり・ユーザマスタなし           | signOut 実行後 `/login?error=unauthorized` |
+| UT-A03-L03 | セッションあり・ユーザマスタあり・テナント紐付けなし | signOut 実行後 `/login?error=unauthorized` |
+| UT-A03-L04 | セッションなし                    | `/login?error=no_session` へリダイレクト       |
+
+---
+
+## 第7章 結合・運用
+
+### 7.1 他コンポーネント結合ポイント
+
+* LoginPage (A-00)
+
+  * MagicLinkForm (A-01) にて `signInWithOtp` 実行後、Supabase が送信するメール内リンクの遷移先が `/auth/callback` となる。
+* home など認証後画面
+
+  * AuthCallbackHandler 経由でのみ遷移することを前提とし、直接アクセス時は Supabase セッションの有無を再確認する。
+
+### 7.2 環境依存要素
+
+* Supabase Auth 設定
+
+  * MagicLink の `emailRedirectTo` を `/auth/callback` に設定しておくこと。
+* 開発環境
+
+  * Mailpit による MagicLink 検証を行う場合も、最終遷移先は同一である。
+
+### 7.3 例外ログ出力方針
+
+* ログ出力は共通ログユーティリティを利用し、以下のイベントを最低限出力する。
+
+| タイミング     | event                                       | level |
+| --------- | ------------------------------------------- | ----- |
+| セッションなし   | `auth.callback.no_session`                  | ERROR |
+| ユーザマスタ未登録 | `auth.callback.unauthorized.user_not_found` | ERROR |
+| テナント紐付けなし | `auth.callback.unauthorized.no_tenant`      | ERROR |
+| 認可成功      | `auth.callback.authorized`                  | INFO  |
+
+---
+
+## 第8章 メタ情報
+
+### 8.1 用語定義
+
+| 用語                  | 定義                                    |
+| ------------------- | ------------------------------------- |
+| 認証 (Authentication) | MagicLink によりメールアドレスの所有者であることを確認する工程  |
+| 認可 (Authorization)  | ユーザマスタ・テナント情報に基づき、HarmoNet の利用を許可する工程 |
+| MagicLink           | Supabase Auth の OTP メール機能             |
+| ユーザマスタ              | HarmoNet 内で事前登録された利用者情報（users テーブル）   |
+| テナント                | 管理組合・団地などの論理グループ（tenants テーブル）        |
+
+### 8.2 関連資料
+
+* HarmoNet 機能要件定義書 v1.4
+* HarmoNet 非機能要件定義書 v1.0
+* HarmoNet 技術スタック定義書 v4.3
+* ログイン画面 バックエンド基本設計書 v1.0
+* HarmoNet 詳細設計書 - LoginPage (A-00) v1.3
+* HarmoNet 詳細設計書 - MagicLinkForm (A-01) v1.3
+* schema.prisma
+
+### 8.3 ChangeLog
+
+| Version | Date       | Author    | Summary                                                                                       |
+| ------- | ---------- | --------- | --------------------------------------------------------------------------------------------- |
+| 1.0     | 2025-11-18 | Tachikoma | 初版作成。MagicLink 認証 → 認可（ユーザマスタ／テナント）判定を `/auth/callback` に集約した詳細設計を定義。Passkey 廃案後の正式ログイン方式に対応。 |
+
+---
+
+**End of Document**

@@ -18,7 +18,7 @@ v4.3 では、ログイン方式に関する仕様を最新要件に合わせて
 **MagicLink（メール認証）と Passkey（WebAuthn）の 2 方式を独立したカードタイル UI としてログイン画面に並列表示する正式仕様**
 
 へ統一する。
-旧仕様であった「Passkey を MagicLinkForm 内に統合し、自動判定する方式」は完全に廃止する。
+旧仕様であった「Passkey を MagicLinkForm 内に統合し、自動判定する方式」は完全に廃止する。←Passkey導入は当面見送りとする。
 
 ---
 
@@ -29,7 +29,7 @@ v4.3 では、ログイン方式に関する仕様を最新要件に合わせて
 | **UI層**    | Next.js 16 + React 19                               | Appleカタログ風 UI / SSR対応 |
 | **認証層**    | Supabase Auth（MagicLink） + Corbado Web SDK（Passkey） | 2種類のパスワードレス認証方式を提供    |
 | **国際化層**   | StaticI18nProvider (C‑03)                           | JSON辞書ベースの多言語化        |
-| **バックエンド** | Supabase（PostgreSQL 17 / Edge Functions）            | RLS / tenant_id 分離    |
+| **バックエンド** | Supabase（PostgreSQL 17）                  | RLS / tenant_id 分離    |
 | **CI/CD**  | GitHub Actions + Windsurf + Vitest                  | 自動テスト・静的解析・コード生成      |
 
 ---

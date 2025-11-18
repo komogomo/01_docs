@@ -145,7 +145,7 @@ describe('MagicLinkForm (Unified Auth)', () => {
 * CIで `npm run test:unit` を自動実行
 * Windsurf CodeAgent が AverageScore >= 9.0 を満たす必要
 * coverageThreshold により品質担保
-* 将来拡張：Playwright E2E による login→mypage 実証
+* 将来拡張：Playwright E2E による login→home 実証
 
 ---
 
