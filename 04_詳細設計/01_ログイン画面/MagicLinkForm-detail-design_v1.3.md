@@ -16,16 +16,6 @@
 
 MagicLinkForm（A-01）は、HarmoNet ログイン画面における **「メールでログイン」用カードタイル UI** を構成し、Supabase Auth の MagicLink 機能を利用してメール経由のログインリンク送信を行うフォームコンポーネントである。
 
-本 v1.3 では、以下の仕様変更を反映する。
-
-* **Passkey 認証との統合を廃止**し、MagicLinkForm は **MagicLink 専用フォーム** とする（Passkey は A-02 側の責務）。
-* ログイン画面基本設計（A1）および MagicLink 基本設計 v1.0 に基づき、
-
-  * 左側カードタイルとしての UI 構造
-  * 入力〜送信〜結果表示までの状態遷移
-  * 共通ログユーティリティ（`logInfo` / `logError`）によるイベント出力
-    を再定義する。
-
 ### 1.2 責務
 
 | 区分    | 内容                                                                                            |
@@ -34,8 +24,6 @@ MagicLinkForm（A-01）は、HarmoNet ログイン画面における **「メー
 | ロジック  | メール形式チェック、Supabase への MagicLink 送信、状態管理（Idle / Sending / Sent / Error）。                       |
 | メッセージ | A-00 LoginPage 詳細設計で定義された MSG-01〜MSG-06 をカード内で表示。                                             |
 | ログ    | 共通ログユーティリティを使い、`auth.login.start` / `auth.login.success.magiclink` / `auth.login.fail.*` を出力。 |
-
-Passkey に関する UI・ロジック・ログは **A-02 PasskeyAuthTrigger / Passkey ボタン側**で扱い、本コンポーネントでは一切扱わない。
 
 ### 1.3 前提・関連ドキュメント
 
@@ -64,8 +52,6 @@ export interface MagicLinkFormProps {
   onError?: (error: MagicLinkError) => void;
 }
 ```
-
-* 旧版で使用していた `passkeyEnabled` Props は削除する（Passkey は A-02 側の責務）。
 
 ### 2.2 エラー型
 
@@ -394,10 +380,9 @@ MagicLinkForm 単体の Vitest + RTL テスト観点を整理する。
 
 ---
 
-## 第8章 結合・運用設計（A-00 / A-02 との関係）
+## 第8章 結合・運用設計
 
 * LoginPage (A-00) は MagicLinkForm を 1 枚のカードタイルとして配置し、Passkey 用カードタイルは A-02 側の設計に従って別コンポーネントとして配置する。
-* PasskeyAuthTrigger (A-02) は、Passkey ボタンからのみ呼び出され、MagicLinkForm からは呼び出さない。
 * LoginPage 詳細設計に定義されたメッセージ・ログ仕様と完全に整合するよう、本書の状態・メッセージ・ログイベントを定義した。
 
 ---

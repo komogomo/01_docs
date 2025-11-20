@@ -1,0 +1,219 @@
+# MagicLink Backend 詳細設計書 v1.0
+
+---
+
+# 第1章 概要
+
+## 1.1 目的
+
+MagicLink Backend（A-01B）は、HarmoNet で採用されている **MagicLink（メール OTP）方式による認証**を Next.js App Router ＋ Supabase Auth を用いて実現するための **実装仕様のみ** を定義する。ここには **要件（性能・監査・運用）** は一切記載しない。
+
+本書は **実装のための最下位ドキュメント（内部設計）** であり、MagicLink 認証フローを Next.js 16 / React 19 環境で正しく成立させるための技術的 I/O・処理フロー・エラー変換・API 連携構造のみを扱う。
+
+## 1.2 スコープ
+
+**対象**：MagicLink 認証に関わる Next.js App Router 側の技術的仕様
+
+* MagicLink 送信要求：`supabase.auth.signInWithOtp`
+* emailRedirectTo：`/auth/callback`
+* callback でのセッション確立処理の受け渡し（UI側には踏み込まない）
+* UIコンポーネント A-01（MagicLinkForm）から呼ばれるバックエンド I/O の技術仕様
+
+**非対象（本書では扱わない）**：
+
+* 性能値・ログ方針・監査仕様（※NFRによる禁止）
+* UI（MagicLinkForm）の構造・レイアウト
+* Passkey（A-02）
+* DBスキーマや migration（別ドキュメント）
+
+---
+
+# 第2章 入出力（I/O）仕様
+
+MagicLink Backend の処理は **MagicLinkForm（A-01）** からの呼び出しに対して以下の I/O をとる。
+
+## 2.1 入力
+
+| 項目    | 型      | 必須  | 説明                                  |
+| ----- | ------ | --- | ----------------------------------- |
+| email | string | Yes | ユーザのメールアドレス。形式チェックは A-01（UI）で実施済み前提 |
+
+## 2.2 出力
+
+MagicLink Backend は Supabase Auth を直接呼び出すため、戻り値は Supabase 標準の構造に準拠する。
+
+```ts
+{
+  data: null,
+  error: SupabaseAuthError | null
+}
+```
+
+UI側では：
+
+* `error === null` → 送信成功
+* `error !== null` → UIメッセージに変換（A-01 側で処理）
+
+## 2.3 emailRedirectTo
+
+MagicLink 発行後のリダイレクト先：
+
+```
+${window.location.origin}/auth/callback
+```
+
+（基本設計 v1.0 の方式に完全準拠）
+
+---
+
+# 第3章 処理フロー（内部処理）
+
+A-01 → MagicLink Backend → Supabase Auth → `/auth/callback` の一連の処理を技術的に分解する。
+
+## 3.1 送信フロー（正常系）
+
+```mermaid
+sequenceDiagram
+  participant F as MagicLinkForm (A-01)
+  participant B as MagicLink Backend
+  participant S as Supabase Auth
+
+  F->>B: handleMagicLink(email)
+  B->>S: signInWithOtp({ email, emailRedirectTo })
+  S-->>B: { data:null, error:null }
+  B-->>F: 成功
+```
+
+## 3.2 異常系フロー（UI側で分類する前提）
+
+```mermaid
+sequenceDiagram
+  F->>B: handleMagicLink(email)
+  B->>S: signInWithOtp
+  S-->>B: error != null
+  B-->>F: error
+```
+
+UI（A-01）側が、`error.code` を見て種別分類（error_network / error_auth / unexpected）を行う。
+
+---
+
+# 第4章 API 実装仕様
+
+MagicLink Backend の実体は **A-01 MagicLinkForm が直接呼ぶロジック**（Next.js client component 内で実行）であるため、API Route（route.ts）は不要。
+
+## 4.1 呼び出しコード（UI側から参照）
+
+※ UI 側用の技術仕様として **実装イメージを明確化**。
+
+```ts
+import { createBrowserClient } from '@supabase/ssr';
+
+export async function sendMagicLink(email: string) {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  return await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+}
+```
+
+### ポイント
+
+* `shouldCreateUser: false` は HarmoNet のユーザマスタ前提運用に必須
+* emailRedirectTo は `/auth/callback` 固定（基本設計準拠）
+
+---
+
+# 第5章 エラー変換仕様（Backend 観点）
+
+MagicLink Backend 自体は Supabase の生エラーを返すだけで **変換処理はしない**。
+（分類は A-01 MagicLinkForm 側で行うため、Backend 側で加工すると責務逆転になる）
+
+## 5.1 Supabase から返る可能性のある主な error.code
+
+| error.code                   | 説明      | UIでの扱い（A-01で分類）  |
+| ---------------------------- | ------- | ---------------- |
+| `invalid_email`              | メール形式不正 | error_auth       |
+| `rate_limit_error`           | レート制限   | error_network    |
+| `over_email_send_rate_limit` | 送信回数制限  | error_network    |
+| その他                          | 想定外     | error_unexpected |
+
+---
+
+# 第6章 `/auth/callback` 受け側の技術仕様
+
+※ MagicLink Backend 自体は callback の UI 遷移を行わないため、ここでは **Next.js 側の受け処理の技術的前提だけ** を記載する。
+
+## 6.1 callback の役割
+
+* Supabase がブラウザにセッション Cookie を発行したかを検査
+* セッションが有効であれば `/home`（またはトップ）へ遷移
+* UI 表示は行わず、redirect のみ
+
+## 6.2 実装イメージ
+
+```tsx
+// app/auth/callback/page.tsx
+import { redirect } from 'next/navigation';
+import { createServerClient } from '@supabase/ssr';
+
+export default async function CallbackPage() {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: /* Next.js cookies */ }
+  );
+
+  const { data } = await supabase.auth.getSession();
+
+  if (data.session) {
+    redirect('/home');
+  }
+
+  redirect('/login');
+}
+```
+
+### 技術上の注意点
+
+* redirect のみのため **UI は不要**。
+* route.ts への置換も可能（基本設計で定義された方式に従う）。
+
+---
+
+# 第7章 テスト仕様（Backend 部分）
+
+A-01（UI）では Vitest + RTL を使用するため、MagicLink Backend に対するテストは UI 側で行う。
+Backend は Supabase SDK を直接呼ぶだけなので、**単体テストは UI 側の mock テストでカバー**する。
+
+## 7.1 テスト観点（必要最小限）
+
+* signInWithOtp が正しいパラメータで呼ばれる
+* emailRedirectTo が `/auth/callback` である
+* shouldCreateUser が false である
+* Supabase が返す error がそのまま UI に渡る
+
+---
+
+# 第8章 メタ情報
+
+| 項目          | 内容                                          |
+| ----------- | ------------------------------------------- |
+| Document ID | HARMONET-A01B-MAGICLINK-BACKEND-DETAIL-V1.0 |
+| Version     | 1.0                                         |
+| Author      | Tachikoma                                   |
+| Reviewer    | TKD                                         |
+| Based on    | Login Backend 基本設計書 v1.0、NFR v1.0           |
+| Note        | 詳細設計書に要件を持ち込まない原則に従い、実装仕様のみを記載              |
+
+---
+
+以上、MagicLink Backend の **実装仕様だけに限定した詳細設計書 v1.0** です。
