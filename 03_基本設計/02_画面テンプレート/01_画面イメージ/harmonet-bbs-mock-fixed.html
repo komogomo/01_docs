@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarmoNet 掲示板モックアップ</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        
+        // ============ SVG Icons ============
+        const Plus = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        );
+        
+        const ChevronLeft = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        );
+        
+        const Paperclip = () => (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+            </svg>
+        );
+        
+        const Languages = ({ className }) => (
+            <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 8l6 6"></path>
+                <path d="M4 14l6-6 2-3"></path>
+                <path d="M2 5h12"></path>
+                <path d="M7 2h1"></path>
+                <path d="M22 22l-5-10-5 10"></path>
+                <path d="M14 18h6"></path>
+            </svg>
+        );
+        
+        const Volume2 = ({ className }) => (
+            <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+        );
+        
+        const Home = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const MessageSquare = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        );
+        
+        const Calendar = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+        );
+        
+        const User = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        );
+        
+        const LogOut = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        );
+        
+        const FileText = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+        );
+
+        // ============ Main App Component ============
+        const HarmoNetBBSMock = () => {
+            const [currentScreen, setCurrentScreen] = useState('top');
+            const [selectedPostId, setSelectedPostId] = useState(null);
+            const [language, setLanguage] = useState('JA');
+            const [favorites, setFavorites] = useState(['1', '3']);
+            const [posts, setPosts] = useState([
+                {
+                    id: '1',
+                    category: '重要',
+                    authorType: '管理組合',
+                    targetLabel: '全体向け',
+                    title: '【重要】定期総会のお知らせ',
+                    body: '2025年12月15日（日）10:00より、集会室にて定期総会を開催いたします。\n\n出席者の確認をお願いいたします。当日ご出席いただけない場合は、委任状の提出をお願いします。\n\n【議題】\n1. 2024年度活動報告\n2. 2024年度決算報告\n3. 2025年度活動計画案\n4. 2025年度予算案\n5. その他',
+                    createdAt: '2025/11/21 10:30',
+                    hasAttachment: true,
+                    attachments: [{ id: 'a1', name: '定期総会_議案書.pdf' }],
+                    replies: [
+                        { id: 'r1', displayName: '匿名', body: '出席予定です。よろしくお願いいたします。', createdAt: '2025/11/21 11:00' }
+                    ]
+                },
+                {
+                    id: '2',
+                    category: 'お知らせ',
+                    authorType: '管理組合',
+                    targetLabel: '北-Aグループ向け',
+                    title: '駐輪場の利用ルールについて',
+                    body: '駐輪場の整理整頓にご協力ください。自転車は指定の場所に停めていただきますようお願いいたします。',
+                    createdAt: '2025/11/20 14:15',
+                    hasAttachment: false,
+                    attachments: [],
+                    replies: []
+                },
+                {
+                    id: '3',
+                    category: 'お知らせ',
+                    authorType: '防災委員会',
+                    targetLabel: '全体向け',
+                    title: '防災訓練のご案内',
+                    body: '2025年11月30日（土）9:00より、防災訓練を実施します。全世帯のご参加をお願いいたします。',
+                    createdAt: '2025/11/19 16:45',
+                    hasAttachment: true,
+                    attachments: [{ id: 'a2', name: '防災訓練実施要項.pdf' }],
+                    replies: [
+                        { id: 'r2', displayName: '匿名', body: '参加します。', createdAt: '2025/11/19 17:00' }
+                    ]
+                },
+                {
+                    id: '4',
+                    category: 'ルール',
+                    authorType: '管理組合',
+                    targetLabel: '全体向け',
+                    title: 'ゴミ出しルールの再確認',
+                    body: '最近、ゴミの分別が守られていないケースが見受けられます。ルールの再確認をお願いします。',
+                    createdAt: '2025/11/18 10:00',
+                    hasAttachment: true,
+                    attachments: [{ id: 'a3', name: 'ゴミ分別ガイド.pdf' }],
+                    replies: []
+                },
+                {
+                    id: '5',
+                    category: 'グループ',
+                    authorType: '一般利用者',
+                    targetLabel: '北-Bグループ向け',
+                    title: '懇親会のご案内',
+                    body: '北-Bグループの皆さまで懇親会を開催したいと思います。ご参加お待ちしております。',
+                    createdAt: '2025/11/17 18:20',
+                    hasAttachment: false,
+                    attachments: [],
+                    replies: []
+                }
+            ]);
+
+            const goToTop = () => {
+                setCurrentScreen('top');
+                setSelectedPostId(null);
+            };
+
+            const goToDetail = (postId) => {
+                setSelectedPostId(postId);
+                setCurrentScreen('detail');
+            };
+
+            const goToNew = () => {
+                setCurrentScreen('new');
+            };
+
+            const toggleFavorite = (postId) => {
+                setFavorites(prev =>
+                    prev.includes(postId)
+                        ? prev.filter(id => id !== postId)
+                        : [...prev, postId]
+                );
+            };
+
+            const addPost = (newPost) => {
+                setPosts([newPost, ...posts]);
+                goToTop();
+            };
+
+            const addReply = (postId, reply) => {
+                setPosts(posts.map(p => 
+                    p.id === postId 
+                        ? { ...p, replies: [reply, ...p.replies] }
+                        : p
+                ));
+            };
+
+            const selectedPost = posts.find(p => p.id === selectedPostId);
+
+            return (
+                <div className="min-h-screen bg-gray-50 flex flex-col">
+                    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg"></div>
+                            <span className="font-bold text-lg">HarmoNET</span>
+                        </div>
+                        <div className="flex gap-2">
+                            {['JA', 'EN', 'ZH'].map(lang => (
+                                <button
+                                    key={lang}
+                                    onClick={() => setLanguage(lang)}
+                                    className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                                        language === lang
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    {lang}
+                                </button>
+                            ))}
+                        </div>
+                    </header>
+
+                    <main className="flex-1 pb-20">
+                        {currentScreen === 'top' && (
+                            <BoardTop posts={posts} goToDetail={goToDetail} favorites={favorites} toggleFavorite={toggleFavorite} />
+                        )}
+                        {currentScreen === 'detail' && selectedPost && (
+                            <BoardDetail post={selectedPost} goToTop={goToTop} addReply={addReply} />
+                        )}
+                        {currentScreen === 'new' && (
+                            <NewPostForm goToTop={goToTop} addPost={addPost} />
+                        )}
+                    </main>
+
+                    {currentScreen === 'top' && (
+                        <button
+                            onClick={goToNew}
+                            className="fixed right-6 bottom-24 w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all flex items-center justify-center z-30"
+                            title="新規投稿"
+                        >
+                            <Plus />
+                        </button>
+                    )}
+
+                    <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20">
+                        <div className="flex justify-around items-center py-2">
+                            <button className="flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-blue-500">
+                                <Home />
+                                <span className="text-xs">ホーム</span>
+                            </button>
+                            <button 
+                                onClick={goToTop}
+                                className="flex flex-col items-center gap-1 p-2 text-blue-500"
+                            >
+                                <MessageSquare />
+                                <span className="text-xs">掲示板</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-blue-500">
+                                <Calendar />
+                                <span className="text-xs">施設予約</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-blue-500">
+                                <User />
+                                <span className="text-xs">マイページ</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-blue-500">
+                                <LogOut />
+                                <span className="text-xs">ログアウト</span>
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // ============ Board Top Component ============
+        const BoardTop = ({ posts, goToDetail, favorites, toggleFavorite }) => {
+            const [selectedFilters, setSelectedFilters] = useState(['all']);
+
+            const filters = [
+                { id: 'all', label: 'すべて' },
+                { id: 'circular', label: '回覧板' },
+                { id: 'group', label: 'グループ' },
+                { id: 'rule', label: 'ルール' },
+                { id: 'favorite', label: '⭐️', icon: true }
+            ];
+
+            const handleFilterClick = (filterId) => {
+                if (filterId === 'all') {
+                    setSelectedFilters(['all']);
+                } else {
+                    const newFilters = selectedFilters.filter(f => f !== 'all');
+                    if (newFilters.includes(filterId)) {
+                        const updated = newFilters.filter(f => f !== filterId);
+                        setSelectedFilters(updated.length === 0 ? ['all'] : updated);
+                    } else {
+                        setSelectedFilters([...newFilters, filterId]);
+                    }
+                }
+            };
+
+            const Star = ({ filled }) => (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            );
+
+            return (
+                <div>
+                    <div className="sticky top-[57px] bg-white border-b border-gray-200 px-4 py-3 overflow-x-auto z-10">
+                        <div className="flex gap-2 min-w-max">
+                            {filters.map(filter => (
+                                <button
+                                    key={filter.id}
+                                    onClick={() => handleFilterClick(filter.id)}
+                                    className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-all ${
+                                        selectedFilters.includes(filter.id)
+                                            ? 'bg-blue-500 text-white border-2 border-blue-500'
+                                            : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-gray-400'
+                                    }`}
+                                >
+                                    {filter.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="px-4 py-6">
+                        <div className="space-y-4 mb-6">
+                            {posts.map(post => (
+                                <div
+                                    key={post.id}
+                                    className="bg-white border border-gray-200 rounded-2xl p-4 hover:bg-gray-50 transition-colors cursor-pointer relative"
+                                >
+                                    <div className="absolute top-4 right-4 flex items-center gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleFavorite(post.id);
+                                            }}
+                                            className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                        >
+                                            <Star filled={favorites.includes(post.id)} />
+                                        </button>
+                                        {post.hasAttachment && (
+                                            <Paperclip />
+                                        )}
+                                    </div>
+                                    
+                                    <div onClick={() => goToDetail(post.id)}>
+                                        <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full mb-2">
+                                            {post.category}
+                                        </span>
+                                        
+                                        <h2 className="font-bold text-base mb-2 pr-16">
+                                            {post.title}
+                                        </h2>
+                                        
+                                        <div className="flex items-center justify-between text-xs text-gray-500">
+                                            <span>{post.authorType}</span>
+                                            <span>{post.createdAt}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center justify-center gap-3 flex-wrap bg-white border border-gray-200 rounded-xl p-4">
+                            <div className="flex items-center gap-2">
+                                <select className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <option>10件</option>
+                                    <option>25件</option>
+                                    <option>50件</option>
+                                </select>
+                                <span className="text-sm text-gray-600">表示中</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    ‹‹
+                                </button>
+                                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    ‹
+                                </button>
+                                <span className="px-4 text-sm text-gray-600">1 / 1</span>
+                                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    ›
+                                </button>
+                                <button className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    ››
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============ Board Detail Component ============
+        const BoardDetail = ({ post, goToTop, addReply }) => {
+            const [replyText, setReplyText] = useState('');
+            const [showTranslation, setShowTranslation] = useState(false);
+
+            const handleSubmitReply = () => {
+                if (replyText.trim()) {
+                    const newReply = {
+                        id: `r${Date.now()}`,
+                        displayName: '匿名',
+                        body: replyText,
+                        createdAt: new Date().toLocaleString('ja-JP', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }).replace(/\//g, '/')
+                    };
+                    addReply(post.id, newReply);
+                    setReplyText('');
+                }
+            };
+
+            return (
+                <div className="px-4 py-6">
+                    <button
+                        onClick={goToTop}
+                        className="flex items-center gap-2 text-blue-500 hover:text-blue-600 mb-4"
+                    >
+                        <ChevronLeft />
+                        <span>一覧に戻る</span>
+                    </button>
+
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-4">
+                        <div className="flex items-start gap-2 mb-4">
+                            <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full flex-shrink-0">
+                                {post.category}
+                            </span>
+                            <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full flex-shrink-0">
+                                {post.targetLabel}
+                            </span>
+                        </div>
+
+                        <h1 className="font-bold text-xl mb-4">{post.title}</h1>
+
+                        <div className="flex items-center gap-3 text-sm text-gray-600 mb-6 pb-4 border-b border-gray-200">
+                            <span>{post.authorType}</span>
+                            <span>•</span>
+                            <span>{post.createdAt}</span>
+                        </div>
+
+                        <div className="mb-6">
+                            <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+                                {post.body}
+                            </div>
+
+                            {showTranslation && (
+                                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <p className="text-sm text-blue-900 whitespace-pre-wrap">
+                                        {post.body}
+                                        {"\n\n"}(Translation in English will be displayed here)
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {post.attachments && post.attachments.length > 0 && (
+                            <div className="mb-6">
+                                <p className="text-sm font-semibold mb-2">添付ファイル</p>
+                                <div className="space-y-2">
+                                    {post.attachments.map(att => (
+                                        <div key={att.id} className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                                            <FileText />
+                                            <span className="text-sm text-gray-700">{att.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setShowTranslation(!showTranslation)}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                            >
+                                <Languages className="text-white" />
+                                <span>{showTranslation ? '原文表示' : '翻訳'}</span>
+                            </button>
+                            <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm">
+                                <Volume2 className="text-white" />
+                                <span>読み上げ</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                        <h2 className="font-bold text-lg mb-4">返信 ({post.replies.length}件)</h2>
+
+                        <div className="mb-6">
+                            <textarea
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                rows="4"
+                                placeholder="返信を入力..."
+                            />
+                            <div className="flex justify-end mt-3">
+                                <button
+                                    onClick={handleSubmitReply}
+                                    disabled={!replyText.trim()}
+                                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    返信する
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {post.replies.map(reply => (
+                                <div key={reply.id} className="border-l-4 border-blue-500 pl-4 py-2">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                                        <span className="font-semibold">{reply.displayName}</span>
+                                        <span>•</span>
+                                        <span>{reply.createdAt}</span>
+                                    </div>
+                                    <p className="text-gray-800">{reply.body}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============ New Post Form Component ============
+        const NewPostForm = ({ goToTop, addPost }) => {
+            const [displayMode, setDisplayMode] = useState('A');
+            const [category, setCategory] = useState('重要');
+            const [title, setTitle] = useState('');
+            const [body, setBody] = useState('');
+            const [target, setTarget] = useState('all');
+
+            const categories = ['重要', 'お知らせ', 'グループ', 'ルール'];
+
+            const handleSubmit = () => {
+                if (title.trim() && body.trim()) {
+                    const newPost = {
+                        id: `${Date.now()}`,
+                        category,
+                        authorType: '管理組合',
+                        targetLabel: target === 'all' ? '全体向け' : '北-Aグループ向け',
+                        title,
+                        body,
+                        createdAt: new Date().toLocaleString('ja-JP', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }).replace(/\//g, '/'),
+                        hasAttachment: false,
+                        attachments: [],
+                        replies: []
+                    };
+                    addPost(newPost);
+                }
+            };
+
+            return (
+                <div className="px-4 py-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <button
+                            onClick={goToTop}
+                            className="flex items-center gap-2 text-blue-500 hover:text-blue-600"
+                        >
+                            <ChevronLeft />
+                            <span>戻る</span>
+                        </button>
+                        <h1 className="font-bold text-xl">新規投稿</h1>
+                        <div className="w-16"></div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-6">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <p className="font-semibold mb-2 text-blue-900">📝 表示モード選択（デモ用）</p>
+                            <div className="flex gap-2 flex-wrap">
+                                {['A', 'B', 'C'].map(mode => (
+                                    <button
+                                        key={mode}
+                                        onClick={() => setDisplayMode(mode)}
+                                        className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+                                            displayMode === mode
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
+                                        }`}
+                                    >
+                                        {mode === 'A' && 'モードA: シンプル'}
+                                        {mode === 'B' && 'モードB: ツールバー付き'}
+                                        {mode === 'C' && 'モードC: リッチエディタ'}
+                                    </button>
+                                ))}
+                            </div>
+                            <p className="text-xs text-gray-600 mt-2">
+                                {displayMode === 'A' && '最もシンプルなテキストエリア'}
+                                {displayMode === 'B' && 'ツールバー付き（見た目のみ、装飾機能なし）'}
+                                {displayMode === 'C' && 'Google Docs風エディタ（実際に装飾が反映される）'}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold mb-2">
+                                カテゴリ <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex gap-2 flex-wrap">
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategory(cat)}
+                                        className={`px-4 py-2 rounded-lg border transition-colors ${
+                                            category === cat
+                                                ? 'bg-blue-500 text-white border-blue-500'
+                                                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                                        }`}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold mb-2">
+                                タイトル <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="タイトルを入力"
+                            />
+                        </div>
+
+                        {displayMode === 'A' && (
+                            <div>
+                                <label className="block text-sm font-semibold mb-2">
+                                    本文 <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    value={body}
+                                    onChange={(e) => setBody(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    rows="10"
+                                    placeholder="本文を入力"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    プレーンテキストのみ
+                                </p>
+                            </div>
+                        )}
+
+                        {displayMode === 'B' && (
+                            <div>
+                                <label className="block text-sm font-semibold mb-2">
+                                    本文 <span className="text-red-500">*</span>
+                                </label>
+                                <div className="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex gap-2">
+                                    <button
+                                        onClick={() => console.log('太字（見た目のみ）')}
+                                        className="px-3 py-1 hover:bg-gray-200 rounded transition-colors text-sm"
+                                        title="太字（見た目のみ）"
+                                    >
+                                        <strong>B</strong>
+                                    </button>
+                                    <button
+                                        onClick={() => console.log('斜体（見た目のみ）')}
+                                        className="px-3 py-1 hover:bg-gray-200 rounded transition-colors text-sm"
+                                        title="斜体（見た目のみ）"
+                                    >
+                                        <em>I</em>
+                                    </button>
+                                    <button
+                                        onClick={() => console.log('下線（見た目のみ）')}
+                                        className="px-3 py-1 hover:bg-gray-200 rounded transition-colors text-sm"
+                                        title="下線（見た目のみ）"
+                                    >
+                                        <u>U</u>
+                                    </button>
+                                    <div className="border-l border-gray-300 mx-1"></div>
+                                    <button
+                                        onClick={() => console.log('箇条書き（見た目のみ）')}
+                                        className="px-3 py-1 hover:bg-gray-200 rounded transition-colors text-sm"
+                                        title="箇条書き（見た目のみ）"
+                                    >
+                                        • リスト
+                                    </button>
+                                    <button
+                                        onClick={() => console.log('番号付きリスト（見た目のみ）')}
+                                        className="px-3 py-1 hover:bg-gray-200 rounded transition-colors text-sm"
+                                        title="番号付きリスト（見た目のみ）"
+                                    >
+                                        1. リスト
+                                    </button>
+                                </div>
+                                <textarea
+                                    value={body}
+                                    onChange={(e) => setBody(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 border-t-0 rounded-b-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    rows="10"
+                                    placeholder="本文を入力"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    ツールバー付きだが、実際の装飾機能なし（プレーンテキスト）
+                                </p>
+                            </div>
+                        )}
+
+                        {displayMode === 'C' && (
+                            <div>
+                                <label className="block text-sm font-semibold mb-2">
+                                    本文 <span className="text-red-500">*</span>
+                                </label>
+                                
+                                <div className="border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
+                                    <div className="bg-gray-50 border-b border-gray-200 px-3 py-2 flex items-center gap-4 text-sm">
+                                        <button className="hover:bg-gray-200 px-2 py-1 rounded transition-colors">
+                                            ファイル
+                                        </button>
+                                        <button className="hover:bg-gray-200 px-2 py-1 rounded transition-colors">
+                                            編集
+                                        </button>
+                                        <button className="hover:bg-gray-200 px-2 py-1 rounded transition-colors">
+                                            挿入
+                                        </button>
+                                        <button className="hover:bg-gray-200 px-2 py-1 rounded transition-colors">
+                                            書式設定
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="bg-white border-b border-gray-200 px-3 py-2 flex items-center gap-1 flex-wrap">
+                                        <button
+                                            onClick={() => document.execCommand('undo')}
+                                            className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                                            title="元に戻す"
+                                        >
+                                            ↶
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('redo')}
+                                            className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                                            title="やり直す"
+                                        >
+                                            ↷
+                                        </button>
+                                        
+                                        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                        
+                                        <select 
+                                            className="px-2 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                                            onChange={(e) => {
+                                                if (e.target.value !== 'normal') {
+                                                    document.execCommand('formatBlock', false, e.target.value);
+                                                }
+                                            }}
+                                            defaultValue="normal"
+                                        >
+                                            <option value="normal">段落</option>
+                                            <option value="h1">見出し1</option>
+                                            <option value="h2">見出し2</option>
+                                            <option value="h3">見出し3</option>
+                                        </select>
+                                        
+                                        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                        
+                                        <button
+                                            onClick={() => document.execCommand('bold')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors font-bold"
+                                            title="太字"
+                                        >
+                                            B
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('italic')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors italic"
+                                            title="斜体"
+                                        >
+                                            I
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('underline')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors underline"
+                                            title="下線"
+                                        >
+                                            U
+                                        </button>
+                                        
+                                        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                        
+                                        <button
+                                            onClick={() => document.execCommand('foreColor', false, '#000000')}
+                                            className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                                            title="文字色"
+                                        >
+                                            <span className="text-lg">A</span>
+                                        </button>
+                                        
+                                        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                        
+                                        <button
+                                            onClick={() => document.execCommand('justifyLeft')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors text-xs"
+                                            title="左揃え"
+                                        >
+                                            ≡
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('justifyCenter')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors text-xs"
+                                            title="中央揃え"
+                                        >
+                                            ≡
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('justifyRight')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors text-xs"
+                                            title="右揃え"
+                                        >
+                                            ≡
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('justifyFull')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors text-xs"
+                                            title="両端揃え"
+                                        >
+                                            ≡
+                                        </button>
+                                        
+                                        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                        
+                                        <button
+                                            onClick={() => document.execCommand('insertUnorderedList')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors text-xs"
+                                            title="箇条書き"
+                                        >
+                                            • リスト
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('insertOrderedList')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors text-xs"
+                                            title="番号付きリスト"
+                                        >
+                                            1. リスト
+                                        </button>
+                                        
+                                        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                        
+                                        <button
+                                            onClick={() => document.execCommand('outdent')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors"
+                                            title="インデント解除"
+                                        >
+                                            ⇤
+                                        </button>
+                                        <button
+                                            onClick={() => document.execCommand('indent')}
+                                            className="px-2 py-1 hover:bg-gray-100 rounded transition-colors"
+                                            title="インデント"
+                                        >
+                                            ⇥
+                                        </button>
+                                    </div>
+                                    
+                                    <div
+                                        contentEditable
+                                        onInput={(e) => setBody(e.currentTarget.innerHTML || '')}
+                                        className="min-h-[300px] px-4 py-3 focus:outline-none bg-white"
+                                        style={{ 
+                                            lineHeight: '1.6',
+                                            fontSize: '14px'
+                                        }}
+                                        suppressContentEditableWarning
+                                    >
+                                    </div>
+                                </div>
+                                
+                                <p className="text-xs text-blue-600 mt-2 font-semibold">
+                                    ✨ Google Docs風リッチエディタ：装飾が実際に反映されます
+                                </p>
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="block text-sm font-semibold mb-2">
+                                添付ファイル（任意）
+                            </label>
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer">
+                                <p className="text-gray-500 text-sm">ファイルをドロップまたはクリックして選択</p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-4">
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!title.trim() || !body.trim()}
+                                className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                投稿する
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============ Render ============
+        const root = document.getElementById('root');
+        const element = React.createElement(HarmoNetBBSMock);
+        ReactDOM.render(element, root);
+    </script>
+</body>
+</html>
