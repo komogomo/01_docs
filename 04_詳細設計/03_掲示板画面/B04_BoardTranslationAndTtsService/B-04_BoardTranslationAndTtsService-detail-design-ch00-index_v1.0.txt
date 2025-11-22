@@ -1,0 +1,136 @@
+# B-04 BoardTranslationAndTtsService 詳細設計書 ch00 目次 v1.0
+
+**Document ID:** HARMONET-COMPONENT-B04-BOARDTRANSLATIONANDTTSSERVICE-DETAIL-CH00
+**Version:** 1.0
+**Supersedes:** -
+**Created:** 2025-11-22
+**Updated:** 2025-11-22
+**Author:** Tachikoma
+**Reviewer:** TKD
+**Status:** Draft
+
+---
+
+## ch01 概要
+
+* 1.1 目的
+* 1.2 適用範囲（翻訳／音声読み上げ）
+* 1.3 前提条件・システム構成（Supabase Pro / Edge Functions / GCP）
+* 1.4 対象外・非スコープ
+* 1.5 関連ドキュメント
+* 1.6 本書で定義する内容
+
+## ch02 内部API・外部API・認証設計
+
+* 2.1 本章の目的
+* 2.2 内部サービス API 設計
+
+  * 2.2.1 言語コード定義（SupportedLang）
+  * 2.2.2 翻訳サービスインターフェース（TranslationService / BoardPostTranslationService）
+  * 2.2.3 TTS サービスインターフェース（TtsService / BoardPostTtsService）
+* 2.3 Google Cloud Translation API 連携
+
+  * 2.3.1 認証方式・環境変数
+  * 2.3.2 エンドポイント・リクエスト仕様
+  * 2.3.3 エラー処理方針（翻訳）
+* 2.4 TTS API 連携
+
+  * 2.4.1 認証方式・環境変数
+  * 2.4.2 エンドポイント・リクエスト仕様
+  * 2.4.3 TTS 結果の扱い
+  * 2.4.4 エラー処理方針（TTS）
+* 2.5 B-02 / B-03 からの利用契約（サマリ）
+
+## ch03 翻訳キャッシュ／DB・スキーマ設計
+
+* 3.1 本章の目的
+* 3.2 対象テーブル一覧
+
+  * 3.2.1 board_posts（既存）との関係
+  * 3.2.2 tenant_settings（既存）との関係
+  * 3.2.3 board_post_translations（新設）概要
+* 3.3 board_post_translations 論理設計
+
+  * 3.3.1 カラム定義
+  * 3.3.2 主キー・ユニーク制約
+  * 3.3.3 インデックス設計
+  * 3.3.4 RLS 方針（tenant_id / post_id）
+* 3.4 tenant_settings.config_json 設計
+
+  * 3.4.1 translation_retention_days のキー定義
+  * 3.4.2 デフォルト値・設定可能範囲（60〜120 / 既定90）
+  * 3.4.3 テナント管理者画面との連携ポイント
+* 3.5 スキーマ反映方法
+
+  * 3.5.1 schema.prisma への定義
+  * 3.5.2 差分 SQL（Supabase Studio 用）の扱い
+* 3.6 データ整合性・マイグレーション方針（既存投稿への影響）
+
+## ch04 掲示板詳細画面との連携（翻訳・TTS 利用フロー）
+
+* 4.1 本章の目的
+* 4.2 翻訳フロー（B-02 / B-03 視点）
+
+  * 4.2.1 投稿時初回翻訳フロー
+  * 4.2.2 B-02 でのオンデマンド翻訳フロー（翻訳アイコン押下時）
+  * 4.2.3 キャッシュ有無判定と取得ロジック
+* 4.3 TTS フロー（B-02 視点）
+
+  * 4.3.1 音声読み上げボタン押下〜TTS API 呼び出し
+  * 4.3.2 ブラウザ再生（audioBuffer / mimeType）の扱い
+  * 4.3.3 エラー時の UI 表示仕様（文言参照のみ）
+* 4.4 Route Handler / Edge Function との責務分担
+
+  * 4.4.1 Next.js Route Handler 経由での呼び出し
+  * 4.4.2 Supabase Edge Function 経由での呼び出し（必要な場合）
+
+## ch05 翻訳キャッシュ保有期間・削除バッチ設計
+
+* 5.1 本章の目的
+* 5.2 保有期間ロジック
+
+  * 5.2.1 retention_days の決定ルール（テナント設定）
+  * 5.2.2 期限超過判定（created_at との比較）
+* 5.3 Supabase Edge Function 設計
+
+  * 5.3.1 実行トリガ（Supabase Scheduler / cron）
+  * 5.3.2 処理アルゴリズム（テナント単位の削除）
+  * 5.3.3 例外処理・再実行方針
+* 5.4 ローカル環境での実行方法（開発用）
+
+  * 5.4.1 supabase functions serve / invoke
+  * 5.4.2 手動実行手順メモ
+
+## ch06 非機能設計（性能・タイムアウト・レート・セキュリティ）
+
+* 6.1 本章の目的
+* 6.2 性能・タイムアウト
+
+  * 6.2.1 翻訳・TTS 呼び出しタイムアウト
+  * 6.2.2 同時実行・スループットの想定
+* 6.3 レート・クオータ対応
+
+  * 6.3.1 Google クオータ超過時の扱い
+  * 6.3.2 HarmoNet 側レート制限（v1.0 の扱い）
+* 6.4 セキュリティ
+
+  * 6.4.1 サービスアカウントキーの管理ルール
+  * 6.4.2 ログ出力時の情報マスキング
+  * 6.4.3 RLS と tenantId の整合
+
+## ch07 ログ・監視・エラー設計
+
+* 7.1 本章の目的
+* 7.2 ログ出力ポリシー
+
+  * 7.2.1 翻訳成功・失敗ログ（イベント名・項目）
+  * 7.2.2 TTS 成功・失敗ログ
+  * 7.2.3 バッチ（Edge Function）実行ログ
+* 7.3 監視・アラート（v1.0 の扱い）
+
+  * 7.3.1 致命的エラーの検知方法
+  * 7.3.2 今後の監視拡張余地メモ
+* 7.4 画面側へのエラー伝播
+
+  * 7.4.1 B-02 / B-03 へのエラーレスポンス方針
+  * 7.4.2 UI メッセージ仕様との連携

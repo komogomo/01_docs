@@ -1,0 +1,83 @@
+# B-02 BoardDetail 詳細設計書 ch00 Index v1.0
+
+**Document ID:** HARMONET-COMPONENT-B02-BOARDDETAIL-DETAIL-CH00-INDEX
+**Version:** 1.0
+**Supersedes:** -
+**Created:** 2025-11-22
+**Updated:** 2025-11-22
+**Author:** Tachikoma
+**Reviewer:** TKD
+**Status:** Draft
+
+---
+
+## 0.1 文書の目的
+
+本書は、HarmoNet 掲示板機能における **掲示板詳細画面コンポーネント BoardDetail（B-02）** の詳細設計書を章別に管理するためのインデックスである。
+`harmonet-detail-design-agenda-standard_v1.0.md` に準拠し、BoardDetail に必要な章構成と、それぞれの役割・対応ファイル名を一覧として定義する。
+
+BoardDetail は、BoardTop（B-01）から遷移してきた利用者に対して、単一投稿の本文・添付ファイル・翻訳/TTS・コメント等を表示する画面であり、掲示板機能の中心的な閲覧 UI となる。
+
+---
+
+## 0.2 対象コンポーネント
+
+* コンポーネント ID: **B-02**
+* 名称: **BoardDetail**（掲示板 詳細画面）
+* 対応 URL: `/board/[postId]`
+
+本コンポーネントは、BoardTop で選択された 1 件の投稿を詳細表示し、以下を提供する役割を持つ。
+
+* 本文のフルテキスト表示
+* 添付ファイル（PDF 等）の表示・プレビュー起動
+* 翻訳（Google Translate）結果の表示・切替
+* 音声読み上げ（TTS）の起動
+* コメント一覧・コメント投稿（MVP の範囲に応じて）
+
+※ コメント機能やモデレーション機能の詳細な範囲は、掲示板基本設計・決定サマリに従って後続章で詳細化する。
+
+---
+
+## 0.3 章構成一覧
+
+BoardDetail 詳細設計は、以下の章別ファイルで構成する。
+
+| ch | 章タイトル             | 役割 / 内容概要                                       | 対応ファイル名（想定）                                               |
+| -- | ----------------- | ----------------------------------------------- | --------------------------------------------------------- |
+| 00 | Index             | 本一覧。対象コンポーネントと章構成、関連文書を定義。                      | `B-02_BoardDetail-detail-design-ch00-index_v1.0.md`       |
+| 01 | 概要                | 目的・スコープ・用語・関連ドキュメント・前提条件を定義。                    | `B-02_BoardDetail-detail-design-ch01-overview_v1.0.md`    |
+| 02 | 画面構造・コンポーネント構成    | 画面レイアウト・コンポーネント分割・ルーティングを定義。                    | `B-02_BoardDetail-detail-design-ch02-layout_v1.0.md`      |
+| 03 | データモデル・入出力仕様      | `schema.prisma` に基づく入出力 DTO・取得条件・ソート定義。         | `B-02_BoardDetail-detail-design-ch03-data-model_v1.0.md`  |
+| 04 | 状態管理・イベント遷移       | 投稿本文・翻訳/TTS・PDFプレビュー・コメント等の状態・イベント。             | `B-02_BoardDetail-detail-design-ch04-state-event_v1.0.md` |
+| 05 | UI 詳細仕様・メッセージ仕様   | 本文表示、翻訳/TTS ボタン、PDF プレビュー、コメント UI など。           | `B-02_BoardDetail-detail-design-ch05-ui-spec_v1.0.md`     |
+| 06 | 結合・依存関係（共通部品・他画面） | BoardTop / PostForm / 共通翻訳/TTS / Logger との結合関係。 | `B-02_BoardDetail-detail-design-ch06-integration_v1.0.md` |
+| 07 | テスト観点・UT/IT 方針    | Jest/RTL による UT 観点・モック方針・主要テストケース一覧。            | `B-02_BoardDetail-detail-design-ch07-test-plan_v1.0.md`   |
+
+※ 章タイトル・ファイル名は初版案であり、TKD による承認後に確定とする。
+
+---
+
+## 0.4 関連ドキュメント
+
+BoardDetail 詳細設計の前提となる関連ドキュメントを以下に示す。
+
+| 種別     | 名称                                               | 備考                                              |
+| ------ | ------------------------------------------------ | ----------------------------------------------- |
+| 要件定義   | `functional-requirements-all_v1.6.md`            | 掲示板機能（投稿・コメント・回覧板・翻訳・TTS 等）の要件。                 |
+| 非機能要件  | `Nonfunctional-requirements_v1.0.md`             | 認証方式・性能・セキュリティ・運用方針。                            |
+| 技術スタック | `harmonet-technical-stack-definition_v4.4.md`    | Next.js / Supabase / Prisma / i18n 等の技術前提。      |
+| 基本設計   | `board-design-ch00-index_v2.2.md`                | 掲示板機能 基本設計 目次。                                  |
+| 基本設計   | `board-design-ch01_v2.2.md`                      | 掲示板機能 全体概要・用語定義。                                |
+| 基本設計   | `board-design-ch04_vX.Y.md`                      | 掲示板詳細画面（BoardDetail）基本設計。                       |
+| スキーマ   | `schema.prisma.txt`                              | `board_posts` / `board_comments` / 添付・翻訳キャッシュ等。 |
+| 詳細設計標準 | `harmonet-detail-design-agenda-standard_v1.0.md` | 詳細設計書の章構成・記載粒度標準。                               |
+| 他画面詳細  | `B-01_BoardTop-detail-design-ch00〜07`            | BoardTop との整合を取るため参照。                           |
+
+---
+
+## 0.5 今後の執筆・更新方針
+
+1. まず `B-02_BoardDetail-detail-design-ch01-overview_v1.0.md` および `-ch02-layout_v1.0.md` を優先して執筆し、BoardDetail の役割と画面構造を確定する。
+2. 続いて `schema.prisma` に基づき `-ch03-data-model_v1.0.md` を作成し、BoardDetail が扱う入出力データ（投稿本文・添付・翻訳/TTS・コメント）とソート・取得条件を明文化する。
+3. 状態管理・イベント（ch04）、UI/メッセージ仕様（ch05）、結合（ch06）、テスト観点（ch07）は、BoardTop との整合を維持しつつ、実装タスクおよび Jest/RTL テスト設計と並行して詳細化していく。
+4. 章構成そのものを変更する必要が生じた場合は、本 Index の ChangeLog に記録し、バージョンを `v1.1` 以降へ更新する。
