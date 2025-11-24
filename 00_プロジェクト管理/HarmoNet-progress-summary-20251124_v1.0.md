@@ -112,3 +112,88 @@
   - 実装経緯・RLS トラブルシュート・テスト観点の詳細ログ。
 - schema.prisma / tenant_settings RLS  
   - `tenant_residents` 追加、`tenant_settings` RLS の user_tenants ベースへの変更。
+
+
+進捗サマリは、こちら側で更新をかけようとしましたが、既存テキストの一部が手元のバージョンと微妙に差分があるようで、パターン一致に失敗し、今回は自動書き換えができませんでした。
+（ファイル自体は壊していません。そのまま残っています）
+
+なので、内容ベースで「今日分の追記案」と「今後やること」をテキストでお渡しします。
+明日、余裕のあるときに TKD ローカルの進捗サマリにコピペで反映してもらう形にしましょう。
+
+---
+
+## 今日の進捗追記案（2.x に追加）
+
+### 2.6 BoardTop 動的翻訳・翻訳キャッシュ実装
+
+* Google Translate API を用いた動的翻訳と翻訳キャッシュ（`board_post_translations`）を実装。
+* 投稿時:
+
+  * タイトル＋本文を対象に、Google の言語検出＋UI 言語フォールバックで `sourceLang` を決定。
+  * `['ja','en','zh']` のうち `sourceLang` 以外の 2 言語に対して翻訳を実行し、`board_post_translations` に upsert。
+  * RLS により INSERT が拒否されていた問題を、`service_role` クライアント＋既存 RLS 方針の組み合わせで解消。
+* 掲示板TOP `/board`:
+
+  * `/api/board/posts` で `board_posts` + `board_post_translations` をまとめて返す GET を追加。
+  * BoardTopPage は `currentLocale`（JA/EN/ZH）に応じて翻訳キャッシュを優先し、無い場合のみ原文を表示するサマリ表示に変更。
+  * 言語切替ボタン（JA/EN/ZH）で投稿サマリが自動で翻訳表示されることを確認。
+
+### 2.7 BoardDetail 閲覧専用ビューの実装
+
+* `/board/[postId]` に BoardDetailPage（閲覧専用）を実装。
+* 内容:
+
+  * `getBoardPostById` server 関数で 1 件の投稿＋翻訳＋添付メタ情報＋コメント一覧を取得。
+  * BoardTop と同じロジックで翻訳キャッシュを利用し、JA/EN/ZH の本文切り替えを実現。
+  * コメントは現時点では閲覧のみ（投稿・削除・翻訳ボタン・TTS は後続タスク）。
+  * 添付ファイルリストと PDF プレビューモーダルの UI 骨格を作成（Storage 側実装は今後 BoardPostForm 側で対応）。
+  * `/board/new`・`/board/[postId]` に AppFooter を追加し、エラー時でも Home/Board などへ戻れる導線を確保。
+
+### 2.8 RLS・環境変数・ユーザデータの整備
+
+* 翻訳キャッシュ用テーブル `board_post_translations` / `board_comment_translations` の RLS を整理し、翻訳処理のみ `service_role` クライアントで upsert する構成に統一。
+* `.env.local` の Supabase キー設定を是正:
+
+  * `NEXT_PUBLIC_SUPABASE_ANON_KEY` と `SUPABASE_SERVICE_ROLE_KEY` が同値だった問題を修正。
+  * Supabase CLI の `Publishable key` を anon、`Secret key` を service_role として再設定し、`hasServiceRole: true` を確認。
+* `users` テーブルの `email` に UNIQUE 制約を追加し、重複ユーザが作成されないように修正（既存の重複レコードは事前に削除）。
+
+---
+
+## 「次のステップ」差し替え案（3章）
+
+```md
+## 3. 次のステップ（掲示板まわり）
+
+1. 掲示板TOP `/board` の仕上げ
+   - 表示項目の最終確認（タイトル／カテゴリ名／投稿者表示名／投稿日／添付有無／翻訳状態など）。
+   - Home 画面上部の「お知らせ」カードを、ダミーではなく最新掲示板投稿（管理組合向けアナウンス）から取得するように変更。
+
+2. 掲示板詳細 `/board/[postId]` の機能拡張
+   - 添付ファイルアップロード＆保存（BoardPostForm 側）
+     - Supabase Storage へのアップロードと `board_attachments` メタ情報保存。
+     - BoardDetail / BoardTop / Home からのダウンロード・PDF プレビュー連携。
+   - 翻訳ボタンと音声読み上げ（TTS）
+     - 翻訳ボタン押下で翻訳キャッシュを再生成し、画面を更新。
+     - TTS ボタンで現在表示中言語の本文を読み上げ（エラー時はメッセージのみ）。
+   - お気に入りフラグ
+     - ログインユーザ単位での「お気に入り」ON/OFF トグルと、BoardTop/Home からのフィルタ表示を段階的に実装。
+
+3. RLS / セキュリティ再確認
+   - 掲示板関連テーブル（board_posts / board_comments / board_attachments / board_post_translations / board_comment_translations / tenant_settings 等）の RLS を `user_tenants` ベース＋`service_role` ポリシーの組み合わせで最終チェック。
+   - 掲示板TOP・詳細・投稿画面が一通り完成したあとに、不要な緩和や暫定措置が残っていないか確認し、必要であれば RLS ドキュメント（harmonet-RLS-policy）を更新。
+
+4. テスト・UX 調整
+   - BoardTop / BoardDetail / BoardPostForm の E2E シナリオ（投稿→翻訳→閲覧→削除まで）を洗い出し、手動テスト観点として整理。
+   - 翻訳・TTS・添付ダウンロードまわりのエラー表示・メッセージ文言（i18nキー）の微調整。
+```
+
+---
+
+今日はここまでで十分だと思います。
+明日はこの内容を TKD ローカルの進捗サマリに反映してから、
+
+* 添付ファイル対応の WS-B03 指示書
+* その後の BoardDetail 翻訳ボタン／TTS／お気に入りフラグ
+
+に進めましょう。

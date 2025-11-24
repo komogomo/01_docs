@@ -46,3 +46,5 @@ Windsurf向けのコーディング規約を作成。
 2025-11-21 21:29:53 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - ホーム画面実装完了
 2025-11-23 02:11:55 : [自動検出: 01_docs] Commit/Push - Google Transtrate API/Google Text to Speach実装完了。
 2025-11-23 02:12:25 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - Google Transtrate API/Google Text to Speach実装完了。
+2025-11-24 14:15:58 : [自動検出: 01_docs] Commit/Push - 掲示板投稿画面、AIモデレーション作成
+2025-11-24 14:16:14 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push -  掲示板投稿画面、AIモデレーション作成
