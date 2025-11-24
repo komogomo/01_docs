@@ -63,6 +63,10 @@ export type BoardPostFormState = {
   categoryTag: string | null; // 選択されたタグ
   audienceType: "GLOBAL" | "GROUP";
   audienceGroupId: string | null;          // GROUP の場合のみ有効
+  
+  // 表示名
+  if authorRole === 'admin' then displayNameMode = 'admin' // 表示名ラジオ非表示
+  if authorRole === 'user' then displayNameMode ラジオを表示（anonymous / nickname）
 
   // 本文
   title: string;
@@ -101,8 +105,15 @@ BoardPostForm 初期表示時の状態は、以下のルールで構成する。
       * `mode === 'edit'` の場合、Props (`initialData`) から既存のタイトル・本文・カテゴリ・添付ファイル等を State に展開する。
   * `tenantId` / `viewerUserId` / `viewerRole` / `viewerGroupIds` は認証コンテキストから取得し、初期化時に埋め込む。
   * `postAuthorRole`
-      * デフォルトは `"user"`（一般利用者として投稿）
-      * 管理組合ロールを持つユーザの場合のみ、UI 上のトグルで `"admin"` へ切り替え可能。
+      * 認証コンテキストから取得したロール情報
+        （例: `hasManagementRole`, `hasGeneralRole`）に基づき初期値と UI 表示を決定する。
+      * `hasManagementRole && hasGeneralRole === true` の場合:
+        * フォーム上に「管理組合として投稿する／一般利用者として投稿する」のラジオを表示する。
+        * 初期値は `"user"` とし、ユーザが `"admin"` / `"user"` のいずれかを明示的に選択できる。
+      * `hasManagementRole === true` かつ `hasGeneralRole === false` の場合:
+        * 投稿者区分 UI は表示せず、内部的に `postAuthorRole = "admin"` を固定する。
+      * `hasGeneralRole === true` かつ `hasManagementRole === false` の場合:
+        * 投稿者区分 UI は表示せず、内部的に `postAuthorRole = "user"` を固定する。
   * **displayNameMode**
       * 初期値は `null`（未選択）。バリデーションで選択を強制する。
   * `categoryTag`
@@ -143,7 +154,7 @@ BoardPostForm で扱う主なイベントと、それに対応するハンドラ
 | EVT\_INPUT\_TITLE\_CHANGE   | タイトルテキスト入力変更           | `onChangeTitle`              | `state.title` 更新 + `isDirty = true`                                  |
 | EVT\_INPUT\_CONTENT\_CHANGE | 本文入力変更                 | `onChangeContent`            | `state.content` 更新 + `isDirty = true`                                |
 | EVT\_SELECT\_CATEGORY      | 投稿区分タグ選択               | `onChangeCategory`           | `categoryTag` / `audienceType` / `audienceGroupId` 更新 + ロール制約バリデーション |
-| EVT\_TOGGLE\_AUTHOR\_ROLE   | 「管理組合として投稿」トグル切り替え     | `onToggleAuthorRole`         | `postAuthorRole` 更新 + 選択可能カテゴリ再計算                                    |
+| EVT_TOGGLE_AUTHOR_ROLE   | 投稿者区分ラジオ切り替え（※両ロール保有者のみ表示） | `onToggleAuthorRole`         | `postAuthorRole` 更新 + 選択可能カテゴリ再計算（管理組合投稿か一般投稿かに応じてフィルタ） |
 | EVT\_CHANGE\_DISPLAY\_NAME\_MODE | 投稿者表示モード選択 | `onChangeDisplayNameMode` | `displayNameMode` 更新 |
 | EVT\_TOGGLE\_CIRCULATION   | 「回覧板として扱う」チェックボックス切り替え | `onToggleCirculation`        | `isCirculation` 更新 + 回覧板用入力制約適用                                      |
 | EVT\_CHANGE\_CIRC\_GROUPS   | 回覧対象グループ選択             | `onChangeCirculationGroups`  | `circulationGroupIds` 更新                                             |
@@ -153,7 +164,7 @@ BoardPostForm で扱う主なイベントと、それに対応するハンドラ
 
 | イベント ID                | 発火トリガー                    | ハンドラ                     | 主な処理内容                                                         |
 | ---------------------- | ------------------------- | ------------------------ | -------------------------------------------------------------- |
-| EVT\_ATTACH\_FILE\_SELECT | 「ファイルを選択」ボタンでファイルを選択     | `onSelectAttachmentFile` | 拡張子・MIMEチェックを実施。許可形式なら `attachments` に追加。不許可ならエラー表示。 |
+| EVT_ATTACH_FILE_SELECT | 「ファイルを選択」ボタンでファイルを選択     | `onSelectAttachmentFile` | 拡張子・MIMEチェックを実施（PDF/Word/Excel/PPT/jpg/jpeg/png）。テナント設定上限（ファイルサイズ・件数）も確認し、許可範囲なら `attachments` に追加。不許可ならエラー表示。 |
 | EVT\_ATTACH\_FILE\_UPLOAD | ファイル選択後、自動 or 明示的アップロード開始 | `onUploadAttachmentFile` | Storage アップロード開始。`status = "uploading"` に変更。完了時に `fileUrl` 設定。 |
 | EVT\_ATTACH\_FILE\_REMOVE | 添付リスト上の×ボタン               | `onRemoveAttachment`     | 対象 `tempId` の添付要素を配列から削除。                                      |
 
@@ -202,9 +213,13 @@ Storage へのアップロード処理自体は、別コンポーネントまた
       * `isCirculation = true` かつ `categoryTag` が回覧板対象外（例: `GLOBAL_OTHER` 等）の場合はエラー。
       * `isCirculation = true` の場合、`circulationGroupIds` が空配列であれば警告扱いとし、必要に応じてエラーに昇格できるようにしておく。
 
-5.  添付
+5. 添付
 
-      * 選択ファイルの拡張子が許可リスト（PDF/Word/Excel/PPT）に含まれない場合はエラー。
+      * 選択ファイルの拡張子が許可リストに含まれない場合はエラー。
+        * ドキュメント系: PDF / Word / Excel / PowerPoint（`.pdf`, `.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx`）
+        * 画像系: `.jpg`, `.jpeg`, `.png`
+      * 新規に追加するファイルについて、ファイルサイズがテナント設定 `maxAttachmentSizeMB` を超える場合はエラー。
+      * `status !== "removed"` の添付ファイル数がテナント設定 `maxAttachmentCount` を超える場合はエラー。
       * 選択済みファイルがすべて `status = "error"` の場合は投稿前にユーザへ警告ダイアログを表示する。
 
 ### 4.4.3 エラー状態の保持と表示
@@ -230,6 +245,44 @@ export type BoardPostFormErrors = {
       * 1 つでもエラーがあれば
           * `submitError` に総括メッセージ（例: `"board.post.validation_failed"`）を設定
           * 確認ダイアログは開かない
+
+#### 4.4.4 カテゴリ候補フィルタリング
+
+BoardPostForm では、Supabase から取得したカテゴリ一覧 `allCategories` をそのまま表示せず、  
+`postAuthorRole` に応じて表示候補をフィルタリングする。
+
+擬似コード:
+
+```ts
+const ADMIN_TAGS = [
+  "GLOBAL_IMPORTANT",
+  "GLOBAL_CIRCULAR",
+  "GLOBAL_EVENT",
+  "GLOBAL_RULES",
+];
+
+const USER_TAGS = [
+  "GLOBAL_QUESTION",
+  "GLOBAL_REQUEST",
+  "GLOBAL_OTHER",
+  // 自グループ系カテゴリは audienceType="GROUP" とグループIDで表現
+];
+
+function getVisibleCategories(
+  allCategories: BoardCategory[],
+  postAuthorRole: PostAuthorRole,
+): BoardCategory[] {
+  if (postAuthorRole === "admin") {
+    return allCategories.filter((cat) => ADMIN_TAGS.includes(cat.tag));
+  }
+
+  // postAuthorRole === "user"
+  return allCategories.filter((cat) => {
+    if (USER_TAGS.includes(cat.tag)) return true;
+    if (cat.audienceType === "GROUP") return true; // 自グループ系は別途 RLS / クエリ側で制御
+    return false;
+  });
+}
 
 -----
 
