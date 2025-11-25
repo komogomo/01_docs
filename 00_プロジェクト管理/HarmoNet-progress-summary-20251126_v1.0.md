@@ -197,3 +197,19 @@
 * その後の BoardDetail 翻訳ボタン／TTS／お気に入りフラグ
 
 に進めましょう。
+
+| B-11 | 掲示板投稿    | 管理組合投稿の公開前ワークフロー設計            | 管理組合ロールによる掲示板投稿は、公開前に複数承認者によるワークフロー承認を必須とする。承認者の指定方法（人数・候補ユーザ）、承認フロー（全員承認時に公開／否認時の扱い）、投稿ステータス遷移（draft/pending_approval/published/rejected）と管理画面UIを設計する。 | TKD  | 中     | 未着手     | 2025-11-25  |       | 掲示板の基本機能・運用が安定してから詳細設計・実装。承認履歴テーブル追加も想定。 |
+
+
+# HarmoNet 掲示板まわり 進捗管理表（2025-11-26）
+
+## 本日の実績
+
+| No | 区分           | タスクID / ドキュメント                     | 内容概要                                               | 状態       | 備考 |
+|----|----------------|----------------------------------------------|--------------------------------------------------------|------------|------|
+| 1  | 実装・API      | WS-B02_BoardComments_ReplyAndDelete_v1.0    | コメント投稿API・コメント削除API・投稿削除API（親）の実装とUI統合。返信ボタン・削除モーダル、翻訳対応、BoardTopへの返信数表示。 | 完了       |      |
+| 2  | 実装・機能     | WS-B02 BoardDetail Favorites                 | BoardDetailのお気に入り★トグルと、BoardTopの「☆お気に入り」フィルタタブ実装。`board_favorites` テーブル連携。 | 完了       |      |
+| 3  | 実装・通知     | WS-N01 BoardNotification                      | ベル通知・HOMEバナー・HOMEお知らせ一覧・既読管理（`user_tenants.board_last_seen_at`）・メール通知ロジック（ログベース）の実装。 | 動作確認中 | 通知ベル挙動・既読更新ロジックは概ね確認済／メール実送信は未実装（通知機能全体の優先度は中〜低） |
+| 4  | 実装・TTS      | WS-B02 BoardDetail TTS                        | BoardDetailの本文読上げボタンと `/api/board/tts` 実装。Google Cloud TTS連携、読上げ状態管理、添付ボタンの枠線スタイル統一。 | 完了       |      |
+| 5  | 実装・添付     | WS-B03 BoardPostForm 添付機能                | BoardPostFormの添付（PDF/Office/画像 最大5件）・Storage連携・BoardDetailでのプレビュー／ダウンロード・匿名表示・翻訳キャッシュ修正。 | 完了       |      |
+| 6  | 実装・RLS強化  | WS-B99_BoardApiTenantGuard_v1.0              | board API（コメント作成／削除・投稿削除）のテナントガード強化。`user_tenants` から取得した `tenantIds` での絞り込みとGuardテスト追加。 | 完了       | 既存テストにRED残あり（本タスク範囲外） |
