@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HarmoNet - Society 5.0 社会実装トライアル支援事業 申請資料</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+      background: #1a202c;
+      overflow: hidden;
+    }
+    
+    .slides {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      background: #ffffff;
+    }
+    
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Slide 1: Cover */
+    .slide-1 {
+      background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #0d9488 100%);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    
+    .slide-1::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: #d69e2e;
+    }
+    
+    .slide-1 .logo-placeholder {
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.1);
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    
+    .slide-1 .logo-placeholder span {
+      font-size: 48px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .slide-1 h1 {
+      font-size: 64px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    
+    .slide-1 .subtitle {
+      font-size: 24px;
+      color: #d69e2e;
+      margin-bottom: 48px;
+    }
+    
+    .slide-1 .tagline {
+      display: inline-block;
+      padding: 12px 32px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 100px;
+      color: #ffffff;
+      font-size: 18px;
+    }
+    
+    .slide-1 .footer {
+      position: absolute;
+      bottom: 24px;
+      left: 40px;
+      right: 40px;
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+    
+    /* Common slide layout */
+    .slide-content {
+      flex: 1;
+      padding: 40px 60px;
+      position: relative;
+    }
+    
+    .slide-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background: linear-gradient(180deg, #1a365d 0%, #0d9488 100%);
+    }
+    
+    .slide-title {
+      display: inline-block;
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a365d;
+      margin-bottom: 8px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid #d69e2e;
+      margin-left: 20px;
+    }
+    
+    .slide-body {
+      margin-left: 20px;
+      margin-top: 24px;
+    }
+    
+    .page-number {
+      position: absolute;
+      bottom: 24px;
+      right: 32px;
+      color: #a0aec0;
+      font-size: 14px;
+    }
+    
+    /* Slide 2: Why */
+    .quote-box {
+      background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+      padding: 20px 32px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+    }
+    
+    .quote-box p {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 500;
+    }
+    
+    .points-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .point-card {
+      background: #f7fafc;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border-left: 5px solid;
+    }
+    
+    .point-card.teal { border-color: #0d9488; }
+    .point-card.gold { border-color: #d69e2e; }
+    .point-card.red { border-color: #e53e3e; }
+    .point-card.purple { border-color: #805ad5; }
+    .point-card.teal-bg {
+      background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+      border: none;
+    }
+    .point-card.navy-bg {
+      background: #1a365d;
+      border: none;
+    }
+    
+    .point-card .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    
+    .point-card.teal .label { color: #0d9488; }
+    .point-card.gold .label { color: #d69e2e; }
+    .point-card.red .label { color: #e53e3e; }
+    .point-card.purple .label { color: #805ad5; }
+    .point-card.teal-bg .label { color: rgba(255,255,255,0.8); }
+    .point-card.navy-bg .label { color: #d69e2e; }
+    
+    .point-card .text {
+      font-size: 14px;
+      color: #1a202c;
+      line-height: 1.5;
+    }
+    
+    .point-card.teal-bg .text,
+    .point-card.navy-bg .text {
+      color: #ffffff;
+    }
+    
+    /* Slide 3: Problems */
+    .problems-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .problem-card {
+      padding: 24px;
+      border-radius: 16px;
+      border: 2px solid;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .problem-card.red {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+    .problem-card.yellow {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+    .problem-card.green {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+    
+    .problem-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .problem-card.red .problem-number { background: #e53e3e; }
+    .problem-card.yellow .problem-number { background: #d69e2e; }
+    .problem-card.green .problem-number { background: #16a34a; }
+    
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .problem-card.red h3 { color: #e53e3e; }
+    .problem-card.yellow h3 { color: #b7791f; }
+    .problem-card.green h3 { color: #16a34a; }
+    
+    .problem-card .desc {
+      font-size: 14px;
+      color: #1a202c;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    
+    .problem-card .examples {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #718096;
+      margin-top: auto;
+    }
+    
+    .bottom-message {
+      background: linear-gradient(90deg, #1a365d 0%, #2c5282 100%);
+      padding: 20px 28px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .bottom-message .bar {
+      width: 5px;
+      height: 40px;
+      background: #d69e2e;
+      border-radius: 3px;
+    }
+    
+    .bottom-message p {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    /* Slide 4: What is HarmoNet */
+    .slide-4-content {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 32px;
+      height: 100%;
+    }
+    
+    .tagline-box {
+      background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+      padding: 16px 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .tagline-box p {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #f7fafc;
+      padding: 14px 18px;
+      border-radius: 10px;
+    }
+    
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: #1a365d;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    .feature-text {
+      flex: 1;
+    }
+    
+    .feature-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a365d;
+      margin-bottom: 2px;
+    }
+    
+    .feature-text p {
+      font-size: 12px;
+      color: #718096;
+    }
+    
+    .feature-badge {
+      background: #dcfce7;
+      color: #16a34a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    
+    .tags-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    
+    .tag {
+      background: #e2e8f0;
+      color: #4a5568;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    
+    .screenshot-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .screenshot-label {
+      color: #718096;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    
+    .phone-mockup {
+      background: #f7fafc;
+      border: 3px dashed #cbd5e0;
+      border-radius: 24px;
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    
+    .phone-frame {
+      width: 200px;
+      height: 360px;
+      background: #1a365d;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    }
+    
+    .phone-frame .placeholder-text {
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+    }
+    
+    .phone-frame .placeholder-sub {
+      color: #d69e2e;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+    
+    /* Slide 5: Technology */
+    .slide-5-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a365d;
+      margin-bottom: 16px;
+    }
+    
+    .tech-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .tech-card {
+      padding: 14px 18px;
+      border-radius: 10px;
+      border-left: 5px solid;
+    }
+    
+    .tech-card.green {
+      background: #f0fdf4;
+      border-color: #16a34a;
+    }
+    .tech-card.blue {
+      background: #eff6ff;
+      border-color: #3b82f6;
+    }
+    .tech-card.purple {
+      background: #faf5ff;
+      border-color: #8b5cf6;
+    }
+    .tech-card.orange {
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+    
+    .tech-card .label {
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .tech-card.green .label { color: #16a34a; }
+    .tech-card.blue .label { color: #3b82f6; }
+    .tech-card.purple .label { color: #8b5cf6; }
+    .tech-card.orange .label { color: #d97706; }
+    
+    .tech-card h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a202c;
+      margin-bottom: 2px;
+    }
+    
+    .tech-card p {
+      font-size: 11px;
+      color: #718096;
+    }
+    
+    .ai-driven-box {
+      background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+      padding: 18px 22px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .ai-driven-box .label {
+      color: #d69e2e;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    
+    .ai-driven-box p {
+      color: #ffffff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .profile-box {
+      background: #f7fafc;
+      padding: 18px 22px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+    }
+    
+    .profile-box .label {
+      color: #0d9488;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    
+    .profile-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    
+    .profile-avatar {
+      width: 48px;
+      height: 48px;
+      background: #1a365d;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    
+    .profile-info h4 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 4px;
+    }
+    
+    .profile-info p {
+      font-size: 13px;
+      color: #718096;
+      line-height: 1.4;
+    }
+    
+    .skill-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    
+    .skill-tag {
+      background: #e2e8f0;
+      color: #4a5568;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    
+    .quality-box {
+      background: #0d9488;
+      padding: 14px 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .quality-box p {
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    /* Slide 6: Roadmap */
+    .timeline-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .phase-card {
+      padding: 20px;
+      border-radius: 12px;
+    }
+    
+    .phase-card.navy {
+      background: #1a365d;
+    }
+    .phase-card.teal {
+      background: #0d9488;
+    }
+    .phase-card.light {
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+    }
+    
+    .phase-card .phase-label {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    
+    .phase-card.navy .phase-label { color: #d69e2e; }
+    .phase-card.teal .phase-label { color: #fef3c7; }
+    .phase-card.light .phase-label { color: #718096; }
+    
+    .phase-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .phase-card.navy h3,
+    .phase-card.teal h3 { color: #ffffff; }
+    .phase-card.light h3 { color: #1a202c; }
+    
+    .phase-card .desc {
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    
+    .phase-card.navy .desc { color: rgba(255,255,255,0.8); }
+    .phase-card.teal .desc { color: rgba(255,255,255,0.8); }
+    .phase-card.light .desc { color: #4a5568; }
+    
+    .phase-card .note {
+      font-size: 11px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .phase-card.navy .note { color: rgba(255,255,255,0.5); }
+    .phase-card.teal .note { color: rgba(255,255,255,0.5); }
+    .phase-card.light .note {
+      color: #a0aec0;
+      border-color: #e2e8f0;
+    }
+    
+    .target-box {
+      background: #f7fafc;
+      padding: 18px 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .target-box h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a365d;
+      margin-bottom: 14px;
+    }
+    
+    .target-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    
+    .target-item h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a202c;
+      margin-bottom: 4px;
+    }
+    
+    .target-item p {
+      font-size: 12px;
+      color: #718096;
+    }
+    
+    .cta-box {
+      background: linear-gradient(90deg, #1a365d 0%, #2c5282 50%, #0d9488 100%);
+      padding: 20px 28px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .cta-text h4 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    
+    .cta-text p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .cta-button {
+      background: #d69e2e;
+      padding: 12px 24px;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    
+    /* Navigation */
+    .nav-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      z-index: 100;
+      opacity: 0.8;
+    }
+    
+    .nav-hint kbd {
+      background: rgba(255,255,255,0.2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="slides">
+    
+    <!-- Slide 1: Cover -->
+    <div class="slide slide-1 active">
+      <div class="logo-placeholder">
+        <span>H</span>
+      </div>
+      <h1>HarmoNet</h1>
+      <p class="subtitle">多文化共生型 地域コミュニティ DX プラットフォーム</p>
+      <p class="tagline">〜 生成 AI が実現する「言葉の壁を超えた」暮らし 〜</p>
+      <div class="footer">
+        <span>令和8年度 つくば市スタートアップ支援申請 / Society 5.0 社会実装トライアル</span>
+        <span>申請者： TKD / 2025年11月</span>
+      </div>
+    </div>
+    
+    <!-- Slide 2: Why -->
+    <div class="slide slide-2">
+      <div class="slide-content">
+        <h2 class="slide-title">なぜ HarmoNet を作るのか</h2>
+        <div class="slide-body">
+          <div class="quote-box">
+            <p>「国籍・人種・性別に関係なく、誰もが安心して暮らせる街をつくりたい」</p>
+          </div>
+          <div class="points-grid">
+            <div class="point-card teal">
+              <p class="label">背景</p>
+              <p class="text">つくば市は外国人研究者が多く、大規模住宅街や集合住宅に多くの外国人居住者が暮らしている</p>
+            </div>
+            <div class="point-card purple">
+              <p class="label">技術の進化</p>
+              <p class="text">2025年、生成AIの性能が飛躍的に向上。1人でもAI支援でSaaS開発が可能に</p>
+            </div>
+            <div class="point-card gold">
+              <p class="label">課題認識</p>
+              <p class="text">管理組合では言語的なコミュニケーション困難が発生。ゴミ出し・防災ルールが伝わらない</p>
+            </div>
+            <div class="point-card teal-bg">
+              <p class="label">つくば市への想い</p>
+              <p class="text">自然と研究学園都市という構想が大変気に入っている。この街をより快適に便利に</p>
+            </div>
+            <div class="point-card red">
+              <p class="label">アナログの限界</p>
+              <p class="text">2026年が近いのに、回覧板は未だに手運用。スマホで完結できないか？</p>
+            </div>
+            <div class="point-card navy-bg">
+              <p class="label">だから</p>
+              <p class="text">HarmoNet で「言葉の壁」を技術で解決し、多文化共生を実現する</p>
+            </div>
+          </div>
+        </div>
+        <span class="page-number">2 / 6</span>
+      </div>
+    </div>
+    
+    <!-- Slide 3: Problems -->
+    <div class="slide slide-3">
+      <div class="slide-content">
+        <h2 class="slide-title">解決したい課題</h2>
+        <div class="slide-body">
+          <div class="problems-row">
+            <div class="problem-card red">
+              <div class="problem-number">1</div>
+              <h3>言語の壁</h3>
+              <p class="desc">外国人居住者に日本語の回覧板・掲示物が伝わらない</p>
+              <div class="examples">ゴミ出しルールの誤解 / 防災訓練の不参加 / 共用施設トラブル</div>
+            </div>
+            <div class="problem-card yellow">
+              <div class="problem-number">2</div>
+              <h3>アナログ運用</h3>
+              <p class="desc">回覧板は紙でポスト投函。回らない・届かない・遅い</p>
+              <div class="examples">現役世代は情報取得困難 / 配布に1週間以上 / 既読確認不可</div>
+            </div>
+            <div class="problem-card green">
+              <div class="problem-number">3</div>
+              <h3>役員負担</h3>
+              <p class="desc">管理組合役員の業務負担が限界。なり手不足が深刻化</p>
+              <div class="examples">回覧板の印刷配布 / 施設予約の手作業 / 多言語対応の困難</div>
+            </div>
+          </div>
+          <div class="bottom-message">
+            <div class="bar"></div>
+            <p>これらの課題を <strong>テクノロジー</strong> で解決し、<strong>多文化共生</strong> の地域コミュニティを実現する</p>
+          </div>
+        </div>
+        <span class="page-number">3 / 6</span>
+      </div>
+    </div>
+    
+    <!-- Slide 4: What is HarmoNet -->
+    <div class="slide slide-4">
+      <div class="slide-content">
+        <h2 class="slide-title">HarmoNet とは</h2>
+        <div class="slide-body slide-4-content">
+          <div>
+            <div class="tagline-box">
+              <p>多言語対応の「デジタル回覧板」で地域コミュニティをDX</p>
+            </div>
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-text">
+                  <h4>3言語リアルタイム翻訳</h4>
+                  <p>日本語・英語・中国語の自動翻訳</p>
+                </div>
+                <span class="feature-badge">実装済</span>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">🔊</div>
+                <div class="feature-text">
+                  <h4>3言語音声読み上げ</h4>
+                  <p>高齢者・視覚障害者にも情報を届ける</p>
+                </div>
+                <span class="feature-badge">実装済</span>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">🛡️</div>
+                <div class="feature-text">
+                  <h4>AIモデレーション</h4>
+                  <p>不適切投稿を自動検出・フィルタリング</p>
+                </div>
+                <span class="feature-badge">実装済</span>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <div class="feature-text">
+                  <h4>マジックリンク認証</h4>
+                  <p>パスワード不要。メールリンクをタップするだけ</p>
+                </div>
+                <span class="feature-badge">実装済</span>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">🏢</div>
+                <div class="feature-text">
+                  <h4>マルチテナント対応</h4>
+                  <p>複数の管理組合・自治会を1システムで運用</p>
+                </div>
+                <span class="feature-badge">実装済</span>
+              </div>
+            </div>
+            <div class="tags-row">
+              <span class="tag">掲示板</span>
+              <span class="tag">施設予約</span>
+              <span class="tag">お知らせ通知</span>
+              <span class="tag">PDF添付</span>
+            </div>
+          </div>
+          <div class="screenshot-area">
+            <p class="screenshot-label">実際の画面イメージ</p>
+            <div class="phone-mockup">
+              <div class="phone-frame">
+                <p class="placeholder-text">スクリーンショット</p>
+                <p class="placeholder-sub">後から差し替え</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="page-number">4 / 6</span>
+      </div>
+    </div>
+    
+    <!-- Slide 5: Technology -->
+    <div class="slide slide-5">
+      <div class="slide-content">
+        <h2 class="slide-title">技術と開発体制</h2>
+        <div class="slide-body slide-5-content">
+          <div>
+            <h3 class="section-title">技術スタック</h3>
+            <div class="tech-stack">
+              <div class="tech-card green">
+                <p class="label">フロントエンド</p>
+                <h4>Next.js 16 + React 19</h4>
+                <p>最新App Router / Server Components</p>
+              </div>
+              <div class="tech-card blue">
+                <p class="label">バックエンド</p>
+                <h4>Supabase (PostgreSQL + Auth)</h4>
+                <p>RLS（Row Level Security）でテナント分離</p>
+              </div>
+              <div class="tech-card purple">
+                <p class="label">AI連携</p>
+                <h4>Google Cloud + OpenAI API</h4>
+                <p>翻訳・TTS・AIモデレーション</p>
+              </div>
+              <div class="tech-card orange">
+                <p class="label">インフラ</p>
+                <h4>Vercel (Serverless)</h4>
+                <p>ハードウェア保守不要・自動スケール</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 class="section-title">開発体制</h3>
+            <div class="ai-driven-box">
+              <p class="label">AI駆動開発</p>
+              <p>生成AI（Claude / GPT-4.5 Class）との協働で、1人でも商用SaaSレベルの品質を実現</p>
+            </div>
+            <div class="profile-box">
+              <p class="label">開発者プロフィール</p>
+              <div class="profile-row">
+                <div class="profile-avatar">T</div>
+                <div class="profile-info">
+                  <h4>TKD</h4>
+                  <p>ITエンジニア / システムアーキテクト<br>26年間のシステム開発経験</p>
+                </div>
+              </div>
+              <div class="skill-tags">
+                <span class="skill-tag">基盤設計</span>
+                <span class="skill-tag">ネットワーク</span>
+                <span class="skill-tag">セキュリティ</span>
+                <span class="skill-tag">アプリ開発</span>
+                <span class="skill-tag">クラウド</span>
+              </div>
+            </div>
+            <div class="quality-box">
+              <p>個人開発でも <strong>企業レベルの品質</strong> を生成AIで担保</p>
+            </div>
+          </div>
+        </div>
+        <span class="page-number">5 / 6</span>
+      </div>
+    </div>
+    
+    <!-- Slide 6: Roadmap -->
+    <div class="slide slide-6">
+      <div class="slide-content">
+        <h2 class="slide-title">実証計画と展開</h2>
+        <div class="slide-body">
+          <div class="timeline-row">
+            <div class="phase-card navy">
+              <p class="phase-label">PHASE 1 | 2025.12 - 2026.03</p>
+              <h3>実証実験</h3>
+              <p class="desc">セキュレアシティ研究学園（約171戸）で住民利用検証</p>
+              <p class="note">12月：管理組合座談会でデモ</p>
+            </div>
+            <div class="phase-card teal">
+              <p class="phase-label">PHASE 2 | 2026.04 -</p>
+              <h3>TX沿線展開</h3>
+              <p class="desc">大規模住宅街・集合住宅へマルチテナント機能で横展開</p>
+              <p class="note">需要に応じて法人化検討</p>
+            </div>
+            <div class="phase-card light">
+              <p class="phase-label">PHASE 3 | 将来展望</p>
+              <h3>BtoB展開</h3>
+              <p class="desc">大手ハウスメーカー・マンションデベロッパー向け</p>
+              <p class="note">OEM提供・パートナー連携</p>
+            </div>
+          </div>
+          <div class="target-box">
+            <h4>ターゲット市場</h4>
+            <div class="target-grid">
+              <div class="target-item">
+                <h5>📍 TX沿線エリア</h5>
+                <p>つくば〜秋葉原の大規模開発地域</p>
+              </div>
+              <div class="target-item">
+                <h5>🏘️ 大規模住宅街</h5>
+                <p>100戸以上の分譲住宅地</p>
+              </div>
+              <div class="target-item">
+                <h5>🏢 大規模集合住宅</h5>
+                <p>タワーマンション・大規模マンション</p>
+              </div>
+              <div class="target-item">
+                <h5>🏗️ BtoB</h5>
+                <p>ハウスメーカー・デベロッパー</p>
+              </div>
+            </div>
+          </div>
+          <div class="cta-box">
+            <div class="cta-text">
+              <h4>Society 5.0 社会実装トライアル支援事業への申請</h4>
+              <p>つくば市の多文化共生 × 地域DXの実証モデルを創出</p>
+            </div>
+            <div class="cta-button">ご支援をお願いいたします</div>
+          </div>
+        </div>
+        <span class="page-number">6 / 6</span>
+      </div>
+    </div>
+    
+  </div>
+  
+  <div class="nav-hint">
+    <kbd>←</kbd> 前へ / 次へ <kbd>→</kbd> ・ <kbd>Space</kbd> 次へ
+  </div>
+  
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+    
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+      });
+    }
+    
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
+    
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      showSlide(currentSlide);
+    }
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      }
+    });
+    
+    // Touch/click navigation
+    document.addEventListener('click', (e) => {
+      const x = e.clientX;
+      if (x > window.innerWidth / 2) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    });
+    
+    // Hide nav hint after first interaction
+    let hintHidden = false;
+    document.addEventListener('keydown', () => {
+      if (!hintHidden) {
+        document.querySelector('.nav-hint').style.opacity = '0';
+        hintHidden = true;
+      }
+    });
+  </script>
+</body>
+</html>
