@@ -55,3 +55,5 @@ Windsurf向けのコーディング規約を作成。
 2025-11-26 22:43:28 : [自動検出: 01_docs] Commit/Push - 色々と修正。DBデータ削除漏れを改修、掲示板改修
 2025-11-26 22:43:54 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - 色々と修正。DBデータ削除漏れを改修、掲示板改修
 2025-11-28 03:30:07 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - 管理画面作成
+2025-11-28 03:30:46 : [自動検出: 01_docs] Commit/Push - 管理画面作成
+2025-11-30 12:07:16 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - 作業前BK
