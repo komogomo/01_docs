@@ -1,23 +1,31 @@
-# SA-01 システム管理者向けテナント管理・テナント管理者管理 詳細設計書 v1.1
+# SA-01 システム管理者向けテナント管理・テナント管理者管理 詳細設計書 v1.2
 
-* Document ID: SA-01-SysAdmin-Tenant-Management-Detail-Design
-* Version: 1.1
-* Author: Tachikoma
-* Reviewer: TKD
-* Status: Draft
-* Related Docs:
+**Document ID:** SA-01-SysAdmin-Tenant-Management-Detail-Design
+**Version:** 1.2
+**Supersedes:** v1.1
+**Author:** Tachikoma
+**Reviewer:** TKD
+**Status:** Draft（要 TKD 確認）
+**Related Docs:**
 
-  * HarmoNet 詳細設計書アジェンダ標準 v1.0
-  * システム管理者向けテナント管理・テナント管理者管理 基本設計書 v1.1
-  * schema.prisma.20251128-1124
+* HarmoNet 詳細設計書アジェンダ標準 v1.0
+* SysAdmin テナント管理・テナント管理者管理 基本設計書 v1.1
+* テナント管理者用ユーザ登録画面 詳細設計書 ch01 v1.0（/t-admin/users）
+* schema.prisma.20251128-1124（最新版）
 
 ---
 
 ## 第1章 概要
 
-### 1.1 対象コンポーネント・画面
+### 1.1 対象画面・コンポーネント
 
-本書は、システム管理者（system_admin）専用の以下画面群の詳細設計を定義する。
+本書は、**システム管理者専用の 1 画面構成**によるテナント管理コンソールの詳細設計を定義する。
+
+* 画面 ID: **SA-01 SysAdmin Tenant Management Console**
+* 画面パス: `/sys-admin/tenants`（1 画面のみ）
+* 対象ロール: `system_admin` のみ
+
+本 v1.2 では、v1.1 で定義していた以下の 5 画面構成を廃止し、**1 画面内のセクション切替**に統合する。
 
 * SA-01: テナント一覧画面 `/sys-admin/tenants`
 * SA-02: テナント詳細・編集画面 `/sys-admin/tenants/{tenantId}`
@@ -25,285 +33,210 @@
 * SA-04: テナント管理者新規登録画面 `/sys-admin/tenants/{tenantId}/admins/new`
 * SA-05: テナント管理者編集画面 `/sys-admin/tenants/{tenantId}/admins/{userId}`
 
+これらはすべて **SA-01 画面内のセクションとして統合**し、画面遷移を発生させない。
+
 ### 1.2 目的
 
-* テナント単位のライフサイクル管理（作成・論理削除・再有効化）を system_admin のみが実行できるようにする。
-* 各テナントに対して、最低 1 名以上のテナント管理者（tenant_admin ロールを持つ users）を system_admin が登録・更新・管理者ロール解除できるようにする。
-* 既存 t-admin（テナント管理画面）のユーザ管理ロジック（users / roles / user_roles）との整合を保つ。
+* **1 画面で完結するテナント管理 UI** を提供する。
+* system_admin が、以下の操作を 1 画面上で行えるようにする。
+
+  * テナント一覧の参照
+  * テナントの新規登録 / 編集 / 無効化 / 再有効化
+  * 各テナントに紐づくテナント管理者ユーザの一覧表示
+  * テナント管理者ユーザの新規登録 / 編集 / 管理者ロール付与・解除
+* 既存 `t-admin`（テナント管理者用ユーザ管理 `/t-admin/users`）の仕様と整合しつつ、**「物件全体のライフサイクル管理」専用のコンソール**として位置づける。
 
 ### 1.3 前提・制約
 
-* 認証は既存の MagicLink 認証フローを利用し、Supabase Auth の `auth.users` と連携する。
+* 認証は既存 MagicLink フロー（Supabase Auth）を利用する。
+* SysAdmin ログイン入口は `/sys-admin/login` とし、通常ログイン `/login` とは分離する（別仕様書参照）。
+* `/sys-admin/*` にアクセスできるのは `system_admin` ロールを持つユーザのみとする。
+* DB スキーマは `schema.prisma.20251128-1124` を正とし、本機能で直接利用するテーブルは以下とする。
 
-* ログイン入口は以下の 2 系統に分離する。
-
-  * 一般利用者・テナント管理者向け: `/login`
-  * システム管理者向け: `/sys-admin/login`
-
-* `/login` からのログインセッションでは `/sys-admin/*` にアクセスできない（リンクもメニューも表示しない）。
-
-* `/sys-admin/login` からのログインセッションでは、MagicLink 認証成功後に `/sys-admin/tenants`（SA-01）へ遷移し、本書で定義する `/sys-admin/*` 画面のみを利用する。
-
-* 権限管理は `roles` / `user_roles` で行う。
-
-* 権限管理は `roles` / `user_roles` で行う。
-
-  ```prisma
-  enum role_scope {
-    system_admin
-    tenant_admin
-    general_user
-  }
-
-  model roles {
-    id       String   @id @default(uuid())
-    role_key String   @unique
-    name     String
-    scope    role_scope
-  }
-
-  model user_roles {
-    user_id   String
-    tenant_id String
-    role_id   String
-    assigned_at DateTime @default(now())
-
-    user   users   @relation(fields: [user_id], references: [id])
-    tenant tenants @relation(fields: [tenant_id], references: [id])
-    role   roles   @relation(fields: [role_id], references: [id])
-
-    @@unique([user_id, tenant_id, role_id])
-  }
-  ```
-
-  * system_admin 権限:
-
-    * `roles.scope = system_admin`
-    * `roles.role_key = 'SYSTEM_ADMIN'`（キー名は schema.prisma に合わせる）
-  * tenant_admin 権限:
-
-    * `roles.scope = tenant_admin` の role を持つ。
-
-* system_admin ユーザは、システム管理専用のダミーテナント（例: `tenant_code = 'SYSTEM'`）に所属させる。
-
-  * `user_roles.tenant_id` にはこのダミーテナントの `tenants.id` を設定する。
-  * system_admin 権限の判定では tenant_id を参照せず、`roles.scope` / `roles.role_key` のみを用いる。
-
-* DB スキーマは `schema.prisma.20251128-1124` を正とする。
-
-  * 本機能で直接参照するテーブルは `tenants` / `users` / `roles` / `user_roles`。
-  * `user_tenants` は掲示板既読管理等で利用されるが、本機能では参照・更新を行わない（テナント所属は `users.tenant_id` を正とする）。
-
-* ユーザとテナントの関係は「1ユーザ = 1テナント」とする。
-
-  * `users.tenant_id` は必須かつ 1 つのテナントを指す。
-  * 別テナントに所属している users を本機能から管理者として追加することはできない。
-
-* テナントの削除は status による論理削除とする（`tenants.status = inactive`）。物理削除は行わない。
-
-* テナント管理者ユーザの「有効／無効」状態フラグは設けず、「管理者である／ない」は tenant_admin ロールの有無（該当 `user_roles` レコードの存在）で表現する。
-
-  * 管理者から外す操作 = tenant_admin ロールの削除（`user_roles` DELETE）。
-  * users レコード自体は削除しない。
-
-### 1.4 対象外
-
-* 一般ユーザ（general_user）の登録・編集・削除。
-* 掲示板・翻訳・ショートカット等のテナント設定。
-* system_admin 自身のユーザ情報編集 UI。
+  * `tenants`
+  * `users`
+  * `roles`
+  * `user_roles`
+* ユーザとテナントの関係は **1ユーザ=1テナント**（`users.tenant_id`）とし、system_admin は専用のダミーテナントを持つ。
+* **画面は 1 ページ構成**とし、モーダル・サイドパネル・フォーム表示切替で状態を切り替える。別ページへの遷移は行わない。
 
 ---
 
-## 第2章 画面要件・UI仕様
+## 第2章 画面仕様（1 画面 3 セクション構成）
 
-### 2.1 テナント一覧画面（SA-01）
+### 2.1 レイアウト概要
 
-#### 2.1.1 表示要素
+画面 `/sys-admin/tenants` は、以下の 3 セクションで構成する。
 
-* 画面タイトル: 「テナント一覧」
-* ボタン:
+1. **SEC-01: テナント一覧パネル（左側）**
 
-  * 「新規テナント作成」（右上配置）
-* テナント一覧テーブル:
+   * 全テナントの一覧テーブル
+   * 新規テナント作成ボタン
+2. **SEC-02: テナント詳細フォーム（右上）**
 
-  * 列（論理名称）
+   * 選択中テナントの基本情報編集
+   * 状態変更（有効/無効）
+3. **SEC-03: テナント管理者管理パネル（右下）**
+
+   * 選択中テナントに紐づく管理者ユーザ一覧
+   * 管理者ユーザの新規登録フォーム
+   * 既存管理者の編集 / ロール解除
+
+画面レイアウト（イメージ）:
+
+```text
+┌─────────────────────────────────────────────┐
+│ [共通ヘッダー AppHeader]                                            │
+├─────────────────────────────────────────────┤
+│ 左: SEC-01 テナント一覧       │ 右上: SEC-02 テナント詳細フォーム         │
+│                               │ 右下: SEC-03 管理者一覧＋登録フォーム      │
+├─────────────────────────────────────────────┤
+│ [共通フッター AppFooter]                                            │
+└─────────────────────────────────────────────┘
+```
+
+### 2.2 SEC-01 テナント一覧パネル
+
+#### 2.2.1 表示要素
+
+* セクションタイトル: 「テナント一覧」
+* ボタン: 「新規テナント作成」
+
+  * クリックで SEC-02 のフォームを「新規モード」に切り替え
+* テナント一覧テーブル（スクロール可）
+
+  * 列（論理名）
 
     * テナントコード
     * テナント名
     * タイムゾーン
-    * 状態（有効／無効）※ `tenants.status`
+    * 状態（有効 / 無効）
     * 作成日時
 
-#### 2.1.2 操作仕様
+#### 2.2.2 操作仕様
 
-* 行クリック（テナントコード or テナント名）
+* 行クリック: 対象テナントを選択し、SEC-02/SEC-03 に詳細情報を読み込む。
+* 新規テナント作成ボタン:
 
-  * 対象テナントの SA-02 へ遷移。
-* 「新規テナント作成」ボタン
+  * SEC-02 を新規モードに切り替え（全項目空欄・状態=有効）
+  * SEC-03 は「管理者なし」として空表示
 
-  * SA-02 を新規モードで表示。
-
-#### 2.1.3 メッセージ仕様
-
-* データなし:
-
-  * 「テナントが登録されていません。」
-* 取得失敗:
-
-  * 「テナント一覧の取得に失敗しました。時間をおいて再度お試しください。」
-
----
-
-### 2.2 テナント詳細・編集画面（SA-02）
-
-#### 2.2.1 表示要素
-
-* 画面タイトル: 「テナント詳細」
-* モード:
-
-  * 新規: 「テナント新規登録」
-  * 更新: 「テナント詳細」＋テナントコード表示
-* 入力項目（論理名称）
-
-  * テナントコード（新規時のみ編集可）
-  * テナント名
-  * タイムゾーン
-  * 状態（有効／無効）
-* ボタン:
-
-  * 「保存」
-  * 状態が有効のとき: 「無効化」
-  * 状態が無効のとき: 「再有効化」
-  * 「管理者一覧へ」
-  * 「一覧に戻る」
-
-#### 2.2.2 バリデーション
-
-* テナントコード
-
-  * 必須
-  * 英数字＋`-` `_` のみ
-  * 最大 32 文字
-  * システム全体でユニーク
-* テナント名
-
-  * 必須
-  * 最大 80 文字
-* タイムゾーン
-
-  * 必須
-  * IANA TZ から選択（例: Asia/Tokyo）
-* 状態
-
-  * 「有効」「無効」の 2 値のみ
-
-#### 2.2.3 メッセージ仕様
-
-* 保存成功:
-
-  * 「テナント情報を保存しました。」
-* 無効化成功:
-
-  * 「テナントを無効化しました。このテナントの利用者はログインできなくなります。」
-* 再有効化成功:
-
-  * 「テナントを再有効化しました。」
-
----
-
-### 2.3 テナント管理者一覧画面（SA-03）
+### 2.3 SEC-02 テナント詳細フォーム
 
 #### 2.3.1 表示要素
 
-* 画面タイトル: 「テナント管理者一覧」
-* サブタイトル: 「テナント：{テナント名}」
-* ボタン:
+* セクションタイトル:
 
-  * 「新規管理者登録」（右上）
-  * 「テナント詳細へ戻る」
-* テーブル列（論理名称）
+  * 新規モード: 「テナント新規登録」
+  * 編集モード: 「テナント詳細: {テナントコード}」
+* 入力項目
+
+  * テナントコード（新規時のみ編集可）
+  * テナント名
+  * タイムゾーン（IANA TZ のプルダウン）
+  * 状態（有効 / 無効 のラジオ or トグル。更新時のみ編集可）
+* ボタン
+
+  * 「保存」
+  * 「無効化」 / 「再有効化」（状態に応じてどちらか 1 つ）
+
+#### 2.3.2 バリデーション
+
+* テナントコード
+
+  * 必須、英数字 + `-` `_` のみ、最大 32 文字、システム全体で一意
+* テナント名
+
+  * 必須、最大 80 文字
+* タイムゾーン
+
+  * 必須、IANA TZ から選択
+
+#### 2.3.3 メッセージ
+
+* 保存成功: 「テナント情報を保存しました。」
+* 無効化成功: 「テナントを無効化しました。このテナントの利用者はログインできなくなります。」
+* 再有効化成功: 「テナントを再有効化しました。」
+
+### 2.4 SEC-03 テナント管理者管理パネル
+
+#### 2.4.1 表示要素
+
+* セクションタイトル: 「テナント管理者」
+* サブタイトル: 「テナント: {テナント名}」
+* 管理者一覧テーブル
+
+  * 列
+
+    * メールアドレス
+    * 表示名（ニックネーム）
+    * 氏名
+    * 最終ログイン（任意、取得できる場合のみ）
+    * 操作（編集 / 管理者解除）
+* 管理者登録フォーム
 
   * メールアドレス
   * 表示名
-  * 最終ログイン（任意）
+  * 氏名
+* ボタン
 
-※ 「状態」列は持たず、tenant_admin ロールを持つユーザのみを一覧表示する。
+  * 「管理者ユーザ登録」
 
-#### 2.3.2 メッセージ仕様
+#### 2.4.2 操作仕様
 
-* データなし
+* 管理者一覧行の「編集」
 
-  * 「このテナントの管理者ユーザは登録されていません。」
-* 管理者ロール解除成功
+  * 下部フォームに選択ユーザの表示名 / 氏名を読み込み、編集モードにする。
+  * 「管理者ユーザ更新」ボタンで `users` を更新。
+* 管理者一覧行の「管理者解除」
 
-  * 「管理者ユーザを削除しました。（一般ユーザとしての情報は残ります）」
+  * 対象ユーザの `tenant_admin` ロールに紐づく `user_roles` レコードを削除する。
+  * `users` レコード自体は削除しない。
+* 管理者登録フォーム
 
----
+  * メールアドレスで既存ユーザを検索。
 
-### 2.4 テナント管理者新規登録画面（SA-04）
+    * 存在し、かつ `users.tenant_id = 選択中 tenant_id` の場合: 既存ユーザに `tenant_admin` ロールを付与。
+    * 存在し、**別テナントに所属している場合**: エラー。
+    * 存在しない場合: Supabase Auth + `users` 新規作成後、`tenant_admin` ロールを付与。
 
-#### 2.4.1 入力項目（論理名称）
+#### 2.4.3 メッセージ
 
-* メールアドレス
-* 表示名
-* 氏名
-
-※ t-admin のユーザ登録仕様と同一のバリデーションルールを用いる。
-
-#### 2.4.2 メッセージ
-
-* 保存成功
-
-  * 「管理者ユーザを登録しました。」
-* 既存メールアドレスの場合
-
-  * 「既存ユーザをこのテナントの管理者として登録しました。」と表示してもよい。
-
----
-
-### 2.5 テナント管理者編集画面（SA-05）
-
-* メールアドレスは表示のみ（変更不可）。
-* 表示名／氏名のみ編集可。
-* 「管理者ロール解除」ボタンを配置し、押下すると当該テナントにおける tenant_admin ロールを削除する（ユーザ自体は残す）。
+* 管理者登録成功: 「管理者ユーザを登録しました。」
+* 既存ユーザを管理者に昇格: 「既存ユーザをこのテナントの管理者として登録しました。」
+* 管理者解除成功: 「管理者ユーザを削除しました。（一般ユーザとしての情報は残ります）」
+* 異なるテナント所属ユーザを指定した場合: 「他テナントに所属しているユーザは管理者として追加できません。」
 
 ---
 
 ## 第3章 構造設計
 
-### 3.1 Next.js ルーティング
+### 3.1 コンポーネント構成
 
-* ベースパス: `/sys-admin`
+* ページコンポーネント
 
-```text
-app/
-  sys-admin/
-    tenants/
-      page.tsx              // SA-01 テナント一覧
-      [tenantId]/
-        page.tsx            // SA-02 テナント詳細
-        admins/
-          page.tsx          // SA-03 テナント管理者一覧
-          new/
-            page.tsx        // SA-04 テナント管理者新規登録
-          [userId]/
-            page.tsx        // SA-05 テナント管理者編集
-```
+  * `SysAdminTenantManagementPage`（/sys-admin/tenants）
+* 内部セクションコンポーネント（例）
 
-### 3.2 コンポーネント構成
+  * `TenantListPanel`（SEC-01）
+  * `TenantDetailForm`（SEC-02）
+  * `TenantAdminPanel`（SEC-03、一覧＋登録フォーム）
+* 共通レイアウト
 
-* 共通レイアウト:
+  * `SysAdminLayout`（AppHeader / AppFooter / サイドメニュー）
 
-  * `SysAdminLayout`（仮）
+### 3.2 状態管理
 
-    * AppHeader / AppFooter を内包
-* ページコンポーネント:
+* ページ内で保持する主な状態
 
-  * `TenantListPage`（SA-01）
-  * `TenantDetailPage`（SA-02）
-  * `TenantAdminListPage`（SA-03）
-  * `TenantAdminCreatePage`（SA-04）
-  * `TenantAdminEditPage`（SA-05）
+  * `selectedTenantId` … SEC-01 の選択行に応じて更新
+  * `tenantList` … `tenants` 一覧
+  * `tenantDetail` … 選択テナントの詳細情報
+  * `tenantAdmins` … 選択テナントの管理者一覧
+  * `adminFormMode` … `'create' | 'edit'`
+  * `adminFormValues` … メールアドレス / 表示名 / 氏名
+
+状態遷移はすべて 1 ページ内で完結させ、ページ遷移は発生させない。
 
 ---
 
@@ -311,35 +244,37 @@ app/
 
 ### 4.1 system_admin 判定
 
-* `/sys-admin/login` からの MagicLink 認証後、`currentUserId` を取得し、以下を満たすか判定する。
+* `/sys-admin/tenants` 初期表示時、サーバ側で以下を実行する（擬似コード）。
 
 ```ts
+const currentUserId = getCurrentUserId();
+
 const isSystemAdmin = await prisma.user_roles.findFirst({
   where: {
     user_id: currentUserId,
     role: {
-      scope: "system_admin",
-      role_key: "SYSTEM_ADMIN",
+      scope: 'system_admin',
+      role_key: 'SYSTEM_ADMIN',
     },
   },
 });
+
+if (!isSystemAdmin) {
+  // 403 or リダイレクト
+}
 ```
 
-* 判定 NG の場合は `/sys-admin/*` へのアクセスを拒否する。
-
-### 4.2 テナント一覧取得ロジック（SA-01）
-
-テナント一覧取得ロジック（SA-01）
+### 4.2 テナント一覧取得
 
 ```ts
 const tenants = await prisma.tenants.findMany({
-  orderBy: { created_at: "desc" },
+  orderBy: { created_at: 'desc' },
 });
 ```
 
-### 4.3 テナント登録・更新ロジック（SA-02）
+### 4.3 テナント登録・更新
 
-* 新規登録:
+* 新規登録
 
 ```ts
 await prisma.tenants.create({
@@ -347,12 +282,12 @@ await prisma.tenants.create({
     tenant_code,
     tenant_name,
     timezone,
-    status: "active",
+    status: 'active',
   },
 });
 ```
 
-* 更新:
+* 更新
 
 ```ts
 await prisma.tenants.update({
@@ -360,12 +295,12 @@ await prisma.tenants.update({
   data: {
     tenant_name,
     timezone,
-    status, // "active" or "inactive"
+    status, // 'active' | 'inactive'
   },
 });
 ```
 
-### 4.4 テナント管理者一覧ロジック（SA-03）
+### 4.4 テナント管理者一覧取得
 
 ```ts
 const admins = await prisma.users.findMany({
@@ -373,7 +308,7 @@ const admins = await prisma.users.findMany({
     tenant_id: tenantId,
     user_roles: {
       some: {
-        role: { scope: "tenant_admin" },
+        role: { scope: 'tenant_admin' },
       },
     },
   },
@@ -385,20 +320,20 @@ const admins = await prisma.users.findMany({
 });
 ```
 
-### 4.5 テナント管理者登録ロジック（SA-04）
+### 4.5 テナント管理者登録
 
 1. メールアドレスで `users` を検索。
 2. 既存ユーザが存在する場合:
 
    * `users.tenant_id !== tenantId` の場合はエラー。
-   * 同一テナントであれば、users はそのまま利用。
+   * 同一テナントであれば、そのユーザに `tenant_admin` ロールを付与。
 3. 存在しない場合:
 
    * Supabase Auth にユーザ作成。
-   * `users` に INSERT（`tenant_id = tenantId`、表示名等）。
+   * `users` に INSERT（`tenant_id = tenantId`、表示名など）。
 
-     * `group_code` / `residence_code` 等の NOT NULL カラムには、sys-admin 固有のダミー値（例: `SYSADMIN`）を設定する。
-4. tenant_admin ロールを付与:
+     * NOT NULL カラム（`group_code` / `residence_code`）には、system_admin 用のダミー値（例: `SYSADMIN`）を設定。
+4. `tenant_admin` ロール付与:
 
 ```ts
 await prisma.user_roles.create({
@@ -410,9 +345,7 @@ await prisma.user_roles.create({
 });
 ```
 
-### 4.6 テナント管理者編集ロジック（SA-05）
-
-* ユーザ情報の更新（UI で編集可能な項目のみ）:
+### 4.6 テナント管理者編集
 
 ```ts
 await prisma.users.update({
@@ -424,7 +357,7 @@ await prisma.users.update({
 });
 ```
 
-* 管理者ロール解除:
+### 4.7 管理者ロール解除
 
 ```ts
 await prisma.user_roles.delete({
@@ -440,7 +373,7 @@ await prisma.user_roles.delete({
 
 ---
 
-## 第5章 データ仕様
+## 第5章 データ仕様（抜粋）
 
 ### 5.1 tenants
 
@@ -456,7 +389,9 @@ model tenants {
 }
 ```
 
-### 5.2 users
+### 5.2 users / user_roles / roles
+
+本画面で利用するカラムは以下の通り（詳細は DB 設計書参照）。
 
 ```prisma
 model users {
@@ -465,24 +400,9 @@ model users {
   email          String   @unique
   display_name   String
   full_name      String
-  full_name_kana String?
   group_code     String
   residence_code String
-  phone_number   String?
-  language       String   @default("JA")
-  note           String?
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-}
-```
-
-### 5.3 roles / user_roles
-
-```prisma
-enum role_scope {
-  system_admin
-  tenant_admin
-  general_user
+  // ...
 }
 
 model roles {
@@ -498,10 +418,57 @@ model user_roles {
   role_id     String
   assigned_at DateTime @default(now())
 
-  user   users   @relation(fields: [user_id], references: [id])
-  tenant tenants @relation(fields: [tenant_id], references: [id])
-  role   roles   @relation(fields: [role_id], references: [id])
-
   @@unique([user_id, tenant_id, role_id])
 }
 ```
+
+---
+
+## 第6章 メッセージ仕様
+
+### 6.1 成功メッセージ
+
+| コード                                     | 文言                                    |
+| --------------------------------------- | ------------------------------------- |
+| `sysadmin.tenants.save.success`         | テナント情報を保存しました。                        |
+| `sysadmin.tenants.deactivate.success`   | テナントを無効化しました。このテナントの利用者はログインできなくなります。 |
+| `sysadmin.tenants.activate.success`     | テナントを再有効化しました。                        |
+| `sysadmin.tenants.admin.create.success` | 管理者ユーザを登録しました。                        |
+| `sysadmin.tenants.admin.update.success` | 管理者ユーザ情報を更新しました。                      |
+| `sysadmin.tenants.admin.remove.success` | 管理者ユーザを削除しました。（一般ユーザとしての情報は残ります）      |
+
+### 6.2 エラーメッセージ
+
+| コード                                        | 文言                              |
+| ------------------------------------------ | ------------------------------- |
+| `sysadmin.tenants.error.validation`        | 入力内容を確認してください。                  |
+| `sysadmin.tenants.error.code.duplicate`    | テナントコードが既に存在します。他のコードを指定してください。 |
+| `sysadmin.tenants.error.admin.crossTenant` | 他テナントに所属しているユーザは管理者として追加できません。  |
+| `sysadmin.tenants.error.unauthorized`      | システム管理者権限がありません。                |
+| `sysadmin.tenants.error.internal`          | サーバーエラーが発生しました。時間をおいて再度お試しください。 |
+
+---
+
+## 第7章 テスト観点（要約）
+
+### 7.1 テナント一覧・詳細
+
+* SA-UT-01: system_admin でログインし、全テナントが一覧表示されること。
+* SA-UT-02: テナント行選択で SEC-02 / SEC-03 が選択テナントの情報に更新されること。
+* SA-UT-03: 新規テナント登録→一覧に即時反映されること。
+
+### 7.2 管理者管理
+
+* SA-UT-10: 既存ユーザを管理者として追加した場合、`user_roles` にレコードが追加されること。
+* SA-UT-11: 新規メールアドレスで管理者登録した場合、`auth.users` / `users` / `user_roles` にレコードが作成されること。
+* SA-UT-12: 管理者解除で `user_roles` の該当レコードのみ削除されること。
+
+---
+
+## 第8章 ChangeLog
+
+| Version | Date       | Author    | Summary                                        |
+| ------- | ---------- | --------- | ---------------------------------------------- |
+| 1.2     | 2025-11-30 | Tachikoma | SysAdmin テナント管理画面を 5 画面構成から 1 画面 3 セクション構成に統合。 |
+| 1.1     | 2025-11-28 | Tachikoma | 初版 5 画面構成案（SA-01〜05）を作成。                       |
+| 1.0     | 2025-11-27 | Tachikoma | たたき台作成。                                        |
