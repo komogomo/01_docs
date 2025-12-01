@@ -50,6 +50,9 @@ export interface MagicLinkFormProps {
 
   /** 重要なエラー発生時の通知コールバック（任意） */
   onError?: (error: MagicLinkError) => void;
+
+  /** ログイン後のリダイレクト先 URL（任意） */
+  redirectTo?: string;
 }
 ```
 
@@ -59,7 +62,7 @@ export interface MagicLinkFormProps {
 
 ```ts
 export type MagicLinkErrorType =
-  | 'error_input'       // 入力バリデーションエラー
+  | 'error_input'       // 入力バリデーションエラー / 未登録メールアドレス
   | 'error_network'     // Supabase 通信エラー
   | 'error_auth'        // Supabase 認証エラー
   | 'error_unexpected'; // 想定外エラー
@@ -78,9 +81,9 @@ MagicLinkForm の内部状態は、MagicLink 基本設計のカード状態（Id
 | 状態                 | 説明                           |
 | ------------------ | ---------------------------- |
 | `idle`             | 初期状態。メール入力待ち。                |
-| `sending`          | MagicLink 送信中。ボタンは disabled。 |
+| `sending`          | MagicLink 送信中（存在確認含む）。ボタンは disabled。 |
 | `sent`             | MagicLink 送信完了。MSG-01 を表示。   |
-| `error_input`      | 入力バリデーションエラー（MSG-03/04）。     |
+| `error_input`      | 入力バリデーションエラーまたは未登録メール（MSG-03/04/MSG-02相当）。     |
 | `error_network`    | 通信エラー（MSG-05）。               |
 | `error_auth`       | Supabase 認証エラー（MSG-06）。      |
 | `error_unexpected` | 想定外の例外（MSG-09）。              |
@@ -93,6 +96,7 @@ stateDiagram-v2
   idle --> sending: ログインボタン押下（形式OK）
   idle --> error_input: ログインボタン押下（形式NG）
   sending --> sent: MagicLink送信成功
+  sending --> error_input: メールアドレス未登録
   sending --> error_network: ネットワーク障害
   sending --> error_auth: Supabase認証エラー
   sending --> error_unexpected: その他例外
@@ -112,6 +116,7 @@ stateDiagram-v2
 sequenceDiagram
   participant U as User
   participant F as MagicLinkForm
+  participant A as API (/api/auth/check-email)
   participant S as Supabase
 
   U->>F: メール入力
@@ -119,15 +124,23 @@ sequenceDiagram
   F->>F: 形式チェック
   alt 入力OK
     F->>F: state = sending
-    F->>S: signInWithOtp(email, redirect=/auth/callback)
-    alt Supabase成功
-      S-->>F: 200 OK
-      F->>F: state = sent
-      F-->>U: MSG-01 表示（メール送信完了）
-    else Supabase認証エラー
-      S-->>F: AuthError
-      F->>F: state = error_auth
-      F-->>U: MSG-06 表示
+    F->>A: POST { email }
+    alt メール登録済み
+      A-->>F: { exists: true }
+      F->>S: signInWithOtp(email, redirect=redirectTo)
+      alt Supabase成功
+        S-->>F: 200 OK
+        F->>F: state = sent
+        F-->>U: MSG-01 表示（メール送信完了）
+      else Supabase認証エラー
+        S-->>F: AuthError
+        F->>F: state = error_auth
+        F-->>U: MSG-06 表示
+      end
+    else メール未登録
+      A-->>F: { exists: false }
+      F->>F: state = error_input
+      F-->>U: エラーメッセージ表示（未登録）
     end
   else 入力NG
     F->>F: state = error_input
@@ -153,7 +166,7 @@ MagicLink 基本設計に基づき、カードタイルは以下の要素で構�
 * 説明文：`t('auth.login.magiclink.description')`
 * メール入力フィールド
 * 「ログイン」ボタン
-* メッセージ領域
+* メッセージ領域（Banner形式で統一）
 
 ### 4.2 JSX 構造（概要）
 
@@ -172,22 +185,20 @@ MagicLink 基本設計に基づき、カードタイルは以下の要素で構�
   </div>
 
   <form className="mt-4 space-y-3" onSubmit={handleSubmit} noValidate>
-    <label className="block text-sm font-medium text-gray-700" htmlFor="email">
-      {t('auth.login.email.label')}
-    </label>
-    <input
-      id="email"
-      type="email"
-      autoComplete="email"
-      className={emailInputClassName}
-      value={email}
-      onChange={handleChange}
-      disabled={state === 'sending'}
-    />
-
-    {state === 'error_input' && (
-      <InlineFieldError>{inlineErrorMessage}</InlineFieldError>
-    )}
+    <div>
+      <label className="block text-sm font-medium text-gray-700" htmlFor="email">
+        {t('auth.login.email.label')}
+      </label>
+      <input
+        id="email"
+        type="email"
+        autoComplete="email"
+        className={emailInputClassName}
+        value={email}
+        onChange={handleChange}
+        disabled={state === 'sending'}
+      />
+    </div>
 
     <button
       type="submit"
@@ -199,10 +210,10 @@ MagicLink 基本設計に基づき、カードタイルは以下の要素で構�
         : t('auth.login.magiclink.button_login')}
     </button>
 
-    <AuthErrorBanner
-      kind={bannerKind}
-      message={bannerMessage}
-    />
+    {/* 全てのエラー・メッセージを Banner 形式で表示 */}
+    <div className="mt-3 min-h-[44px] flex items-start w-full">
+      {banner && <AuthErrorBanner kind={banner.kind} message={t(banner.messageKey)} />}
+    </div>
   </form>
 </div>
 ```
@@ -211,15 +222,15 @@ MagicLink 基本設計に基づき、カードタイルは以下の要素で構�
 
 ### 4.3 メッセージ表示
 
-A-00 詳細設計で定義されたメッセージ仕様と整合させる。
+A-00 詳細設計で定義されたメッセージ仕様と整合させる。ただし、実装上の都合により全て Banner 形式で表示する。
 
 | 状態                 | 表示種別         | 使用メッセージ                            |
 | ------------------ | ------------ | ---------------------------------- |
-| `sent`             | Info         | MSG-01 `auth.login.magiclink_sent` |
-| `error_input`      | Inline Error | MSG-03 / MSG-04                    |
-| `error_network`    | Banner Error | MSG-05                             |
-| `error_auth`       | Banner Error | MSG-06                             |
-| `error_unexpected` | Banner Error | MSG-09                             |
+| `sent`             | Info Banner  | MSG-01 `auth.login.magiclink_sent` |
+| `error_input`      | Error Banner | MSG-03 / MSG-04 / 未登録エラー           |
+| `error_network`    | Error Banner | MSG-05                             |
+| `error_auth`       | Error Banner | MSG-06                             |
+| `error_unexpected` | Error Banner | MSG-09                             |
 
 ---
 
@@ -237,7 +248,8 @@ const handleLogin = async (): Promise<void> => {
     };
 
     setState('error_input');
-    setInlineErrorMessage(error.message);
+    setBanner({ kind: 'error', messageKey: 'auth.login.error.email_invalid' });
+    
     logError('auth.login.fail.input', {
       screen: 'LoginPage',
       method: 'magiclink',
@@ -253,14 +265,49 @@ const handleLogin = async (): Promise<void> => {
     logInfo('auth.login.start', {
       screen: 'LoginPage',
       method: 'magiclink',
-      email, // 実際のログ出力時に共通ログユーティリティ側でマスキングされる前提。
+      email,
     });
+
+    const targetRedirectTo = redirectTo ?? '/auth/callback';
+
+    // メールアドレスの存在チェック
+    const checkRes = await fetch('/api/auth/check-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!checkRes.ok) {
+      throw new Error('check_email_failed');
+    }
+
+    const { exists } = await checkRes.json();
+
+    if (!exists) {
+      const error: MagicLinkError = {
+        code: 'EMAIL_NOT_FOUND',
+        message: t('auth.login.error.email_not_found') || 'メールアドレスが登録されていません',
+        type: 'error_input',
+      };
+
+      setState('error_input');
+      setBanner({ kind: 'error', messageKey: 'auth.login.error.email_not_found' });
+
+      logInfo('auth.login.fail.not_found', {
+        screen: 'LoginPage',
+        method: 'magiclink',
+        email,
+      });
+
+      onError?.(error);
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}${targetRedirectTo}`,
       },
     });
 
@@ -281,7 +328,7 @@ const handleLogin = async (): Promise<void> => {
       };
 
       setState(errorType);
-      setBanner({ kind: 'error', message: magicError.message });
+      setBanner({ kind: 'error', messageKey });
 
       logError(
         isAuthError
@@ -300,7 +347,7 @@ const handleLogin = async (): Promise<void> => {
 
     // 成功
     setState('sent');
-    setBanner({ kind: 'info', message: t('auth.login.magiclink_sent') });
+    setBanner({ kind: 'info', messageKey: 'auth.login.magiclink_sent' });
 
     logInfo('auth.login.success.magiclink', {
       screen: 'LoginPage',
@@ -316,7 +363,7 @@ const handleLogin = async (): Promise<void> => {
     };
 
     setState('error_unexpected');
-    setBanner({ kind: 'error', message: magicError.message });
+    setBanner({ kind: 'error', messageKey: 'auth.login.error.unexpected' });
 
     logError('auth.login.fail.unexpected', {
       screen: 'LoginPage',
