@@ -9,50 +9,54 @@
 **特に「ホーム画面」および「掲示板（Board）」のデザインテイストを基準（Gold Standard）とします。**
 
 ## 2. デザイン原則 (Design Principles)
-*   **Rounded & Soft**: 角丸（`rounded-2xl`）を多用し、親しみやすくモダンな印象を与える。
+*   **Rounded**: コンテナ（カード）は `rounded-lg`、インタラクティブ要素（ボタン・入力）は `rounded-md` を基準とする。
 *   **Clean & Airy**: 余白を十分に取り、コンテンツ幅は `max-w-5xl` を基準とする。
 *   **Blue Accent**: アクションカラーには `text-blue-600` や `border-blue-400` を使用し、清潔感を演出する。
 
 ## 3. カラーパレット (Colors)
 
 ### Primary (Action)
-*   **Solid**: `#6495ed` (Cornflower Blue) - `bg-[#6495ed]`
-*   **Outline/Text**: `text-blue-600`, `border-blue-400`
-*   **Hover**: `hover:bg-blue-50/40` (Ghost/Outline), `hover:bg-[#5386d9]` (Solid)
+*   **Solid**: `bg-blue-600` (Hover: `bg-blue-700`)
+*   **Outline/Text**: `text-blue-600`, `border-blue-200` (Hover: `bg-blue-50`)
 
 ### Neutral (Text & Border)
 *   **Text Main**: `text-gray-900`
-*   **Text Sub**: `text-gray-600`
-*   **Border**: `border-gray-300` (Input), `border-gray-100` (Card)
+*   **Text Sub**: `text-gray-600`, `text-gray-500`
+*   **Border**: `border-gray-200` (Card), `border-gray-300` (Input/Cancel)
 *   **Background**: `bg-white`, `bg-gray-50`
 
 ## 4. コンポーネントスタイル (Component Styles)
 
 ### 4.1 ボタン (Button)
-高さ `44px` (`h-11`) を基準とする。
+高さ `40px` (`py-2`) 〜 `44px` を基準とする。**角丸は `rounded-md`**。
 
-#### Primary (Solid) - ログイン、確定など
+#### Primary (Solid) - 確定、投稿など
 ```tsx
-className="w-full h-11 rounded-2xl bg-[#6495ed] text-white text-sm font-medium flex items-center justify-center hover:bg-[#5386d9] transition-colors"
+className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
 ```
 
-#### Floating Action Button (FAB) - 新規投稿など
+#### Secondary (Outline) - アクション（返信、翻訳など）
 ```tsx
-className="flex h-11 w-11 items-center justify-center rounded-full bg-transparent border-2 border-blue-400 text-blue-600 shadow-lg shadow-blue-200/60 hover:bg-blue-50/40"
+className="rounded-md border-2 border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+```
+
+#### Cancel (Neutral) - キャンセル、戻る
+```tsx
+className="rounded-md border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
 ```
 
 ### 4.2 入力フォーム (Input)
-高さ `44px` (`h-11`) を基準とする。
+**角丸は `rounded-md`**。ボーダーは `border-2`。
 
 ```tsx
-className="block w-full h-11 px-3 rounded-2xl border border-gray-300 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+className="block w-full rounded-md border-2 border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
 ```
 
 ### 4.3 カード (Card)
-薄いボーダーと微細なシャドウで浮き上がりを表現。
+**角丸は `rounded-lg`**。ボーダーは `border-2`。
 
 ```tsx
-className="rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.06)] border border-gray-100 bg-white px-4 py-4"
+className="rounded-lg border-2 border-gray-200 bg-white px-4 py-3 shadow-sm"
 ```
 
 ### 4.4 レイアウト (Layout)

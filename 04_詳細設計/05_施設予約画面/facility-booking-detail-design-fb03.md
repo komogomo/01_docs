@@ -32,16 +32,19 @@ FB-01で日付を選択した後に遷移する。
 
 #### (2) 区画セレクター (ParkingSlotSelector)
 *   **表示形式**: **参照画像 ＋ グリッド選択方式**。
-    *   **配置図エリア**: 駐車場の配置図画像（`facilities.image_url`）を上部に表示（タップ不可、参照用）。
+    *   **配置図エリア**: 駐車場の配置図画像（`facilities.image_url` または `meta`）を上部に表示（タップ不可、参照用）。
+        *   ※画像はテナントごとに異なるため、DBから取得する。
     *   **選択エリア**: 画像の下に、登録されている区画（`facility_slots`）をカード/ボタンのグリッドとして並べる。
-        *   ※DBの `facility_slots` テーブルに登録されたレコード数分だけ、自動的にボタンが生成される（テナントごとの台数変更にコード修正なしで対応可能）。
+        *   **重要**: DBの `facility_slots` テーブルに登録されたレコード数分だけ、自動的にボタンが生成されること（テナントごとの台数変更にコード修正なしで対応可能）。
+        *   ※「全8区画」などと決め打ちしない。
 *   **区画アイテム**:
     *   シンプルな番号付きボタン（例: "1", "2", "3"...）。
     *   `slot_name` を表示。
-*   **状態**:
-    *   `Available`: 白背景、青枠（Hover時）。タップ可能。
-    *   `Selected`: 青背景、白文字。
-    *   `Booked`: グレー背景、選択不可。
+*   **状態とスタイル**:
+    *   `Available` (空き): **白背景、緑枠、緑文字** (`border-green-500 text-green-600`)。
+    *   `Selected` (選択中): **青背景、白文字** (`bg-blue-600 text-white`)。
+    *   `Booked` (予約済): **グレー背景、グレー文字** (`bg-gray-100 text-gray-400`)。
+    *   `MyBooking` (自分の予約): **白背景、青枠、青文字** (`border-blue-500 text-blue-600`)。
 *   **メリット**:
     *   テナントごとに区画数や配置が異なっても、DBの登録データに基づいて自動的にボタンが並ぶため、画面改修不要で汎用性が高い。
 
@@ -50,13 +53,15 @@ FB-01で日付を選択した後に遷移する。
 *   **車両情報**: `meta` カラムに保存するための追加フィールド（任意）。
     *   "車両ナンバー" (Vehicle Number)
     *   "車種" (Vehicle Model)
+*   **※注意**: 「参加人数」「備品利用」などの項目は表示しないこと（集会所用のため）。
 
 #### (4) アクションエリア
-*   **確認画面へ進む**: Primary Button
+*   **戻る**: Secondary Button
+*   **次へ**: Primary Button
 
 ### 2.3 デザイン適用
-*   **Slot Card**: `flex flex-col items-center justify-center p-4 border rounded-xl transition-all`
-*   **Selected**: `border-blue-500 bg-blue-50 text-blue-700 ring-2 ring-blue-500`
+*   **全体**: `rounded-lg` または `rounded-md` を採用し、過度な丸みを避ける（`rounded-2xl` は使用しない）。
+*   **Slot Card**: `flex flex-col items-center justify-center w-16 h-16 border-2 rounded-lg transition-all font-bold`
 
 ## 3. データ要件 & ロジック
 
@@ -69,6 +74,11 @@ FB-01で日付を選択した後に遷移する。
 ### 3.2 バリデーション
 1.  **区画**: 1つ選択されていること。
 2.  **利用目的**: 必須。
+3.  **ダブルブッキング防止 (Critical)**:
+    *   選択された区画 (`slot_id`) と日付において、既存の有効な予約と重複がないか厳密にチェックする。
+    *   ※駐車場は「日単位」または「時間単位」の管理設定 (`fee_unit`) に従う。
+4.  **キャンセル規定**:
+    *   `facility_settings.cancel_restriction_days` を確認し、期限切れの予約に対するキャンセル操作をブロックする。
 
 ## 4. 実装タスク
 1.  `src/components/facilities/ParkingSlotSelector.tsx` の作成

@@ -63,10 +63,16 @@ FB-01で日付を選択した後に遷移する。
 *   **Availability**: `GET /api/facilities/[id]/slots?date=YYYY-MM-DD`
     *   Response: `{ time: "09:00", status: "available" | "booked" }[]`
 
-### 3.2 バリデーション (Client Side)
+### 3.2 バリデーション (Server Side & Client Side)
 1.  **時間枠**: 1つ以上選択されていること。
 2.  **連続性**: 飛び地選択（9:00と10:00を選択し、9:30が未選択など）はエラーとする。
 3.  **利用目的**: 空白不可。
+4.  **ダブルブッキング防止 (Critical)**:
+    *   選択された時間枠が、既存の予約（`status != canceled`）と重複していないか厳密にチェックする。
+    *   `[NewStart, NewEnd)` と `[ExistingStart, ExistingEnd)` の交差判定を行う。
+5.  **キャンセル規定**:
+    *   `facility_settings.cancel_restriction_days` (新規追加) を確認する。
+    *   予約日までの日数が規定未満の場合、キャンセル不可とする（UIでボタン非表示または無効化）。
 
 ### 3.3 インタラクション
 1.  **確認ボタン押下**:
