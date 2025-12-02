@@ -189,6 +189,15 @@ await prisma.tenants.create({
     status: 'active',
   },
 });
+
+// デフォルト掲示板カテゴリの作成 (board_categories)
+// - 重要なお知らせ
+// - 回覧板
+// - 議事録
+// - イベント
+// - メンテナンス
+// - その他
+// - 管理組合からのお知らせ
 ```
 
 * 更新
@@ -202,6 +211,37 @@ await prisma.tenants.update({
     status, // 'active' | 'inactive'
   },
 });
+
+### 4.4 テナント削除
+
+テナント削除時は、以下の関連テーブルのデータも削除する（外部キー制約および論理削除の考慮）。
+
+1.  **アプリケーションデータ**
+    *   `board_posts` (Cascade: `board_comments`, `board_attachments`, `board_approval_logs`, `board_post_translations`, `board_comment_translations`)
+    *   `board_categories`
+    *   `board_reactions` (明示的削除)
+    *   `board_favorites` (明示的削除)
+    *   `announcements` (Cascade: `announcement_reads`, `announcement_targets`)
+    *   `facilities` (Cascade: `facility_settings`, `facility_slots`, `facility_reservations`, `facility_blocked_ranges`)
+    *   `audit_logs`
+    *   `moderation_logs`
+    *   `tenant_settings`
+    *   `tenant_features`
+    *   `tenant_shortcut_menu`
+    *   `tenant_residents`
+    *   `translation_cache`
+    *   `tts_cache`
+    *   `notifications`
+    *   `user_notification_settings`
+
+2.  **ユーザ関連データ**
+    *   `user_profiles`
+    *   `user_roles`
+    *   `user_tenants`
+    *   `users` (Supabase Authユーザ削除含む)
+
+3.  **テナント本体**
+    *   `tenants`
 ```
 
 ### 4.4 テナント管理者一覧取得
