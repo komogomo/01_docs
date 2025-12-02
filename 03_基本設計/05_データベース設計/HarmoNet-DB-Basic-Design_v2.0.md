@@ -379,36 +379,24 @@
 
 | カラム名 | 型 | 属性 | 説明 |
 | :--- | :--- | :--- | :--- |
-| id | String (UUID) | PK | 施設ID |
+| id | String (UUID) | PK | 設定ID |
 | tenant_id | String | FK | テナントID |
-| facility_name | String | | 施設名 |
-| facility_type | String | | 施設タイプ |
+| facility_id | String | Unique, FK | 施設ID |
+| fee_per_day | Decimal(8,2) | | 利用料金 |
+| fee_unit | Enum | Default(day) | 料金単位 |
+| max_consecutive_days | Int | Default(3) | 最大連続予約日数 |
+| reservable_until_months | Int | Default(1) | 予約可能期間（月数） |
+| slot_duration_minutes | Int | Default(30) | 予約単位（分） |
+| available_from_time | String | Default("09:00") | 利用開始時刻 |
+| available_to_time | String | Default("19:00") | 利用終了時刻 |
+| monthly_limit | Int? | | 月間利用制限回数 |
 | created_at | DateTime | Default(now) | 作成日時 |
 | updated_at | DateTime | UpdatedAt | 更新日時 |
 
 *   **Indexes**: `@@index([tenant_id])`
 
-#### 2.6.2 facility_settings
-施設設定。
-
-*   **Indexes**: `@@index([tenant_id])`
-
 #### 2.6.3 facility_slots
 施設区画。
-
-| カラム名 | 型 | 属性 | 説明 |
-| :--- | :--- | :--- | :--- |
-| id | String (UUID) | PK | 区画ID |
-| tenant_id | String | FK | テナントID |
-| facility_id | String | FK | 施設ID |
-| slot_key | String | | 区画キー |
-| slot_name | String | | 区画名 |
-| status | Enum | Default(active) | ステータス |
-
-*   **Indexes**: `@@index([tenant_id])`, `@@index([facility_id])`
-
-#### 2.6.4 facility_reservations
-施設予約。
 
 | カラム名 | 型 | 属性 | 説明 |
 | :--- | :--- | :--- | :--- |
@@ -419,6 +407,9 @@
 | user_id | String | FK | ユーザID |
 | start_at | DateTime | | 開始日時 |
 | end_at | DateTime | | 終了日時 |
+| purpose | String? | | 使用目的 |
+| participant_count | Int? | | 参加人数 |
+| meta | Json? | | 拡張データ（キャンセル理由等） |
 | status | Enum | Default(pending) | ステータス |
 | created_at | DateTime | Default(now) | 作成日時 |
 | updated_at | DateTime | UpdatedAt | 更新日時 |

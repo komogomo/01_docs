@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HarmoNet 施設予約 - モックアップ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Noto Sans JP', sans-serif; }
+    
+    /* カスタムカラー */
+    :root {
+      --primary: #2563EB;
+      --primary-light: #3B82F6;
+      --primary-dark: #1D4ED8;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+    }
+    
+    /* 画面コンテナ */
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; }
+    
+    /* タブスタイル */
+    .tab-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    .tab-btn:not(.active) {
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+    
+    /* 区画ボタン */
+    .slot-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .slot-btn.available {
+      background: #ECFDF5;
+      border: 2px solid var(--success);
+      color: var(--success);
+    }
+    .slot-btn.booked {
+      background: var(--gray-100);
+      border: 2px solid var(--gray-300);
+      color: var(--gray-400);
+      cursor: not-allowed;
+    }
+    .slot-btn.mine {
+      background: #EFF6FF;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    .slot-btn.blocked {
+      background: var(--gray-700);
+      border: 2px solid var(--gray-700);
+      color: var(--gray-400);
+      cursor: not-allowed;
+    }
+    .slot-btn.selected {
+      background: var(--primary);
+      border: 2px solid var(--primary-dark);
+      color: white;
+    }
+    
+    /* カレンダー */
+    .calendar-day {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .calendar-day:hover:not(.disabled) {
+      background: var(--gray-100);
+    }
+    .calendar-day.selected {
+      background: var(--primary);
+      color: white;
+    }
+    .calendar-day.disabled {
+      color: var(--gray-300);
+      cursor: not-allowed;
+    }
+    .calendar-day.today {
+      border: 2px solid var(--primary);
+    }
+    
+    /* 言語ボタン */
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .lang-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    .lang-btn:not(.active) {
+      color: var(--gray-500);
+    }
+    
+    /* フッターナビ */
+    .footer-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: var(--gray-500);
+      cursor: pointer;
+      padding: 8px 12px;
+    }
+    .footer-nav-item.active {
+      color: var(--primary);
+    }
+    .footer-nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    /* 配置図 */
+    .parking-map {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+    .parking-slot {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--gray-400);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      background: white;
+    }
+    .parking-slot.available { border-color: var(--success); color: var(--success); }
+    .parking-slot.booked { border-color: var(--gray-300); color: var(--gray-400); background: var(--gray-100); }
+    
+    /* チェックボックス */
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--gray-300);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .custom-checkbox.checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg flex flex-col">
+    
+    <!-- ========== FB-01a: 施設予約TOP（集会所タブ） ========== -->
+    <div id="screen-top-meeting" class="screen active">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4">
+        <!-- 施設選択ドロップダウン -->
+        <div class="mb-4">
+          <select id="facility-select-meeting" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 font-medium bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="switchFacility(this.value)">
+            <option value="meeting" selected>🏠 集会所</option>
+            <option value="parking">🚗 ゲスト駐車場</option>
+          </select>
+        </div>
+        
+        <!-- 施設情報カード -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span class="text-xl">🏠</span>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-bold text-gray-800 mb-2">セキュレアステーション</h3>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>・使用時間：原則午前9時より午後7時まで</li>
+                <li>・使用目的：1）本団地の維持管理に関する諸事項の協議等、2）居住者の相互親睦・利便等、3）地域コミュニティの形成等</li>
+                <li>・使用料：無償</li>
+                <li>・遵守事項：集会所では原則飲酒、喫煙をしないこと。ただし、飲酒については理事長が認めた場合はその限りではない。その他規定は管理規約使用細則を参照。</li>
+                <li>・予約方法：貸切での利用に限り、居住者用ホームページ（本サイト）上での予約が必要</li>
+              </ul>
+              <button class="text-blue-600 text-sm mt-2 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                利用規約を確認
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- カレンダー -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-4">
+            <button class="text-gray-400 cursor-not-allowed">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <h3 class="font-bold text-gray-800">2025年12月</h3>
+            <button class="text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 曜日ヘッダー -->
+          <div class="grid grid-cols-7 gap-1 mb-2">
+            <div class="text-center text-xs text-red-500 font-medium">日</div>
+            <div class="text-center text-xs text-gray-500 font-medium">月</div>
+            <div class="text-center text-xs text-gray-500 font-medium">火</div>
+            <div class="text-center text-xs text-gray-500 font-medium">水</div>
+            <div class="text-center text-xs text-gray-500 font-medium">木</div>
+            <div class="text-center text-xs text-gray-500 font-medium">金</div>
+            <div class="text-center text-xs text-blue-500 font-medium">土</div>
+          </div>
+          
+          <!-- 日付グリッド -->
+          <div class="grid grid-cols-7 gap-1">
+            <div class="calendar-day disabled text-red-300">1</div>
+            <div class="calendar-day today" onclick="showScreen('screen-time-select')">2</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">3</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">4</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">5</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">6</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-time-select')">7</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-time-select')">8</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">9</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">10</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">11</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">12</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">13</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-time-select')">14</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-time-select')">15</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">16</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">17</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">18</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">19</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">20</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-time-select')">21</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-time-select')">22</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">23</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">24</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">25</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">26</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">27</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-time-select')">28</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-time-select')">29</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">30</div>
+            <div class="calendar-day" onclick="showScreen('screen-time-select')">31</div>
+          </div>
+        </div>
+      </main>
+      
+      <!-- フッター -->
+      <footer class="bg-white border-t border-gray-200 px-2 py-1">
+        <div class="flex justify-between items-center">
+          <div class="footer-nav-item" onclick="goHome()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>ホーム</span>
+          </div>
+          <div class="footer-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+            <span>掲示板</span>
+          </div>
+          <div class="footer-nav-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>施設予約</span>
+          </div>
+          <div class="footer-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span>マイページ</span>
+          </div>
+          <div class="footer-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>ログアウト</span>
+          </div>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-1">© 2025 HarmoNet. All rights reserved.</p>
+      </footer>
+    </div>
+    
+    <!-- ========== FB-01b: 施設予約TOP（駐車場タブ） ========== -->
+    <div id="screen-top-parking" class="screen">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4">
+        <!-- 施設選択ドロップダウン -->
+        <div class="mb-4">
+          <select id="facility-select-parking" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 font-medium bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="switchFacility(this.value)">
+            <option value="meeting">🏠 集会所</option>
+            <option value="parking" selected>🚗 ゲスト駐車場</option>
+          </select>
+        </div>
+        
+        <!-- 施設情報カード -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span class="text-xl">🚗</span>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-bold text-gray-800 mb-2">8区画（①〜⑧）</h3>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>・使用料：100円/回</li>
+                <li>・支払方法：使用前に集会所備え付けの集金ボックスに入金</li>
+                <li>・最大使用時間：24時間/回</li>
+                <li>・最大使用回数：10回/月</li>
+                <li>・使用方法：集会所備え付けの駐車場管理台帳に使用時間・使用者名等を記入し、集会所内にある「駐車許可証」をフロントガラス等の見やすい部分に掲示し使用すること</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- カレンダー -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-4">
+            <button class="text-gray-400 cursor-not-allowed">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <h3 class="font-bold text-gray-800">2025年12月</h3>
+            <button class="text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 曜日ヘッダー -->
+          <div class="grid grid-cols-7 gap-1 mb-2">
+            <div class="text-center text-xs text-red-500 font-medium">日</div>
+            <div class="text-center text-xs text-gray-500 font-medium">月</div>
+            <div class="text-center text-xs text-gray-500 font-medium">火</div>
+            <div class="text-center text-xs text-gray-500 font-medium">水</div>
+            <div class="text-center text-xs text-gray-500 font-medium">木</div>
+            <div class="text-center text-xs text-gray-500 font-medium">金</div>
+            <div class="text-center text-xs text-blue-500 font-medium">土</div>
+          </div>
+          
+          <!-- 日付グリッド -->
+          <div class="grid grid-cols-7 gap-1">
+            <div class="calendar-day disabled text-red-300">1</div>
+            <div class="calendar-day today" onclick="showScreen('screen-slot-select')">2</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">3</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">4</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">5</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">6</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-slot-select')">7</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-slot-select')">8</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">9</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">10</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">11</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">12</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">13</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-slot-select')">14</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-slot-select')">15</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">16</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">17</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">18</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">19</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">20</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-slot-select')">21</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-slot-select')">22</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">23</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">24</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">25</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">26</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">27</div>
+            <div class="calendar-day text-blue-500" onclick="showScreen('screen-slot-select')">28</div>
+            <div class="calendar-day text-red-500" onclick="showScreen('screen-slot-select')">29</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">30</div>
+            <div class="calendar-day" onclick="showScreen('screen-slot-select')">31</div>
+          </div>
+          
+          <!-- 凡例 -->
+          <div class="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
+            <span class="inline-block">🔵 今日</span>
+          </div>
+        </div>
+      </main>
+      
+      <!-- フッター（共通） -->
+      <footer class="bg-white border-t border-gray-200 px-2 py-1">
+        <div class="flex justify-between items-center">
+          <div class="footer-nav-item" onclick="goHome()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>ホーム</span>
+          </div>
+          <div class="footer-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+            <span>掲示板</span>
+          </div>
+          <div class="footer-nav-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>施設予約</span>
+          </div>
+          <div class="footer-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span>マイページ</span>
+          </div>
+          <div class="footer-nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>ログアウト</span>
+          </div>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-1">© 2025 HarmoNet. All rights reserved.</p>
+      </footer>
+    </div>
+    
+    <!-- ========== FB-02: 時間枠選択（集会所） ========== -->
+    <div id="screen-time-select" class="screen">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4">
+        <!-- 選択日付表示 -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span class="font-medium text-gray-800">選択した日付：2025年12月15日（月）</span>
+        </div>
+        
+        <!-- 時間選択 -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3">利用時間</h3>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">開始時刻</label>
+              <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option>09:00</option>
+                <option>09:30</option>
+                <option selected>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+                <option>18:30</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">終了時刻</label>
+              <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option>09:30</option>
+                <option>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option selected>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+                <option>18:30</option>
+                <option>19:00</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- 予約済み時間帯表示 -->
+          <div class="bg-gray-50 rounded-lg p-3">
+            <p class="text-xs text-gray-500 mb-2">この日の予約状況</p>
+            <div class="flex flex-wrap gap-1">
+              <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded">13:00-15:00 予約済</span>
+              <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded">17:00-19:00 予約済</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 使用目的入力 -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3">使用目的 <span class="text-red-500 text-sm">*必須</span></h3>
+          <textarea 
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+            rows="3" 
+            placeholder="例：住民懇親会、子ども会、サークル活動など"
+          ></textarea>
+        </div>
+        
+        <!-- 参加人数 -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3">参加人数 <span class="text-gray-400 text-sm">任意</span></h3>
+          <div class="flex items-center gap-2">
+            <input 
+              type="number" 
+              class="w-24 border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              placeholder="0"
+              min="1"
+              max="30"
+            >
+            <span class="text-gray-600">名</span>
+            <span class="text-xs text-gray-400">（定員：約30名）</span>
+          </div>
+        </div>
+      </main>
+      
+      <!-- ボタンエリア -->
+      <div class="bg-white border-t border-gray-200 p-4 flex gap-3">
+        <button onclick="showScreen('screen-top-meeting')" class="flex-1 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium">
+          戻る
+        </button>
+        <button onclick="showScreen('screen-confirm')" class="flex-1 py-3 bg-blue-600 rounded-lg text-white font-medium">
+          次へ
+        </button>
+      </div>
+    </div>
+    
+    <!-- ========== FB-03: 区画選択（駐車場） ========== -->
+    <div id="screen-slot-select" class="screen">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4">
+        <!-- 選択日付表示 -->
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span class="font-medium text-gray-800">選択した日付：2025年12月15日（月）</span>
+        </div>
+        
+        <!-- 駐車場配置図 -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3">駐車場配置図</h3>
+          <div class="parking-map">
+            <!-- 上部（学校方面） -->
+            <!-- 上部方向ラベル -->
+            <div class="bg-blue-100 border border-blue-300 rounded py-1 px-2 text-xs text-blue-700 text-center mb-2">
+              つくば市学園の森義務教育学校方面
+            </div>
+            
+            <!-- 上部道路 + ①② -->
+            <div class="bg-gray-300 rounded py-2 px-4 flex justify-center gap-6 mb-2">
+              <div class="parking-slot available">②</div>
+              <div class="parking-slot available">①</div>
+            </div>
+            
+            <!-- 中央エリア：③ + 集会所 -->
+            <div class="flex gap-2 mb-2">
+              <!-- 左側道路 + ③ -->
+              <div class="bg-gray-300 rounded w-12 flex items-center justify-center">
+                <div class="parking-slot available">③</div>
+              </div>
+              <!-- 集会所 -->
+              <div class="flex-1 bg-orange-100 border border-orange-300 rounded-lg py-4 flex items-center justify-center">
+                <span class="text-sm text-gray-700 font-medium">集会所</span>
+              </div>
+            </div>
+            
+            <!-- 下部道路 + ④⑤⑥ -->
+            <div class="bg-gray-300 rounded py-2 px-4 flex justify-center gap-4 mb-2">
+              <div class="parking-slot booked">⑥</div>
+              <div class="parking-slot available">⑤</div>
+              <div class="parking-slot available">④</div>
+            </div>
+            
+            <!-- 最下部道路 + ⑦⑧ -->
+            <div class="bg-gray-300 rounded py-2 px-4 flex justify-center gap-6 mb-2">
+              <div class="parking-slot available">⑧</div>
+              <div class="parking-slot booked">⑦</div>
+            </div>
+            
+            <!-- 下部方向ラベル -->
+            <div class="bg-blue-100 border border-blue-300 rounded py-1 px-2 text-xs text-blue-700 text-center">
+              研究学園駅方面
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- 区画選択ボタン -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3">区画を選択</h3>
+          <div class="grid grid-cols-4 gap-3">
+            <div class="slot-btn available" onclick="selectSlot(this, 1)">
+              <span class="text-lg font-bold">①</span>
+              <span class="text-xs">空き</span>
+            </div>
+            <div class="slot-btn available" onclick="selectSlot(this, 2)">
+              <span class="text-lg font-bold">②</span>
+              <span class="text-xs">空き</span>
+            </div>
+            <div class="slot-btn available" onclick="selectSlot(this, 3)">
+              <span class="text-lg font-bold">③</span>
+              <span class="text-xs">空き</span>
+            </div>
+            <div class="slot-btn available" onclick="selectSlot(this, 4)">
+              <span class="text-lg font-bold">④</span>
+              <span class="text-xs">空き</span>
+            </div>
+            <div class="slot-btn available" onclick="selectSlot(this, 5)">
+              <span class="text-lg font-bold">⑤</span>
+              <span class="text-xs">空き</span>
+            </div>
+            <div class="slot-btn booked">
+              <span class="text-lg font-bold">⑥</span>
+              <span class="text-xs">予約済</span>
+            </div>
+            <div class="slot-btn booked">
+              <span class="text-lg font-bold">⑦</span>
+              <span class="text-xs">予約済</span>
+            </div>
+            <div class="slot-btn available" onclick="selectSlot(this, 8)">
+              <span class="text-lg font-bold">⑧</span>
+              <span class="text-xs">空き</span>
+            </div>
+          </div>
+          
+          <!-- 凡例 -->
+          <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-3 text-xs">
+            <span class="flex items-center gap-1">
+              <span class="w-3 h-3 bg-green-100 border-2 border-green-500 rounded"></span> 空き
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-3 h-3 bg-gray-100 border-2 border-gray-300 rounded"></span> 予約済
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-3 h-3 bg-blue-100 border-2 border-blue-500 rounded"></span> 自分の予約
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-3 h-3 bg-blue-600 border-2 border-blue-700 rounded"></span> 選択中
+            </span>
+          </div>
+        </div>
+        
+        <!-- 選択状態 -->
+        <div id="selected-slot-info" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+          <p class="text-sm text-blue-800">
+            <span class="font-bold">選択中：</span>
+            <span id="selected-slot-number">-</span>番
+          </p>
+        </div>
+      </main>
+      
+      <!-- ボタンエリア -->
+      <div class="bg-white border-t border-gray-200 p-4 flex gap-3">
+        <button onclick="showScreen('screen-top-parking')" class="flex-1 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium">
+          戻る
+        </button>
+        <button onclick="showScreen('screen-confirm-parking')" class="flex-1 py-3 bg-blue-600 rounded-lg text-white font-medium">
+          次へ
+        </button>
+      </div>
+    </div>
+    
+    <!-- ========== FB-04a: 予約確認（集会所） ========== -->
+    <div id="screen-confirm" class="screen">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4">
+        <!-- 予約内容サマリ -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-4">予約内容</h3>
+          
+          <div class="space-y-3">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">🏠</span>
+              <div>
+                <p class="text-xs text-gray-500">施設</p>
+                <p class="font-medium text-gray-800">集会所（セキュレアステーション）</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">📅</span>
+              <div>
+                <p class="text-xs text-gray-500">予約日</p>
+                <p class="font-medium text-gray-800">2025年12月15日（月）</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">🕐</span>
+              <div>
+                <p class="text-xs text-gray-500">利用時間</p>
+                <p class="font-medium text-gray-800">10:00 - 12:00（2時間）</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">📝</span>
+              <div>
+                <p class="text-xs text-gray-500">使用目的</p>
+                <p class="font-medium text-gray-800">住民懇親会</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">👥</span>
+              <div>
+                <p class="text-xs text-gray-500">参加人数</p>
+                <p class="font-medium text-gray-800">20名</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">👤</span>
+              <div>
+                <p class="text-xs text-gray-500">申込者</p>
+                <p class="font-medium text-gray-800">住戸番号 B-71</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 注意事項 -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <span>📌</span> ご利用にあたって
+          </h3>
+          <ul class="text-sm text-gray-700 space-y-2">
+            <li>・原則飲酒・喫煙禁止（理事長許可で飲酒可）</li>
+            <li>・使用後は清掃をお願いします</li>
+            <li>・ゴミは各自でお持ち帰りください</li>
+            <li>・設備の破損・汚損があった場合はご連絡ください</li>
+          </ul>
+        </div>
+        
+        <!-- 同意チェック -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <label class="flex items-center gap-3 cursor-pointer" onclick="toggleCheckbox(this)">
+            <div class="custom-checkbox" id="agree-checkbox">
+              <svg class="w-4 h-4 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-sm text-gray-700">上記の注意事項を確認し、同意します</span>
+          </label>
+        </div>
+      </main>
+      
+      <!-- ボタンエリア -->
+      <div class="bg-white border-t border-gray-200 p-4 flex gap-3">
+        <button onclick="showScreen('screen-time-select')" class="flex-1 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium">
+          戻る
+        </button>
+        <button onclick="confirmReservation()" class="flex-1 py-3 bg-blue-600 rounded-lg text-white font-medium">
+          予約を確定
+        </button>
+      </div>
+    </div>
+    
+    <!-- ========== FB-04b: 予約確認（駐車場） ========== -->
+    <div id="screen-confirm-parking" class="screen">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4">
+        <!-- 予約内容サマリ -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-4">予約内容</h3>
+          
+          <div class="space-y-3">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">🚗</span>
+              <div>
+                <p class="text-xs text-gray-500">施設</p>
+                <p class="font-medium text-gray-800">ゲスト駐車場 ⑧番</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">📅</span>
+              <div>
+                <p class="text-xs text-gray-500">予約日時</p>
+                <p class="font-medium text-gray-800">2025年12月15日（月）終日</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">💰</span>
+              <div>
+                <p class="text-xs text-gray-500">料金</p>
+                <p class="font-medium text-gray-800">100円/回</p>
+                <p class="text-xs text-gray-500">※集会所の集金ボックスに入金</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">👤</span>
+              <div>
+                <p class="text-xs text-gray-500">申込者</p>
+                <p class="font-medium text-gray-800">住戸番号 B-71</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <span class="text-xl">📊</span>
+              <div>
+                <p class="text-xs text-gray-500">今月の利用回数</p>
+                <p class="font-medium text-gray-800">3回 / 10回</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 注意事項 -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+          <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <span>📌</span> ご利用にあたって
+          </h3>
+          <ul class="text-sm text-gray-700 space-y-2">
+            <li>・使用後は清掃をお願いします</li>
+            <li>・ゴミは各自でお持ち帰りください</li>
+            <li>・設備の破損・汚損があった場合はご連絡ください</li>
+            <li>・キャンセルの場合は前日までにご連絡ください</li>
+          </ul>
+        </div>
+        
+        <!-- 同意チェック -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <label class="flex items-center gap-3 cursor-pointer" onclick="toggleCheckbox(this)">
+            <div class="custom-checkbox" id="agree-checkbox-parking">
+              <svg class="w-4 h-4 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-sm text-gray-700">上記の注意事項を確認し、同意します</span>
+          </label>
+        </div>
+      </main>
+      
+      <!-- ボタンエリア -->
+      <div class="bg-white border-t border-gray-200 p-4 flex gap-3">
+        <button onclick="showScreen('screen-slot-select')" class="flex-1 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium">
+          戻る
+        </button>
+        <button onclick="confirmReservationParking()" class="flex-1 py-3 bg-blue-600 rounded-lg text-white font-medium">
+          予約を確定
+        </button>
+      </div>
+    </div>
+    
+    <!-- ========== FB-05: 予約完了 ========== -->
+    <div id="screen-complete" class="screen">
+      <!-- ヘッダー -->
+      <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-end">
+        <div class="flex items-center gap-1">
+          <button class="lang-btn active">JA</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">ZH</button>
+        </div>
+      </header>
+      
+      <!-- コンテンツ -->
+      <main class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
+        <div class="text-center">
+          <!-- 完了アイコン -->
+          <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          
+          <h2 class="text-xl font-bold text-gray-800 mb-2">予約が完了しました</h2>
+          <p class="text-gray-600 mb-6">予約内容はマイページからご確認いただけます</p>
+          
+          <!-- 予約サマリ -->
+          <div class="bg-gray-50 rounded-xl p-4 text-left mb-6">
+            <p class="text-sm text-gray-600 mb-1">予約番号</p>
+            <p class="font-bold text-gray-800 mb-3">RES-2025120001</p>
+            <p class="text-sm text-gray-600 mb-1">予約内容</p>
+            <p class="font-medium text-gray-800">集会所（セキュレアステーション）</p>
+            <p class="text-sm text-gray-600">2025/12/15 10:00-12:00</p>
+          </div>
+          
+          <!-- ボタン -->
+          <div class="space-y-3">
+            <button onclick="showScreen('screen-top-meeting')" class="w-full py-3 bg-blue-600 rounded-lg text-white font-medium">
+              ホームに戻る
+            </button>
+            <button class="w-full py-3 border border-gray-300 rounded-lg text-gray-700 font-medium">
+              予約履歴を見る
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+    
+  </div>
+  
+  <script>
+    // 画面切替
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+    
+    // 施設選択ドロップダウン切替
+    function switchFacility(value) {
+      if (value === 'meeting') {
+        showScreen('screen-top-meeting');
+        document.getElementById('facility-select-meeting').value = 'meeting';
+      } else if (value === 'parking') {
+        showScreen('screen-top-parking');
+        document.getElementById('facility-select-parking').value = 'parking';
+      }
+    }
+    
+    // ホームに戻る（モックなのでTOP画面へ）
+    function goHome() {
+      showScreen('screen-top-meeting');
+    }
+    
+    // 区画選択
+    let selectedSlot = null;
+    function selectSlot(element, slotNumber) {
+      // 既存の選択を解除
+      document.querySelectorAll('.slot-btn.selected').forEach(btn => {
+        btn.classList.remove('selected');
+        btn.classList.add('available');
+      });
+      
+      // 新しい選択
+      element.classList.remove('available');
+      element.classList.add('selected');
+      selectedSlot = slotNumber;
+      
+      // 選択情報を表示
+      document.getElementById('selected-slot-info').classList.remove('hidden');
+      document.getElementById('selected-slot-number').textContent = '⑧①②③④⑤⑥⑦⑧'[slotNumber];
+    }
+    
+    // チェックボックス切替
+    function toggleCheckbox(label) {
+      const checkbox = label.querySelector('.custom-checkbox');
+      const checkIcon = checkbox.querySelector('svg');
+      
+      checkbox.classList.toggle('checked');
+      checkIcon.classList.toggle('hidden');
+    }
+    
+    // 予約確定（集会所）
+    function confirmReservation() {
+      const checkbox = document.getElementById('agree-checkbox');
+      if (!checkbox.classList.contains('checked')) {
+        alert('注意事項に同意してください');
+        return;
+      }
+      showScreen('screen-complete');
+    }
+    
+    // 予約確定（駐車場）
+    function confirmReservationParking() {
+      const checkbox = document.getElementById('agree-checkbox-parking');
+      if (!checkbox.classList.contains('checked')) {
+        alert('注意事項に同意してください');
+        return;
+      }
+      
+      // 完了画面の内容を駐車場用に更新
+      const completeScreen = document.getElementById('screen-complete');
+      const summaryDiv = completeScreen.querySelector('.bg-gray-50');
+      summaryDiv.innerHTML = `
+        <p class="text-sm text-gray-600 mb-1">予約番号</p>
+        <p class="font-bold text-gray-800 mb-3">RES-2025120002</p>
+        <p class="text-sm text-gray-600 mb-1">予約内容</p>
+        <p class="font-medium text-gray-800">ゲスト駐車場 ⑧番</p>
+        <p class="text-sm text-gray-600">2025/12/15 終日</p>
+      `;
+      
+      showScreen('screen-complete');
+    }
+  </script>
+</body>
+</html>
