@@ -71,3 +71,5 @@ Windsurf向けのコーディング規約を作成。
 2025-12-04 02:15:36 : [自動検出: 01_docs] Commit/Push - 施設予約完成
 2025-12-04 02:15:54 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - 施設予約完成
 2025-12-04 19:39:12 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - 静的翻訳DB化
+2025-12-06 01:43:52 : [自動検出: 01_docs] Commit/Push - 掃除当番管理開発中
+2025-12-06 01:45:14 : [開発資材リポジトリ (Projects-HarmoNet)] Commit/Push - 掃除当番管理開発中
